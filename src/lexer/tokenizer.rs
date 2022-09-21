@@ -1,4 +1,7 @@
-
+use std::io::Read;
+use std::mem::discriminant;
+use std::path::PathBuf;
+use crate::cleaner;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
@@ -57,7 +60,30 @@ impl Tokenizer {
         }
     }
 
+    pub fn process_file<P>(&mut self, filename: P) -> Result<Vec<Token>, TokError>
+        where P: AsRef<std::path::Path>,  {
 
+        let display = filename.as_ref().display();;
+        let mut buffer: String = String::new();
+
+        let mut file = std::fs::File::open(&filename).expect("Failed to open file");
+
+
+        let read_res = file.read_to_string(&mut buffer);
+        if let Ok(read_len) = read_res {
+            if read_len <= 0 {
+                panic!("{:?} is empty or failed to read!", display);
+            }
+        } else if let Err(read_err) = read_res {
+            panic!("Failed to read {:?} - reason {:?}", display, read_err );
+        }
+
+        let lines: Vec<String> = cleaner(buffer);
+
+        return self.generate(lines);
+
+
+    }
 
 
     pub fn generate(&mut self, source: Vec<String>) -> Result<Vec<Token>, TokError> {
@@ -65,8 +91,11 @@ impl Tokenizer {
         let mut product: Vec<Token> = Vec::new();
         let mut state = State::new();
 
+        product.push(Token::quick(TType::Encoding, 0, 0, 0, "utf-8".to_string()));
+
         for (lineno, line,) in source.into_iter().enumerate() {
-            match self.process_line(&state, lineno, line) {
+            
+            match self.process_line(&state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => return Err(issue),
             }
