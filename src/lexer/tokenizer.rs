@@ -1,5 +1,8 @@
 
-use crate::tokens::{Position, Token, TokError};
+use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
+use super::code_line::CodeLine;
+
+use crate::tokens::patterns::{NAME_RE, COMMENT, FLOATING_POINT, POSSIBLE_NAME, POSSIBLE_ONE_CHAR_NAME, SPACE_TAB_FORMFEED_RE, };
 
 enum StringType {
     SIMGLE_APOS,
@@ -59,11 +62,19 @@ impl Tokenizer {
 
     pub fn generate(&mut self, source: Vec<String>) -> Result<Vec<Token>, TokError> {
 
-        let product: Vec<Token> = Vec::new();
-        let state = State::new();
+        let mut product: Vec<Token> = Vec::new();
+        let mut state = State::new();
 
         for (lineno, line,) in source.into_iter().enumerate() {
-            println!("Parsing {}-`{:?}`", lineno, line);
+            match self.process_line(&state, lineno, line) {
+                Ok(mut tokens) => product.append(&mut tokens),
+                Err(issue) => return Err(issue),
+            }
+        }
+
+        return Ok(product);
+    }
+
     fn process_line(&self, state: &State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
         println!("Parsing {}-`{:?}`", lineno, line);
@@ -104,7 +115,10 @@ impl Tokenizer {
 
         }
 
+
+
         return Ok(product);
+
     }
 
 }
