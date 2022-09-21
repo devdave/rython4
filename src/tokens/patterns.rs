@@ -6,7 +6,7 @@ pub static COMMENT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A#.*").expect("rege
 
 
 // TODO consolidate floating points
-static POINT_FLOAT_STR1: &str = r#"([0-9](?:_?[0-9])*\\.(?:[0-9](?:_?[0-9])*)?|\\.[0-9](?:_?[0-9])*)([eE][-+]?[0-9](?:_?[0-9])*)?"#;
+static POINT_FLOAT_STR1: &str = r#"([0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?|\.[0-9](?:_?[0-9])*)([eE][-+]?[0-9](?:_?[0-9])*)?"#;
 static POINT_FLOAT_STR2: &str = r"[0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?([eE][-+]?[0-9](?:_?[0-9])*)?";
 static POINT_FLOAT_STR3: &str = r"\.[0-9](?:_?[0-9])*([eE][-+]?[0-9](?:_?[0-9])*)?";
 
