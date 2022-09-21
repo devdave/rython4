@@ -1,5 +1,6 @@
-
+use clap::__macro_refs::once_cell;
 use once_cell::sync::Lazy;
+
 use regex::Regex;
 
 pub static COMMENT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A#.*").expect("regex"));
@@ -24,3 +25,5 @@ pub static POSSIBLE_ONE_CHAR_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[a-
 
 pub static NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(format!(r"\A({}|{})", POSSIBLE_NAME_STR, POSSIBLE_NAME_ONE_CHAR ).as_str()).expect("regex"));
 
+pub static SPACE_TAB_FORMFEED_RE: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\A[ \f\t]+").expect("regex"));
