@@ -7,8 +7,11 @@ pub static COMMENT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A#.*").expect("rege
 
 
 // TODO consolidate floating points
+//Point either in middle or scientific number with point at start
 static POINT_FLOAT_STR1: &str = r#"([0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?|\.[0-9](?:_?[0-9])*)([eE][-+]?[0-9](?:_?[0-9])*)?"#;
+//Point in middle
 static POINT_FLOAT_STR2: &str = r"[0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?([eE][-+]?[0-9](?:_?[0-9])*)?";
+// Point at start
 static POINT_FLOAT_STR3: &str = r"\.[0-9](?:_?[0-9])*([eE][-+]?[0-9](?:_?[0-9])*)?";
 
 static POINTFLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(POINT_FLOAT_STR1).expect("regex"));
