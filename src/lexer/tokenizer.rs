@@ -9,8 +9,9 @@ enum StringType {
 }
 
 #[derive(Default)]
-struct TConfig {
+pub struct TConfig {
     pub skip_encoding: bool,
+    pub skip_endmarker: bool,
 }
 
 struct State {
