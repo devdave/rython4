@@ -1,6 +1,6 @@
 use std::fmt::format;
 
-fn ws_cleaner(source: String) -> Vec<String> {
+pub fn cleaner(source: String) -> Vec<String> {
     let mut lines: Vec<String> = Vec::new();
     let mut iter = source.chars();
     let mut temp = "".to_string();
@@ -50,7 +50,7 @@ mod test {
     #[test]
     fn osx() {
         let fixture = "Hello\rWorld\rThis\rIs a Mac string".to_string();
-        let result = ws_cleaner(fixture);
+        let result = cleaner(fixture);
         assert_eq!(result.len(), 4);
         assert_eq!(result[0], "Hello\n".to_string());
         assert_eq!(result[3], "Is a Mac string\n".to_string());
@@ -60,7 +60,7 @@ mod test {
     #[test]
     fn windows() {
         let fixture = "Hello\r\nWorld\r\nThis\r\nIs a windows string".to_string();
-        let result = ws_cleaner(fixture);
+        let result = cleaner(fixture);
         assert_eq!(result.len(), 4);
         assert_eq!(result[0], "Hello\n".to_string());
         assert_eq!(result[3], "Is a windows string\n".to_string());
@@ -69,7 +69,7 @@ mod test {
     #[test]
     fn linux() {
         let fixture = "Hello\nWorld\nThis\nIs a linux string".to_string();
-        let result = ws_cleaner(fixture);
+        let result = cleaner(fixture);
         assert_eq!(result.len(), 4);
         assert_eq!(result[0], "Hello\n".to_string());
         assert_eq!(result[3], "Is a linux string\n".to_string());
