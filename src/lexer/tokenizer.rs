@@ -41,7 +41,7 @@ impl State {
 
 
 
-struct Tokenizer {
+pub struct Tokenizer {
     config: TConfig,
 
 }
