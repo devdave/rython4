@@ -20,3 +20,14 @@ referenced multiple times by lower tier strs.
 The battle with &str has been seriously discouraging so I am going with the fuck it plan 
 and everything being a String (heap).
 
+
+## STDIN piped processing
+
+stdin::lock()::read_to_string
+
+1. Find out if this is blocking.
+
+
+
+
+
