@@ -9,8 +9,8 @@ mod test {
     macro_rules! test_token_w_position{
         ($token:expr, $ttype:expr, $start:expr, $end:expr, $content:expr)=>{
 
+            assert_eq!($token.text, $content, "Testing for text/content with {:?} != {:?}", $token.text, $content);
             assert_eq!($token.r#type, $ttype, "Testing for type with {:?} {:?} != {:?}", $token.text, $token.r#type, $ttype);
-            assert_eq!($token.text, $content);
             assert_eq!($token.start, Position::t($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
             assert_eq!($token.end, Position::t($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
 
@@ -23,6 +23,10 @@ mod test {
 
         let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: false, skip_encoding: false });
         let tokens = tokenizer.process_file("test_fixtures/test_float.py").expect("tokens");
+
+        for token in tokens.iter() {
+            println!("{:?}", token);
+        }
 
         test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
         test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
@@ -57,6 +61,28 @@ mod test {
         test_token_w_position!(tokens[30], TType::Newline, (12, 7), (13, 7), "\n" );
         test_token_w_position!(tokens[31], TType::EndMarker, (0, 8), (0, 8), "" );
 
+    }
+
+    #[test]
+    fn test_float_scientific () {
+        let test1: String = "x = 3e141\n".to_string();
+        let test2: String = "x = 3E123\n".to_string();
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: true, skip_encoding: true });
+        let tokens1 = tokenizer.process_single_line(test1).expect("tokens");
+
+        assert_eq!(tokens1.len(), 4);
+
+        assert_eq!(tokens1[2].text, "3e141");
+        assert_eq!(tokens1[2].r#type, TType::Number);
+
+        let tokens2 = tokenizer.process_single_line(test2).expect("tokens");
+
+        assert_eq!(tokens2.len(), 4);
+
+        assert_eq!(tokens2[2].text, "3E123");
+        assert_eq!(tokens2[2].r#type, TType::Number);
 
     }
+
 }
