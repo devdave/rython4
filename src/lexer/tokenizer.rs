@@ -82,6 +82,14 @@ impl Tokenizer {
 
         return self.generate(lines);
 
+    }
+
+    pub fn process_single_line(&mut self, raw_line: String) -> Result<Vec<Token>, TokError> {
+
+        let lines: Vec<String> = cleaner(raw_line);
+
+        return self.generate(lines);
+    }
 
     }
 
