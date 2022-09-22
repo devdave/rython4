@@ -20,6 +20,10 @@ static POINTFLOAT2: Lazy<Regex> = Lazy::new(|| Regex::new(POINT_FLOAT_STR3).expe
 
 pub static FLOATING_POINT: Lazy<Regex> = Lazy::new(|| Regex::new(format!(r"\A({}|{}|{})", POINT_FLOAT_STR1, POINT_FLOAT_STR2, POINT_FLOAT_STR3).as_str()).expect("regex"));
 
+const NumberStr: &str = r"\A(([0-9](?:_?[0-9])*[jJ]|(([0-9](?:_?[0-9])*\\.(?:[0-9](?:_?[0-9])*)?|\\.[0-9](?:_?[0-9])*)([eE][-+]?[0-9](?:_?[0-9])*)?|[0-9](?:_?[0-9])*[eE][-+]?[0-9](?:_?[0-9])*)[jJ])|(([0-9](?:_?[0-9])*\\.(?:[0-9](?:_?[0-9])*)?|\\.[0-9](?:_?[0-9])*)([eE][-+]?[0-9](?:_?[0-9])*)?|[0-9](?:_?[0-9])*[eE][-+]?[0-9](?:_?[0-9])*)|(0[xX](?:_?[0-9a-fA-F])+|0[bB](?:_?[01])+|0[oO](?:_?[0-7])+|(?:0(?:_?0)*|[1-9](?:_?[0-9])*)))";
+
+pub static NUMBER: Lazy<Regex> = Lazy::new(||Regex::new(NumberStr).expect("regex"));
+
 static POSSIBLE_NAME_STR: &str = r"[a-zA-Z]{1}[\w\d]+";
 static POSSIBLE_NAME_ONE_CHAR: &str = r"[a-zA-Z]{1}";
 
