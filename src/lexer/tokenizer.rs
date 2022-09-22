@@ -100,6 +100,9 @@ impl Tokenizer {
         let mut state = State::new();
 
         product.push(Token::quick(TType::Encoding, 0, 0, 0, "utf-8".to_string()));
+        if self.config.skip_encoding == false {
+            product.push(Token::quick(TType::Encoding, 0, 0, 0, "utf-8".to_string()));
+        }
 
         for (lineno, line,) in source.into_iter().enumerate() {
             
@@ -107,6 +110,10 @@ impl Tokenizer {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => return Err(issue),
             }
+        }
+
+        if self.config.skip_endmarker == false {
+            product.push(Token::quick(TType::EndMarker, source.len()+1, 0, 0, "".to_string()));
         }
 
         return Ok(product);
