@@ -1,6 +1,6 @@
 use std::io::Read;
-use std::mem::discriminant;
-use std::path::PathBuf;
+
+
 use crate::cleaner;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
@@ -8,10 +8,10 @@ use super::code_line::CodeLine;
 use crate::tokens::patterns::{NAME_RE, COMMENT, FLOATING_POINT, POSSIBLE_NAME, POSSIBLE_ONE_CHAR_NAME, SPACE_TAB_FORMFEED_RE, NUMBER };
 
 enum StringType {
-    SIMGLE_APOS,
-    TRIPLE_APOS,
-    SINGLE_QUOTE,
-    TRIPLE_QUOTE,
+    SingleApos,
+    TripleApos,
+    SingleQuote,
+    TripleQuote,
 }
 
 #[derive(Default)]
@@ -63,7 +63,7 @@ impl Tokenizer {
     pub fn process_file<P>(&mut self, filename: P) -> Result<Vec<Token>, TokError>
         where P: AsRef<std::path::Path>,  {
 
-        let display = filename.as_ref().display();;
+        let display = filename.as_ref().display();
         let mut buffer: String = String::new();
 
         let mut file = std::fs::File::open(&filename).expect("Failed to open file");
