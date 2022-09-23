@@ -230,4 +230,60 @@ mod test {
         test_token_w_position!(tokens[37], TType::EndMarker, (0, 3), (0, 3), "" );
     }
 
+    #[test]
+    fn test_int() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_int.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Number, (0, 1), (4, 1), "0xff" );
+        test_token_w_position!(tokens[2], TType::Op, (5, 1), (7, 1), "<=" );
+        test_token_w_position!(tokens[3], TType::Number, (8, 1), (11, 1), "255" );
+        test_token_w_position!(tokens[4], TType::Newline, (11, 1), (12, 1), "\n" );
+        test_token_w_position!(tokens[5], TType::Number, (0, 2), (4, 2), "0b10" );
+        test_token_w_position!(tokens[6], TType::Op, (5, 2), (7, 2), "<=" );
+        test_token_w_position!(tokens[7], TType::Number, (8, 2), (11, 2), "255" );
+        test_token_w_position!(tokens[8], TType::Newline, (11, 2), (12, 2), "\n" );
+        test_token_w_position!(tokens[9], TType::Number, (0, 3), (5, 3), "0o123" );
+        test_token_w_position!(tokens[10], TType::Op, (6, 3), (8, 3), "<=" );
+        test_token_w_position!(tokens[11], TType::Number, (9, 3), (14, 3), "0O123" );
+        test_token_w_position!(tokens[12], TType::Newline, (14, 3), (15, 3), "\n" );
+        test_token_w_position!(tokens[13], TType::Number, (0, 4), (7, 4), "1234567" );
+        test_token_w_position!(tokens[14], TType::Op, (8, 4), (9, 4), ">" );
+        test_token_w_position!(tokens[15], TType::Op, (10, 4), (11, 4), "~" );
+        test_token_w_position!(tokens[16], TType::Number, (11, 4), (15, 4), "0x15" );
+        test_token_w_position!(tokens[17], TType::Newline, (15, 4), (16, 4), "\n" );
+        test_token_w_position!(tokens[18], TType::Number, (0, 5), (7, 5), "2134568" );
+        test_token_w_position!(tokens[19], TType::Op, (8, 5), (10, 5), "!=" );
+        test_token_w_position!(tokens[20], TType::Number, (11, 5), (18, 5), "1231515" );
+        test_token_w_position!(tokens[21], TType::Newline, (18, 5), (19, 5), "\n" );
+        test_token_w_position!(tokens[22], TType::Op, (0, 6), (1, 6), "(" );
+        test_token_w_position!(tokens[23], TType::Op, (1, 6), (2, 6), "-" );
+        test_token_w_position!(tokens[24], TType::Number, (2, 6), (8, 6), "124561" );
+        test_token_w_position!(tokens[25], TType::Op, (8, 6), (9, 6), "-" );
+        test_token_w_position!(tokens[26], TType::Number, (9, 6), (10, 6), "1" );
+        test_token_w_position!(tokens[27], TType::Op, (10, 6), (11, 6), ")" );
+        test_token_w_position!(tokens[28], TType::Op, (12, 6), (13, 6), "&" );
+        test_token_w_position!(tokens[29], TType::Number, (14, 6), (23, 6), "200000000" );
+        test_token_w_position!(tokens[30], TType::Newline, (23, 6), (24, 6), "\n" );
+        test_token_w_position!(tokens[31], TType::Number, (0, 7), (10, 7), "0xdeadbeef" );
+        test_token_w_position!(tokens[32], TType::Op, (11, 7), (13, 7), "!=" );
+        test_token_w_position!(tokens[33], TType::Op, (14, 7), (15, 7), "-" );
+        test_token_w_position!(tokens[34], TType::Number, (15, 7), (16, 7), "1" );
+        test_token_w_position!(tokens[35], TType::Newline, (16, 7), (17, 7), "\n" );
+        test_token_w_position!(tokens[36], TType::Number, (0, 8), (10, 8), "0xdeadc0de" );
+        test_token_w_position!(tokens[37], TType::Op, (11, 8), (12, 8), "&" );
+        test_token_w_position!(tokens[38], TType::Number, (13, 8), (18, 8), "12345" );
+        test_token_w_position!(tokens[39], TType::Newline, (18, 8), (19, 8), "\n" );
+        test_token_w_position!(tokens[40], TType::Number, (0, 9), (4, 9), "0xFF" );
+        test_token_w_position!(tokens[41], TType::Op, (5, 9), (6, 9), "&" );
+        test_token_w_position!(tokens[42], TType::Number, (7, 9), (11, 9), "0x15" );
+        test_token_w_position!(tokens[43], TType::Op, (12, 9), (13, 9), "|" );
+        test_token_w_position!(tokens[44], TType::Number, (14, 9), (18, 9), "1234" );
+        // test_token_w_position!(tokens[45], TType::Newline, (18, 9), (19, 9), "" );
+        test_token_w_position!(tokens[46], TType::EndMarker, (0, 10), (0, 10), "" );
+
+    }
+
 }
