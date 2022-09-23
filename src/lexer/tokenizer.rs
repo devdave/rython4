@@ -6,7 +6,8 @@ use crate::cleaner;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
-use crate::tokens::patterns::{NAME_RE, COMMENT, FLOATING_POINT, POSSIBLE_NAME, POSSIBLE_ONE_CHAR_NAME, SPACE_TAB_FORMFEED_RE, NUMBER };
+use crate::tokens::patterns::{NAME_RE, COMMENT, FLOATING_POINT, POSSIBLE_NAME, POSSIBLE_ONE_CHAR_NAME, SPACE_TAB_FORMFEED_RE, NUMBER,
+CAPTURE_QUOTE_STRING, CAPTURE_APOS_STRING};
 
 //TODO put these somewhere better
 const MAXINDENT: usize = 999;
@@ -227,6 +228,14 @@ impl Tokenizer {
             else if let Some((new_pos, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
                 //and ignore it
 
+            }
+            //Look for "string"
+            else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
+                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
+            }
+            //Look for 'string'
+            else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
+                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             else {
                 println!("No pattern matched!");
