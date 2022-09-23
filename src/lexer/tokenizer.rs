@@ -135,8 +135,8 @@ impl Tokenizer {
         let mut is_statement = false;
 
         //Deal with blank lines
-        if code.len() <= 1 {
-            //Assume this is a blank line!
+        if code.is_empty() == true {
+            //Blow away the indent stack!
             if state.indent_stack.len() > 0 {
                 state.indent_stack.pop();
                 product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
