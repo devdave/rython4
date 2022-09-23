@@ -57,6 +57,10 @@ impl CodeLine {
         return retval;
     }
 
+    pub fn len(&self) -> usize {
+        self.line.len()
+    }
+
 }
 
 #[cfg(test)]
