@@ -36,6 +36,10 @@ struct State {
     string_type: Option<StringType>,
     string_start: Option<Position>,
     string_buffer: String,
+    //Indentation logic
+    indent: usize,
+    tabsize: usize,
+    altindentstack: Vec<usize>,
 }
 
 impl State {
@@ -47,6 +51,10 @@ impl State {
             string_type: None,
             string_start: None,
             string_buffer: "".into(),
+            indent: 0,
+            tabsize: TABSIZE, //... apparently determined by a fair dice roll.
+            altindentstack: Vec::new(),
+
         }
     }
 }
@@ -145,7 +153,7 @@ impl Tokenizer {
             return Ok(product);
         }
 
-        //Handle indent/dedet here
+        //Handle indent/dedent here
 
 
 
