@@ -128,6 +128,16 @@ impl Tokenizer {
         let mut code = CodeLine::new(line);
         let mut is_statement = false;
 
+        //Deal with blank lines
+        if code.len() <= 1 {
+            //Assume this is a blank line!
+            if state.indent_stack.len() > 0 {
+                state.indent_stack.pop();
+                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+            }
+            product.push(Token::quick(TType::NL, lineno, 0, 0, "\n".to_string()));
+            return Ok(product);
+        }
 
         while code.remaining() > 0 {
             let col_pos = code.position();
