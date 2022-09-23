@@ -34,3 +34,9 @@ pub static NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(format!(r"\A({}|{})", 
 
 pub static SPACE_TAB_FORMFEED_RE: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"\A[ \f\t]+").expect("regex"));
+
+pub static CAPTURE_QUOTE_STRING: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\A(|Rb|br|Br|rF|F|R|r|rb|rf|B|u|RB|bR|f|b|FR|Rf|fr|Fr|rB|BR|RF|fR|U)?"[^\n"\\]*(?:\\.[^\n"\\]*)*""#).expect("regex"));
+
+pub static CAPTURE_APOS_STRING: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r#"\A(|Rb|br|Br|rF|F|R|r|rb|rf|B|u|RB|bR|f|b|FR|Rf|fr|Fr|rB|BR|RF|fR|U)?'[^\n'\\]*(?:\\.[^\n'\\]*)*'"#).expect("regex"));
