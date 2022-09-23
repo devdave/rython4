@@ -313,7 +313,32 @@ mod test {
         test_token_w_position!(tokens[18], TType::EndMarker, (0, 5), (0, 5), "" );
     }
 
-    
+    #[test]
+    fn test_method() {
+        let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: false, skip_encoding: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_method.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Op, (0, 1), (1, 1), "@" );
+        test_token_w_position!(tokens[2], TType::Name, (1, 1), (13, 1), "staticmethod" );
+        test_token_w_position!(tokens[3], TType::Newline, (13, 1), (14, 1), "\n" );
+        test_token_w_position!(tokens[4], TType::Name, (0, 2), (3, 2), "def" );
+        test_token_w_position!(tokens[5], TType::Name, (4, 2), (7, 2), "foo" );
+        test_token_w_position!(tokens[6], TType::Op, (7, 2), (8, 2), "(" );
+        test_token_w_position!(tokens[7], TType::Name, (8, 2), (9, 2), "x" );
+        test_token_w_position!(tokens[8], TType::Op, (9, 2), (10, 2), "," );
+        test_token_w_position!(tokens[9], TType::Name, (10, 2), (11, 2), "y" );
+        test_token_w_position!(tokens[10], TType::Op, (11, 2), (12, 2), ")" );
+        test_token_w_position!(tokens[11], TType::Op, (12, 2), (13, 2), ":" );
+        test_token_w_position!(tokens[12], TType::Newline, (13, 2), (14, 2), "\n" );
+        test_token_w_position!(tokens[13], TType::Indent, (0, 3), (4, 3), "    " );
+        test_token_w_position!(tokens[14], TType::Name, (4, 3), (8, 3), "pass" );
+        // test_token_w_position!(tokens[15], TType::Newline, (8, 3), (9, 3), "" );
+        test_token_w_position!(tokens[16], TType::Dedent, (0, 4), (0, 4), "" );
+        test_token_w_position!(tokens[17], TType::EndMarker, (0, 4), (0, 4), "" );
+
+
+    }
 
 
 }
