@@ -9,7 +9,7 @@ mod test {
     macro_rules! test_token_w_position{
         ($token:expr, $ttype:expr, $start:expr, $end:expr, $content:expr)=>{
 
-            assert_eq!($token.text, $content, "Testing for text/content with {:?} != {:?}", $token.text, $content);
+            assert_eq!($token.text, $content, "Testing for text/content with {:?} != {:?} for a/{:?} e/{:?}", $token.text, $content, $token.r#type, $ttype);
             assert_eq!($token.r#type, $ttype, "Testing for type with {:?} {:?} != {:?}", $token.text, $token.r#type, $ttype);
             assert_eq!($token.start, Position::t($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
             assert_eq!($token.end, Position::t($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
