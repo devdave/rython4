@@ -286,4 +286,34 @@ mod test {
 
     }
 
+    #[test]
+    fn test_long() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_long.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
+        test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "=" );
+        test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "0" );
+        test_token_w_position!(tokens[4], TType::Newline, (5, 1), (6, 1), "\n" );
+        test_token_w_position!(tokens[5], TType::Name, (0, 2), (1, 2), "x" );
+        test_token_w_position!(tokens[6], TType::Op, (2, 2), (3, 2), "=" );
+        test_token_w_position!(tokens[7], TType::Number, (4, 2), (17, 2), "0xfffffffffff" );
+        test_token_w_position!(tokens[8], TType::Newline, (17, 2), (18, 2), "\n" );
+        test_token_w_position!(tokens[9], TType::Name, (0, 3), (1, 3), "x" );
+        test_token_w_position!(tokens[10], TType::Op, (2, 3), (3, 3), "=" );
+        test_token_w_position!(tokens[11], TType::Number, (4, 3), (25, 3), "123141242151251616110" );
+        test_token_w_position!(tokens[12], TType::Newline, (25, 3), (26, 3), "\n" );
+        test_token_w_position!(tokens[13], TType::Name, (0, 4), (1, 4), "x" );
+        test_token_w_position!(tokens[14], TType::Op, (2, 4), (3, 4), "=" );
+        test_token_w_position!(tokens[15], TType::Op, (4, 4), (5, 4), "-" );
+        test_token_w_position!(tokens[16], TType::Number, (5, 4), (22, 4), "15921590215012591" );
+        test_token_w_position!(tokens[17], TType::Newline, (22, 4), (23, 4), "\n" );
+        test_token_w_position!(tokens[18], TType::EndMarker, (0, 5), (0, 5), "" );
+    }
+
+    
+
+
 }
