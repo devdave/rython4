@@ -413,4 +413,112 @@ mod test {
         test_token_w_position!(tokens[9], TType::EndMarker, (0, 2), (0, 2), "" );
     }
 
+    #[test]
+    fn test_string() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_string.py").expect("tokens");
+
+
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
+        test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "=" );
+        test_token_w_position!(tokens[3], TType::String, (4, 1), (6, 1), "''" );
+        test_token_w_position!(tokens[4], TType::Op, (6, 1), (7, 1), ";" );
+        test_token_w_position!(tokens[5], TType::Name, (8, 1), (9, 1), "y" );
+        test_token_w_position!(tokens[6], TType::Op, (10, 1), (11, 1), "=" );
+        test_token_w_position!(tokens[7], TType::String, (12, 1), (14, 1), r#""""# );
+        test_token_w_position!(tokens[8], TType::Newline, (14, 1), (15, 1), "\n" );
+        test_token_w_position!(tokens[9], TType::Name, (0, 2), (1, 2), "x" );
+        test_token_w_position!(tokens[10], TType::Op, (2, 2), (3, 2), "=" );
+        test_token_w_position!(tokens[11], TType::String, (4, 2), (7, 2), r#"'"'"# );
+        test_token_w_position!(tokens[12], TType::Op, (7, 2), (8, 2), ";" );
+        test_token_w_position!(tokens[13], TType::Name, (9, 2), (10, 2), "y" );
+        test_token_w_position!(tokens[14], TType::Op, (11, 2), (12, 2), "=" );
+        test_token_w_position!(tokens[15], TType::String, (13, 2), (16, 2), r#""'""# );
+        test_token_w_position!(tokens[16], TType::Newline, (16, 2), (17, 2), "\n" );
+        test_token_w_position!(tokens[17], TType::Name, (0, 3), (1, 3), "x" );
+        test_token_w_position!(tokens[18], TType::Op, (2, 3), (3, 3), "=" );
+        test_token_w_position!(tokens[19], TType::String, (4, 3), (38, 3), r#""it doesn't \"shrink\", does it\"""# );
+        test_token_w_position!(tokens[20], TType::Newline, (38, 3), (39, 3), "\n" );
+        test_token_w_position!(tokens[21], TType::Name, (0, 4), (1, 4), "x" );
+        test_token_w_position!(tokens[22], TType::Op, (2, 4), (3, 4), "=" );
+        test_token_w_position!(tokens[23], TType::String, (4, 4), (9, 4), "'abc'" );
+        test_token_w_position!(tokens[24], TType::Op, (10, 4), (11, 4), "+" );
+        test_token_w_position!(tokens[25], TType::String, (12, 4), (17, 4), "'ABC'" );
+        test_token_w_position!(tokens[26], TType::Newline, (17, 4), (18, 4), "\n" );
+        test_token_w_position!(tokens[27], TType::Name, (0, 5), (1, 5), "y" );
+        test_token_w_position!(tokens[28], TType::Op, (2, 5), (3, 5), "=" );
+        test_token_w_position!(tokens[29], TType::String, (4, 5), (9, 5), r#""ABC""# );
+        test_token_w_position!(tokens[30], TType::Op, (10, 5), (11, 5), "+" );
+        test_token_w_position!(tokens[31], TType::String, (12, 5), (17, 5), r#""ABC""# );
+        test_token_w_position!(tokens[32], TType::Newline, (17, 5), (18, 5), "\n" );
+        test_token_w_position!(tokens[33], TType::Name, (0, 6), (1, 6), "x" );
+        test_token_w_position!(tokens[34], TType::Op, (2, 6), (3, 6), "=" );
+        test_token_w_position!(tokens[35], TType::String, (4, 6), (10, 6), "r'abc'" );
+        test_token_w_position!(tokens[36], TType::Op, (11, 6), (12, 6), "+" );
+        test_token_w_position!(tokens[37], TType::String, (13, 6), (19, 6), "r'ABC'" );
+        test_token_w_position!(tokens[38], TType::Op, (20, 6), (21, 6), "+" );
+        test_token_w_position!(tokens[39], TType::String, (22, 6), (28, 6), "R'ABC'" );
+        test_token_w_position!(tokens[40], TType::Op, (29, 6), (30, 6), "+" );
+        test_token_w_position!(tokens[41], TType::String, (31, 6), (37, 6), "R'ABC'" );
+        test_token_w_position!(tokens[42], TType::Newline, (37, 6), (38, 6), "\n" );
+        test_token_w_position!(tokens[43], TType::Name, (0, 7), (1, 7), "y" );
+        test_token_w_position!(tokens[44], TType::Op, (2, 7), (3, 7), "=" );
+        test_token_w_position!(tokens[45], TType::String, (4, 7), (10, 7), r#"r"abc""# );
+        test_token_w_position!(tokens[46], TType::Op, (11, 7), (12, 7), "+" );
+        test_token_w_position!(tokens[47], TType::String, (13, 7), (19, 7), r#"r"ABC""# );
+        test_token_w_position!(tokens[48], TType::Op, (20, 7), (21, 7), "+" );
+        test_token_w_position!(tokens[49], TType::String, (22, 7), (28, 7), r#"R"ABC""# );
+        test_token_w_position!(tokens[50], TType::Op, (29, 7), (30, 7), "+" );
+        test_token_w_position!(tokens[51], TType::String, (31, 7), (37, 7), r#"R"ABC""# );
+        test_token_w_position!(tokens[52], TType::Newline, (37, 7), (38, 7), "\n" );
+        test_token_w_position!(tokens[53], TType::String, (0, 8), (6, 8), "u'abc'" );
+        test_token_w_position!(tokens[54], TType::Op, (7, 8), (8, 8), "+" );
+        test_token_w_position!(tokens[55], TType::String, (9, 8), (15, 8), "U'abc'" );
+        test_token_w_position!(tokens[56], TType::Newline, (15, 8), (16, 8), "\n" );
+        test_token_w_position!(tokens[57], TType::String, (0, 9), (6, 9), r#"u"abc""# );
+        test_token_w_position!(tokens[58], TType::Op, (7, 9), (8, 9), "+" );
+        test_token_w_position!(tokens[59], TType::String, (9, 9), (15, 9), r#"U"abc""# );
+        test_token_w_position!(tokens[60], TType::Newline, (15, 9), (16, 9), "\n" );
+        test_token_w_position!(tokens[61], TType::String, (0, 10), (6, 10), "b'abc'" );
+        test_token_w_position!(tokens[62], TType::Op, (7, 10), (8, 10), "+" );
+        test_token_w_position!(tokens[63], TType::String, (9, 10), (15, 10), "B'abc'" );
+        test_token_w_position!(tokens[64], TType::Newline, (15, 10), (16, 10), "\n" );
+        test_token_w_position!(tokens[65], TType::String, (0, 11), (7, 11), "br'abc'" );
+        test_token_w_position!(tokens[66], TType::Op, (8, 11), (9, 11), "+" );
+        test_token_w_position!(tokens[67], TType::String, (10, 11), (17, 11), "bR'abc'" );
+        test_token_w_position!(tokens[68], TType::Op, (18, 11), (19, 11), "+" );
+        test_token_w_position!(tokens[69], TType::String, (20, 11), (27, 11), "Br'abc'" );
+        test_token_w_position!(tokens[70], TType::Op, (28, 11), (29, 11), "+" );
+        test_token_w_position!(tokens[71], TType::String, (30, 11), (37, 11), "BR'abc'" );
+        test_token_w_position!(tokens[72], TType::Newline, (37, 11), (38, 11), "\n" );
+        test_token_w_position!(tokens[73], TType::String, (0, 12), (7, 12), r#"br"abc""# );
+        test_token_w_position!(tokens[74], TType::Op, (8, 12), (9, 12), "+" );
+        test_token_w_position!(tokens[75], TType::String, (10, 12), (17, 12), r#"bR"abc""# );
+        test_token_w_position!(tokens[76], TType::Op, (18, 12), (19, 12), "+" );
+        test_token_w_position!(tokens[77], TType::String, (20, 12), (27, 12), r#"Br"abc""# );
+        test_token_w_position!(tokens[78], TType::Op, (28, 12), (29, 12), "+" );
+        test_token_w_position!(tokens[79], TType::String, (30, 12), (37, 12), r#"BR"abc""# );
+        test_token_w_position!(tokens[80], TType::Newline, (37, 12), (38, 12), "\n" );
+        test_token_w_position!(tokens[81], TType::String, (0, 13), (7, 13), "rb'abc'" );
+        test_token_w_position!(tokens[82], TType::Op, (8, 13), (9, 13), "+" );
+        test_token_w_position!(tokens[83], TType::String, (10, 13), (17, 13), "rB'abc'" );
+        test_token_w_position!(tokens[84], TType::Op, (18, 13), (19, 13), "+" );
+        test_token_w_position!(tokens[85], TType::String, (20, 13), (27, 13), "Rb'abc'" );
+        test_token_w_position!(tokens[86], TType::Op, (28, 13), (29, 13), "+" );
+        test_token_w_position!(tokens[87], TType::String, (30, 13), (37, 13), "RB'abc'" );
+        test_token_w_position!(tokens[88], TType::Newline, (37, 13), (38, 13), "\n" );
+        test_token_w_position!(tokens[89], TType::String, (0, 14), (7, 14), r#"rb"abc""# );
+        test_token_w_position!(tokens[90], TType::Op, (8, 14), (9, 14), "+" );
+        test_token_w_position!(tokens[91], TType::String, (10, 14), (17, 14), r#"rB"abc""# );
+        test_token_w_position!(tokens[92], TType::Op, (18, 14), (19, 14), "+" );
+        test_token_w_position!(tokens[93], TType::String, (20, 14), (27, 14), r#"Rb"abc""# );
+        test_token_w_position!(tokens[94], TType::Op, (28, 14), (29, 14), "+" );
+        test_token_w_position!(tokens[95], TType::String, (30, 14), (37, 14), r#"RB"abc""# );
+        test_token_w_position!(tokens[96], TType::Newline, (37, 14), (38, 14), "\n" );
+        test_token_w_position!(tokens[97], TType::EndMarker, (0, 15), (0, 15), "" );
+
+    }
 }
