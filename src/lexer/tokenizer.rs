@@ -108,7 +108,7 @@ impl Tokenizer {
 
         for (lineno, line,) in source.clone().into_iter().enumerate() {
 
-            match self.process_line(&state, lineno.saturating_add(1), line) {
+            match self.process_line(&mut state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => return Err(issue),
             }
@@ -121,7 +121,7 @@ impl Tokenizer {
         return Ok(product);
     }
 
-    fn process_line(&self, state: &State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
+    fn process_line(&self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
         println!("Parsing {}-`{:?}`", lineno, line);
 
