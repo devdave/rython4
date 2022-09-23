@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::io::Read;
 
 
@@ -128,6 +129,14 @@ impl Tokenizer {
             }
         }
 
+        //Check for indents and push matching dedents
+        if state.indent_stack.len() > 0 {
+            while state.indent_stack.len() > 0 {
+                let last_size = state.indent_stack.pop().unwrap();
+                product.push(Token::quick(TType::Dedent, source.len()+1, 0, 0, "".to_string()));
+            }
+        }
+
         if self.config.skip_endmarker == false {
             product.push(Token::quick(TType::EndMarker, source.len()+1, 0, 0, "".to_string()));
         }
@@ -139,11 +148,11 @@ impl Tokenizer {
         let mut product: Vec<Token> = Vec::new();
         println!("Parsing {}-`{:?}`", lineno, line);
 
-        let mut code = CodeLine::new(line);
+
         let mut is_statement = false;
 
         //Deal with blank lines
-        if code.is_empty() == true {
+        if  line.len() == 1 && line == "\n"{
             //Blow away the indent stack!
             if state.indent_stack.len() > 0 {
                 state.indent_stack.pop();
@@ -154,9 +163,43 @@ impl Tokenizer {
         }
 
         //Handle indent/dedent here
+        if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
+            //TODO make sure there is no mixing of tabs, spaces, and form feed.
+            //TODO drop support for form feed?
+            let current_size: usize = ws_match.end() - ws_match.start();
+            let last_size = state.indent_stack.last().unwrap_or(&0);
+
+            match current_size.cmp(last_size) {
+                Ordering::Greater=> {
+                    //push on a new indent
+                    if state.indent_stack.len() + 1 > MAXINDENT {
+                        return Err(TokError::TooDeep);
+                    }
+                    state.indent_stack.push(current_size);
+                    product.push(Token::quick(TType::Indent, lineno, 0, current_size, ws_match.as_str().to_string()));
+                },
+                Ordering::Less => {
+                    //Pop that indent!
+                    while state.indent_stack.len() > 0 {
+                        let last_size = state.indent_stack.pop().unwrap();
+                        product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                        if last_size == current_size {
+                            break;
+                        }
+                    }
+                },
+                Ordering::Equal => {
+                    //Do nothing
+                }
+            }
+
+
+        }
 
 
 
+
+        let mut code = CodeLine::new(line);
 
         while code.remaining() > 0 {
             let col_pos = code.position();
