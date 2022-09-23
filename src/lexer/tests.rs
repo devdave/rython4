@@ -378,17 +378,21 @@ mod test {
         //import sys, time
         // x = sys.modules['time'].time()
 
-        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: true});
         let tokens = tokenizer.process_file("test_fixtures/test_selector.py").expect("tokens");
 
+        for (lineno, token) in tokens.iter().enumerate() {
+            println!("{}: {:?}", lineno, token);
+        }
 
         test_token!(tokens[0], TType::Name, "import");
         test_token!(tokens[1], TType::Name, "sys");
         test_token!(tokens[2], TType::Op, ",");
         test_token!(tokens[3], TType::Name, "time");
 
+        test_token!(tokens[11], TType::String, "'time'");
 
-        assert_eq!(tokens.len(), 19);
+        assert_eq!(tokens.len(), 18);
     }
 
     #[test]
