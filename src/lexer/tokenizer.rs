@@ -204,7 +204,15 @@ impl Tokenizer {
 
         while code.remaining() > 0 {
             let col_pos = code.position();
-            if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
+                        //Look for "string"
+            if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
+                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
+            }
+            //Look for 'string'
+            else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
+                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
+            }
+            else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 is_statement = true;
 
@@ -229,16 +237,7 @@ impl Tokenizer {
                 //and ignore it
 
             }
-            //Look for "string"
-            else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
-                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
-            //Look for 'string'
-            else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
-                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
             else {
-                println!("No pattern matched!");
                 if let Some(sym) = code.get() {
                     if sym == " " {
                         //skipping white space
