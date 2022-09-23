@@ -17,6 +17,13 @@ mod test {
         }
     }
 
+    macro_rules! test_token{
+        ($token:expr, $ttype:expr, $content:expr)=>{
+            assert_eq!($token.r#type, $ttype);
+            assert_eq!($token.text, $content);
+        }
+    }
+
     #[test]
     fn test_float() {
 
@@ -340,5 +347,66 @@ mod test {
 
     }
 
+    #[test]
+    fn test_multilplicative() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_multiplicative.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
+        test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "=" );
+        test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "1" );
+        test_token_w_position!(tokens[4], TType::Op, (5, 1), (7, 1), "//" );
+        test_token_w_position!(tokens[5], TType::Number, (7, 1), (8, 1), "1" );
+        test_token_w_position!(tokens[6], TType::Op, (8, 1), (9, 1), "*" );
+        test_token_w_position!(tokens[7], TType::Number, (9, 1), (10, 1), "1" );
+        test_token_w_position!(tokens[8], TType::Op, (10, 1), (11, 1), "/" );
+        test_token_w_position!(tokens[9], TType::Number, (11, 1), (12, 1), "5" );
+        test_token_w_position!(tokens[10], TType::Op, (12, 1), (13, 1), "*" );
+        test_token_w_position!(tokens[11], TType::Number, (13, 1), (15, 1), "12" );
+        test_token_w_position!(tokens[12], TType::Op, (15, 1), (16, 1), "%" );
+        test_token_w_position!(tokens[13], TType::Number, (16, 1), (20, 1), "0x12" );
+        test_token_w_position!(tokens[14], TType::Op, (20, 1), (21, 1), "@" );
+        test_token_w_position!(tokens[15], TType::Number, (21, 1), (23, 1), "42" );
+        // test_token_w_position!(tokens[16], TType::Newline, (23, 1), (24, 1), "" );
+        test_token_w_position!(tokens[17], TType::EndMarker, (0, 2), (0, 2), "" );
+    }
+
+    #[test]
+    fn test_selector() {
+        //import sys, time
+        // x = sys.modules['time'].time()
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_selector.py").expect("tokens");
+
+
+        test_token!(tokens[0], TType::Name, "import");
+        test_token!(tokens[1], TType::Name, "sys");
+        test_token!(tokens[2], TType::Op, ",");
+        test_token!(tokens[3], TType::Name, "time");
+
+
+        assert_eq!(tokens.len(), 19);
+    }
+
+    #[test]
+    fn test_shift() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: false, skip_encoding: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_shift.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
+        test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "=" );
+        test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "1" );
+        test_token_w_position!(tokens[4], TType::Op, (6, 1), (8, 1), "<<" );
+        test_token_w_position!(tokens[5], TType::Number, (9, 1), (10, 1), "1" );
+        test_token_w_position!(tokens[6], TType::Op, (11, 1), (13, 1), ">>" );
+        test_token_w_position!(tokens[7], TType::Number, (14, 1), (15, 1), "5" );
+        test_token_w_position!(tokens[8], TType::Newline, (15, 1), (16, 1), "\n" );
+        test_token_w_position!(tokens[9], TType::EndMarker, (0, 2), (0, 2), "" );
+    }
 
 }
