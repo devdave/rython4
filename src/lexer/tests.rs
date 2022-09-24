@@ -564,4 +564,61 @@ mod test {
         test_token_w_position!(tokens[33], TType::EndMarker, (0, 3), (0, 3), "" );
     }
 
+    #[test]
+    fn test_basic_operators() {
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+        let tokens = tokenizer.process_file("test_fixtures/test_basic_operators.py").expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
+        test_token_w_position!(tokens[1], TType::Number, (0, 1), (1, 1), "1" );
+        test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "+" );
+        test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "1" );
+        //TODO test_token_w_position!(tokens[4], TType::Newline, (5, 1), (6, 1), "" );
+        test_token_w_position!(tokens[5], TType::EndMarker, (0, 2), (0, 2), "" );
+
+    }
+
+    #[test]
+    fn test_valid_literals() {
+        let VALID_UNDERSCORE_LITERALS: Vec<&str> = vec![
+            "0_0_0",
+            "4_2",
+            "1_0000_0000",
+            "0b1001_0100",
+            "0xffff_ffff",
+            "0o5_7_7",
+            "1_00_00.5",
+            "1_00_00.5e5",
+            "1_00_00e5_1",
+            "1e1_0",
+            ".1_4",
+            ".1_4e1",
+            "0b_0",
+            "0x_f",
+            "0o_5",
+            "1_00_00j",
+            "1_00_00.5j",
+            "1_00_00e5_1j",
+            ".1_4j",
+            "(1_2.5+3_3j)",
+            "(.5_6j)",
+        ];
+
+        let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: true, skip_encoding: true});
+
+
+        for value in VALID_UNDERSCORE_LITERALS {
+            if value.starts_with("(") {
+                continue;
+            }
+
+            let result = tokenizer.process_single_line(value.to_string()).expect("tokens");
+            assert_eq!(result[0].r#type, TType::Number, "Got the wrong type when processing {:?}.  Got {:?}", value, result[0]);
+        }
+    }
+
+
+
+
 }
