@@ -619,6 +619,18 @@ mod test {
     }
 
 
+    #[test]
+    fn test_multiline_strings() {
+
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let tokens = tokenizer.process_file("test_fixtures/multiline_strings.py").expect("tokens");
+
+        for (lno, token) in tokens.iter().enumerate() {
+            println!("{}: {:?}", lno, token);
+        }
+
+
+    }
 
 
 }
