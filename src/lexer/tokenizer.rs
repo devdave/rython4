@@ -215,8 +215,35 @@ impl Tokenizer {
 
         while code.remaining() > 0 {
             let col_pos = code.position();
-                        //Look for "string"
-            if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
+
+            if state.string_continues == true {
+                //TODO check for string continuation type/state.type to use the correct regex
+                if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_CLOSE.to_owned()) {
+                    state.string_buffer = format!("{}{}", state.string_buffer, found);
+                    let start = state.string_start.as_ref().unwrap().clone();
+
+                    product.push(Token::Make(
+                        TType::String,
+                        start,
+                        Position::m(new_pos, lineno),
+                        state.string_buffer.clone())
+                    );
+                    state.string_start = None;
+                    state.string_continues = false;
+                    state.string_type = None;
+
+                } else {
+                    //Consume the whole line
+                    if let Some((new_pos, found )) = code.return_match(Regex::new(r#"\A.((\n|.)*)"#).expect("regex")) {
+                        state.string_buffer = format!("{}{}", state.string_buffer, found);
+                    }
+                }
+
+            }
+
+
+            //Look for "string"
+            else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             //Look for 'string'
