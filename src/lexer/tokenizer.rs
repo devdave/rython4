@@ -289,8 +289,18 @@ impl Tokenizer {
                 if let Some(sym) = code.get() {
                     if sym == " " {
                         //skipping white space
+                        //Except if we're inside a triple quoted/multiline string!
+                        if state.string_continues == true {
+                            state.string_buffer = format!("{}{}", state.string_buffer, sym);
+                        }
+
                     } else if sym == "\n" {
-                        if is_statement == false {
+
+                        if state.string_continues == true {
+                            // TODO is this really the fastest/"best" way to append to a String?
+                            state.string_buffer = format!("{}{}", state.string_buffer, sym);
+                        }
+                        else if is_statement == false {
                             product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
                         } else {
                             product.push(Token::quick(TType::Newline, lineno, col_pos, code.position(), "\n".to_string()));
