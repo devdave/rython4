@@ -310,6 +310,7 @@ impl Tokenizer {
                         }
                         break;
                     } else {
+                        println!("Bad character @ {}:{}", lineno, col_pos);
                         return Err(TokError::BadCharacter(sym.chars().nth(0).expect("char")));
                     }
                 }
