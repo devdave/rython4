@@ -1,3 +1,4 @@
+
 use clap::__macro_refs::once_cell;
 use once_cell::sync::Lazy;
 
@@ -42,3 +43,11 @@ pub static CAPTURE_QUOTE_STRING: Lazy<Regex> =
 
 pub static CAPTURE_APOS_STRING: Lazy<Regex> =
     Lazy::new(|| Regex::new(r#"\A(|Rb|br|Br|rF|F|R|r|rb|rf|B|u|RB|bR|f|b|FR|Rf|fr|Fr|rB|BR|RF|fR|U)?'[^\n'\\]*(?:\\.[^\n'\\]*)*'"#).expect("regex"));
+
+pub static TRIPLE_QUOTE_START: Lazy<Regex> =
+    Lazy::new(|| Regex::new(&*format!(r#"\A{}{}"#,
+                                            STRING_PREFIXES,
+                                            r#""""(.|\n)*"#
+                            )).expect("regex"));
+
+pub static TRIPLE_QUOTE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*""""#).expect("regex") );
