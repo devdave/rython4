@@ -212,6 +212,8 @@ impl Tokenizer {
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
+            //Capture multi-line string start here
+
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 is_statement = true;
