@@ -29,5 +29,12 @@ stdin::lock()::read_to_string
 
 
 
+## String processing
 
+After the standard string captures, look for triple quoted strings.
+
+1. Need to remember to match/watch for f string and other string prefixes.
+
+If the CAPTURE patterns failed then there will only be a single triple quote/apos on a 
+line followed by content.   I know I already solved this before, but it was a mess in Gen 3.
 
