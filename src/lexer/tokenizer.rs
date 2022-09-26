@@ -251,6 +251,14 @@ impl Tokenizer {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             //Capture multi-line string start here
+            else if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_START.to_owned()) {
+                //Assume this consumed the entire line!
+                state.string_continues = true;
+                state.string_start = Some(Position::m(col_pos, lineno));
+                state.string_buffer = found;
+                state.string_type = Some(StringType::TripleQuote);
+
+            }
 
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
