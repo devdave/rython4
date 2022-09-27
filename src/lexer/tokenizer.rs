@@ -237,7 +237,7 @@ impl Tokenizer {
 
                 } else {
                     //Consume the whole line
-                    if let Some((new_pos, found )) = code.return_match(Regex::new(r#"\A.((\n|.)*)"#).expect("regex")) {
+                    if let Some((new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
                 }
