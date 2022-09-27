@@ -47,7 +47,7 @@ pub static CAPTURE_APOS_STRING: Lazy<Regex> =
 pub static TRIPLE_QUOTE_START: Lazy<Regex> =
     Lazy::new(|| Regex::new(&*format!(r#"\A{}{}"#,
                                             STRING_PREFIXES,
-                                            r#""""[.\n]?"#
+                                            r#"""".*"#
                             )).expect("regex"));
 
 pub static TRIPLE_QUOTE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*""""#).expect("regex") );
