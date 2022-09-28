@@ -1,6 +1,6 @@
 use std::{mem::swap, rc::Rc};
 
-use crate::tokenizer::Token;
+use crate::tokens::Token;
 
 use super::op::{
     UnaryOp, BinaryOp, BooleanOp, AssignEqual, CompOp,
@@ -10,7 +10,7 @@ use super::statement::Annotation;
 
 use super::traits::WithComma;
 
-type TokenRef<'a> = Rc<Token<'a>>;
+type TokenRef = Rc<Token>;
 
 // Atomic nodes
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -19,86 +19,86 @@ pub struct Comma {
 }
 
 #[derive(Clone, PartialEq, Eq, Default, Debug)]
-pub struct Name<'a> {
-    pub value: &'a str,
+pub struct Name {
+    pub value: String,
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
-pub enum NameOrAttribute<'a> {
-    N(Box<Name<'a>>),
-    A(Box<Attribute<'a>>),
+pub enum NameOrAttribute {
+    N(Box<Name>),
+    A(Box<Attribute>),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Integer<'a> {
+pub struct Integer {
     //Because it can be 1234 and 1_234 it must be stored as a string
-    pub value: &'a str,
+    pub value: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Float<'a> {
-    pub value: &'a str,
+pub struct Float {
+    pub value: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Binary<'a> {
-    pub value: &'a str,
+pub struct Binary {
+    pub value: String,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct BinaryOperation<'a> {
-    pub left: Box<Expression<'a>>,
+pub struct BinaryOperation {
+    pub left: Box<Expression>,
     pub operator: BinaryOp,
-    pub right: Box<Expression<'a>>,
-    pub lpar: Vec<LeftParen<'a>>,
-    pub rpar: Vec<RightParen<'a>>,
+    pub right: Box<Expression>,
+    pub lpar: Vec<LeftParen>,
+    pub rpar: Vec<RightParen>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "py", derive(TryIntoPy))]
-pub struct BooleanOperation<'a> {
-    pub left: Box<Expression<'a>>,
+pub struct BooleanOperation {
+    pub left: Box<Expression>,
     pub operator: BooleanOp,
-    pub right: Box<Expression<'a>>,
-    pub lpar: Vec<LeftParen<'a>>,
-    pub rpar: Vec<RightParen<'a>>,
+    pub right: Box<Expression>,
+    pub lpar: Vec<LeftParen>,
+    pub rpar: Vec<RightParen>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Hexidecimal<'a> {
-    pub value: &'a str,
+pub struct Hexidecimal {
+    pub value: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Imaginary<'a> {
-    pub value: &'a str,
+pub struct Imaginary {
+    pub value: String,
 }
 
 // Semi-atomic/more complex nodes
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Comparison<'a> {
+pub struct Comparison {
     // kind of surprised Rust lets me make this recursive/orobus pattern
-    pub left: Box<Expression<'a>>,
-    pub comparisons: Vec<ComparisonTarget<'a>>,
+    pub left: Box<Expression>,
+    pub comparisons: Vec<ComparisonTarget>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct ComparisonTarget<'a> {
+pub struct ComparisonTarget {
     pub operator: CompOp,
-    pub comparator: Expression<'a>,
+    pub comparator: Expression,
 }
 
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Element<'a> {
+pub enum Element {
     Simple {
-        value: Expression<'a>,
+        value: Expression,
     },
-    Starred(Box<StarredElement<'a>>),
+    Starred(Box<StarredElement>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct StarredElement<'a> {
-    pub value: Box<Expression<'a>>,
+pub struct StarredElement {
+    pub value: Box<Expression>,
 }
 
 
@@ -113,88 +113,88 @@ pub struct Ellipsis {
 // Composite nodes
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Expression<'a> {
-    Name(Box<Name<'a>>),
+pub enum Expression {
+    Name(Box<Name>),
     Ellipsis,
-    Integer(Box<Integer<'a>>),
-    Float(Box<Float<'a>>),
-    Binary(Box<Binary<'a>>),
-    Hexidecimal(Box<Hexidecimal<'a>>),
-    Imaginary(Box<Imaginary<'a>>),
-    Comparison(Box<Comparison<'a>>),
-    UnaryOperation(Box<UnaryOperation<'a>>),
-    BinaryOperation(Box<BinaryOperation<'a>>),
-    BooleanOperation(Box<BooleanOperation<'a>>),
-    Attribute(Box<Attribute<'a>>),
-    Tuple(Box<Tuple<'a>>),
-    Call(Box<Call<'a>>),
-    GeneratorExp(Box<GeneratorExp<'a>>),
-    ListComp(Box<ListComp<'a>>),
-    SetComp(Box<SetComp<'a>>),
-    DictComp(Box<DictComp<'a>>),
-    List(Box<List<'a>>),
-    Set(Box<Set<'a>>),
-    Dict(Box<Dict<'a>>),
-    Subscript(Box<Subscript<'a>>),
-    StarredElement(Box<StarredElement<'a>>),
-    IfExp(Box<IfExp<'a>>),
-    Lambda(Box<Lambda<'a>>),
-    Yield(Box<Yield<'a>>),
-    Await(Box<Await<'a>>),
-    SimpleString(Box<SimpleString<'a>>),
-    ConcatenatedString(Box<ConcatenatedString<'a>>),
-    FormattedString(Box<FormattedString<'a>>),
-    NamedExpr(Box<NamedExpr<'a>>),
+    Integer(Box<Integer>),
+    Float(Box<Float>),
+    Binary(Box<Binary>),
+    Hexidecimal(Box<Hexidecimal>),
+    Imaginary(Box<Imaginary>),
+    Comparison(Box<Comparison>),
+    UnaryOperation(Box<UnaryOperation>),
+    BinaryOperation(Box<BinaryOperation>),
+    BooleanOperation(Box<BooleanOperation>),
+    Attribute(Box<Attribute>),
+    Tuple(Box<Tuple>),
+    Call(Box<Call>),
+    GeneratorExp(Box<GeneratorExp>),
+    ListComp(Box<ListComp>),
+    SetComp(Box<SetComp>),
+    DictComp(Box<DictComp>),
+    List(Box<List>),
+    Set(Box<Set>),
+    Dict(Box<Dict>),
+    Subscript(Box<Subscript>),
+    StarredElement(Box<StarredElement>),
+    IfExp(Box<IfExp>),
+    Lambda(Box<Lambda>),
+    Yield(Box<Yield>),
+    Await(Box<Await>),
+    SimpleString(Box<SimpleString>),
+    ConcatenatedString(Box<ConcatenatedString>),
+    FormattedString(Box<FormattedString>),
+    NamedExpr(Box<NamedExpr>),
 
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Arg<'a> {
-    pub value: Expression<'a>,
-    pub keyword: Option<Name<'a>>,
-    pub equal: Option<AssignEqual<'a>>,
+pub struct Arg {
+    pub value: Expression,
+    pub keyword: Option<Name>,
+    pub equal: Option<AssignEqual>,
     pub comma: Option<Comma>,
-    pub star: &'a str,
+    pub star: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Attribute<'a> {
-    pub value: Box<Expression<'a>>,
-    pub attr: Name<'a>,
+pub struct Attribute {
+    pub value: Box<Expression>,
+    pub attr: Name,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
-pub struct Tuple<'a> {
-    pub elements: Vec<Element<'a>>,
+pub struct Tuple {
+    pub elements: Vec<Element>,
 }
 
 
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Call<'a> {
-    pub func: Box<Expression<'a>>,
-    pub args: Vec<Arg<'a>>,
+pub struct Call {
+    pub func: Box<Expression>,
+    pub args: Vec<Arg>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct GeneratorExp<'a> {
-    pub elt: Box<Expression<'a>>,
-    pub for_in: Box<CompFor<'a>>,
+pub struct GeneratorExp {
+    pub elt: Box<Expression>,
+    pub for_in: Box<CompFor>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct CompFor<'a> {
-    pub target: AssignTargetExpression<'a>,
-    pub iter: Expression<'a>,
-    pub ifs: Vec<CompIf<'a>>,
-    pub inner_for_in: Option<Box<CompFor<'a>>>,
+pub struct CompFor {
+    pub target: AssignTargetExpression,
+    pub iter: Expression,
+    pub ifs: Vec<CompIf>,
+    pub inner_for_in: Option<Box<CompFor>>,
     pub asynchronous: Option<Asynchronous>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct CompIf<'a> {
-    pub test: Expression<'a>,
-    pub(crate) if_tok: TokenRef<'a>,
+pub struct CompIf {
+    pub test: Expression,
+    pub(crate) if_tok: TokenRef,
 }
 
 // pub enum CompOp {
@@ -211,112 +211,112 @@ pub struct CompIf<'a> {
 // }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum AssignTargetExpression<'a> {
-    Name(Box<Name<'a>>),
-    Attribute(Box<Attribute<'a>>),
-    StarredElement(Box<StarredElement<'a>>),
-    Tuple(Box<Tuple<'a>>),
-    List(Box<List<'a>>),
-    Subscript(Box<Subscript<'a>>),
+pub enum AssignTargetExpression {
+    Name(Box<Name>),
+    Attribute(Box<Attribute>),
+    StarredElement(Box<StarredElement>),
+    Tuple(Box<Tuple>),
+    List(Box<List>),
+    Subscript(Box<Subscript>),
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Subscript<'a> {
-    pub value: Box<Expression<'a>>,
-    pub slice: Vec<SubscriptElement<'a>>,
+pub struct Subscript {
+    pub value: Box<Expression>,
+    pub slice: Vec<SubscriptElement>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum BaseSlice<'a> {
-    Index(Box<Index<'a>>),
-    Slice(Box<Slice<'a>>),
+pub enum BaseSlice {
+    Index(Box<Index>),
+    Slice(Box<Slice>),
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Index<'a> {
-    pub value: Expression<'a>,
+pub struct Index {
+    pub value: Expression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Slice<'a> {
-    pub lower: Option<Expression<'a>>,
-    pub upper: Option<Expression<'a>>,
-    pub step: Option<Expression<'a>>,
+pub struct Slice {
+    pub lower: Option<Expression>,
+    pub upper: Option<Expression>,
+    pub step: Option<Expression>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct SubscriptElement<'a> {
-    pub slice: BaseSlice<'a>,
+pub struct SubscriptElement {
+    pub slice: BaseSlice,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct ListComp<'a> {
-    pub elt: Box<Expression<'a>>,
-    pub for_in: Box<CompFor<'a>>,
+pub struct ListComp {
+    pub elt: Box<Expression>,
+    pub for_in: Box<CompFor>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct SetComp<'a> {
-    pub elt: Box<Expression<'a>>,
-    pub for_in: Box<CompFor<'a>>,
+pub struct SetComp {
+    pub elt: Box<Expression>,
+    pub for_in: Box<CompFor>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct DictComp<'a> {
-    pub key: Box<Expression<'a>>,
-    pub value: Box<Expression<'a>>,
-    pub for_in: Box<CompFor<'a>>,
+pub struct DictComp {
+    pub key: Box<Expression>,
+    pub value: Box<Expression>,
+    pub for_in: Box<CompFor>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct List<'a> {
-    pub elements: Vec<Element<'a>>,
+pub struct List {
+    pub elements: Vec<Element>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Set<'a> {
-    pub elements: Vec<Element<'a>>,
+pub struct Set {
+    pub elements: Vec<Element>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Dict<'a> {
-    pub elements: Vec<DictElement<'a>>,
+pub struct Dict {
+    pub elements: Vec<DictElement>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum DictElement<'a> {
+pub enum DictElement {
     Simple {
-        key: Expression<'a>,
-        value: Expression<'a>,
+        key: Expression,
+        value: Expression,
     },
-    Starred(StarredDictElement<'a>),
+    Starred(StarredDictElement),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct StarredDictElement<'a> {
-    pub value: Expression<'a>,
+pub struct StarredDictElement {
+    pub value: Expression,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct IfExp<'a> {
-    pub test: Box<Expression<'a>>,
-    pub body: Box<Expression<'a>>,
-    pub orelse: Box<Expression<'a>>,
+pub struct IfExp {
+    pub test: Box<Expression>,
+    pub body: Box<Expression>,
+    pub orelse: Box<Expression>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Lambda<'a> {
-    pub params: Box<Parameters<'a>>,
-    pub body: Box<Expression<'a>>,
+pub struct Lambda {
+    pub params: Box<Parameters>,
+    pub body: Box<Expression>,
 }
 
 #[derive(Default, PartialEq, Eq, Debug, Clone)]
-pub struct Parameters<'a> {
-    pub params: Vec<Param<'a>>,
-    pub star_arg: Option<StarArg<'a>>,
-    pub kwonly_params: Vec<Param<'a>>,
-    pub star_kwarg: Option<Param<'a>>,
-    pub posonly_params: Vec<Param<'a>>,
+pub struct Parameters {
+    pub params: Vec<Param>,
+    pub star_arg: Option<StarArg>,
+    pub kwonly_params: Vec<Param>,
+    pub star_kwarg: Option<Param>,
+    pub posonly_params: Vec<Param>,
     pub posonly_ind: Option<ParamSlash>,
 }
 
-impl<'a> Parameters<'a> {
+impl Parameters {
     pub fn is_empty(&self) -> bool {
         self.params.is_empty()
             && self.star_arg.is_none()
@@ -328,14 +328,14 @@ impl<'a> Parameters<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Param<'a> {
-    pub name: Name<'a>,
-    pub annotation: Option<Annotation<'a>>,
-    pub equal: Option<AssignEqual<'a>>,
-    pub default: Option<Expression<'a>>,
+pub struct Param {
+    pub name: Name,
+    pub annotation: Option<Annotation>,
+    pub equal: Option<AssignEqual>,
+    pub default: Option<Expression>,
 }
 
-impl<'a> Default for Param<'a> {
+impl Default for Param {
     fn default() -> Self {
         Self {
             name: Default::default(),
@@ -355,30 +355,30 @@ pub struct ParamSlash {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum StarArg<'a> {
+pub enum StarArg {
     Star(Box<ParamStar>),
-    Param(Box<Param<'a>>),
+    Param(Box<Param>),
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Yield<'a> {
-    pub value: Option<Box<YieldValue<'a>>>,
+pub struct Yield {
+    pub value: Option<Box<YieldValue>>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub enum YieldValue<'a> {
-    Expression(Box<Expression<'a>>),
-    From(Box<From<'a>>),
+pub enum YieldValue {
+    Expression(Box<Expression>),
+    From(Box<From>),
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct From<'a> {
-    pub item: Expression<'a>,
+pub struct From {
+    pub item: Expression,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Await<'a> {
-    pub expression: Box<Expression<'a>>,
+pub struct Await {
+    pub expression: Box<Expression>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -387,97 +387,97 @@ pub struct Asynchronous {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct SimpleString<'a> {
+pub struct SimpleString {
     /// The texual representation of the string, including quotes, prefix
     /// characters, and any escape characters present in the original source code,
     /// such as ``r"my string\n"``.
-    pub value: &'a str,
+    pub value: String,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct ConcatenatedString<'a> {
-    pub left: Box<String<'a>>,
-    pub right: Box<String<'a>>,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum String<'a> {
-    Simple(SimpleString<'a>),
-    Concatenated(ConcatenatedString<'a>),
-    Formatted(FormattedString<'a>),
+pub struct ConcatenatedString {
+    pub left: Box<String>,
+    pub right: Box<String>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct FormattedString<'a> {
-    pub parts: Vec<FormattedStringContent<'a>>,
-    pub start: &'a str,
-    pub end: &'a str,
+pub enum String {
+    Simple(SimpleString),
+    Concatenated(ConcatenatedString),
+    Formatted(FormattedString),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum FormattedStringContent<'a> {
-    Text(FormattedStringText<'a>),
-    Expression(Box<FormattedStringExpression<'a>>),
+pub struct FormattedString {
+    pub parts: Vec<FormattedStringContent>,
+    pub start: String,
+    pub end: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct FormattedStringText<'a> {
-    pub value: &'a str,
+pub enum FormattedStringContent {
+    Text(FormattedStringText),
+    Expression(Box<FormattedStringExpression>),
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct FormattedStringText {
+    pub value: String,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct FormattedStringExpression<'a> {
-    pub expression: Expression<'a>,
-    pub conversion: Option<&'a str>,
-    pub format_spec: Option<Vec<FormattedStringContent<'a>>>,
-    pub equal: Option<AssignEqual<'a>>,
+pub struct FormattedStringExpression {
+    pub expression: Expression,
+    pub conversion: Option<String>,
+    pub format_spec: Option<Vec<FormattedStringContent>>,
+    pub equal: Option<AssignEqual>,
 }
 
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct NamedExpr<'a> {
-    pub target: Box<Expression<'a>>,
-    pub value: Box<Expression<'a>>,
+pub struct NamedExpr {
+    pub target: Box<Expression>,
+    pub value: Box<Expression>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct UnaryOperation<'a> {
+pub struct UnaryOperation {
     pub operator: UnaryOp,
-    pub expression: Box<Expression<'a>>,
+    pub expression: Box<Expression>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct LeftSquareBracket<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct LeftSquareBracket {
+    pub(crate) tok: TokenRef,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct RightSquareBracket<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct RightSquareBracket {
+    pub(crate) tok: TokenRef,
 }
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct LeftCurlyBrace<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct LeftCurlyBrace {
+    pub(crate) tok: TokenRef,
 }
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct RightCurlyBrace<'a> {
-    pub(crate) tok: TokenRef<'a>,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct RightParen<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct RightCurlyBrace {
+    pub(crate) tok: TokenRef,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct LeftParen<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct RightParen {
+    pub(crate) tok: TokenRef,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct LeftParen {
+    pub(crate) tok: TokenRef,
 }
 
 
 // Converters
 
-impl<'a> std::convert::From<Expression<'a>> for Element<'a> {
-    fn from(e: Expression<'a>) -> Self {
+impl std::convert::From<Expression> for Element {
+    fn from(e: Expression) -> Self {
         match e {
             Expression::StarredElement(e) => Element::Starred(e),
             value => Element::Simple { value,  },
@@ -485,8 +485,8 @@ impl<'a> std::convert::From<Expression<'a>> for Element<'a> {
     }
 }
 
-impl<'a> std::convert::From<NameOrAttribute<'a>> for Expression<'a> {
-    fn from(x: NameOrAttribute<'a>) -> Self {
+impl std::convert::From<NameOrAttribute> for Expression {
+    fn from(x: NameOrAttribute) -> Self {
         match x {
             NameOrAttribute::N(n) => Self::Name(n),
             NameOrAttribute::A(a) => Self::Attribute(a),
@@ -494,8 +494,8 @@ impl<'a> std::convert::From<NameOrAttribute<'a>> for Expression<'a> {
     }
 }
 
-impl<'a> std::convert::From<String<'a>> for Expression<'a> {
-    fn from(s: String<'a>) -> Self {
+impl std::convert::From<String> for Expression {
+    fn from(s: String) -> Self {
         match s {
             String::Simple(s) => Self::SimpleString(Box::new(s)),
             String::Concatenated(s) => Self::ConcatenatedString(Box::new(s)),
@@ -504,7 +504,7 @@ impl<'a> std::convert::From<String<'a>> for Expression<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for Arg<'a> {
+impl WithComma for Arg {
     fn with_comma(self, c: Comma) -> Self {
         Self {
             comma: Some(c),
@@ -513,7 +513,7 @@ impl<'a> WithComma<'a> for Arg<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for DictElement<'a> {
+impl WithComma for DictElement {
     fn with_comma(self, comma: Comma) -> Self {
 
         match self {
@@ -524,7 +524,7 @@ impl<'a> WithComma<'a> for DictElement<'a> {
 }
 
 
-impl<'a> WithComma<'a> for Element<'a> {
+impl WithComma for Element {
     fn with_comma(self, comma: Comma) -> Self {
 
         match self {
