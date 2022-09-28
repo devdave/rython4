@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::tokenizer::Token;
+use crate::tokens::Token;
 
 type TokenRef = Rc<Token>;
 
