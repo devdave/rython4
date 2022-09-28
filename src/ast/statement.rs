@@ -1,7 +1,7 @@
 
 use std::rc::Rc;
 
-use crate::tokenizer::Token;
+use crate::tokens::Token;
 
 use super::expression::{Arg, AssignTargetExpression, Asynchronous, Expression, From, Parameters, StarredElement, Tuple, List, Subscript, Name, NameOrAttribute, Comma, Element, Attribute};
 use super::op::{ AugOp, AssignEqual, BitOr, ImportStar};
@@ -430,7 +430,7 @@ pub struct IndentedBlock {
     /// default indentation. This is included because indentation is allowed to be
     /// inconsistent across a file, just not ambiguously.
 
-    pub indent: Option<&'a str>,
+    pub indent: Option<String>,
 
 
     pub(crate) newline_tok: TokenRef,
