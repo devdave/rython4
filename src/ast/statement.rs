@@ -7,424 +7,424 @@ use super::expression::{Arg, AssignTargetExpression, Asynchronous, Expression, F
 use super::op::{ AugOp, AssignEqual, BitOr, ImportStar};
 use super::traits::WithComma;
 
-type TokenRef<'a> = Rc<Token<'a>>;
+type TokenRef = Rc<Token>;
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct AugAssign<'a> {
-    pub target: AssignTargetExpression<'a>,
+pub struct AugAssign {
+    pub target: AssignTargetExpression,
     pub operator: AugOp,
-    pub value: Expression<'a>,
+    pub value: Expression,
 }
 
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub enum CompoundStatement<'a> {
-    FunctionDef(FunctionDef<'a>),
-    If(If<'a>),
-    For(For<'a>),
-    While(While<'a>),
-    ClassDef(ClassDef<'a>),
-    Try(Try<'a>),
-    TryStar(TryStar<'a>),
-    With(With<'a>),
-    Match(Match<'a>),
+pub enum CompoundStatement {
+    FunctionDef(FunctionDef),
+    If(If),
+    For(For),
+    While(While),
+    ClassDef(ClassDef),
+    Try(Try),
+    TryStar(TryStar),
+    With(With),
+    Match(Match),
 }
 
 #[derive(Eq, PartialEq, Clone, Debug)]
-pub struct ClassDef<'a> {
-    pub name: Name<'a>,
-    pub body: Suite<'a>,
-    pub bases: Vec<Arg<'a>>,
-    pub keywords: Vec<Arg<'a>>,
-    pub decorators: Vec<Decorator<'a>>,
+pub struct ClassDef {
+    pub name: Name,
+    pub body: Suite,
+    pub bases: Vec<Arg>,
+    pub keywords: Vec<Arg>,
+    pub decorators: Vec<Decorator>,
 }
 
-impl<'a> ClassDef<'a> {
-    pub fn with_decorators(self, decorators: Vec<Decorator<'a>>) -> Self {
+impl ClassDef {
+    pub fn with_decorators(self, decorators: Vec<Decorator>) -> Self {
         Self { decorators, ..self }
     }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct FunctionDef<'a> {
-    pub name: Name<'a>,
-    pub params: Parameters<'a>,
-    pub body: Suite<'a>,
-    pub decorators: Vec<Decorator<'a>>,
-    pub returns: Option<Annotation<'a>>,
+pub struct FunctionDef {
+    pub name: Name,
+    pub params: Parameters,
+    pub body: Suite,
+    pub decorators: Vec<Decorator>,
+    pub returns: Option<Annotation>,
     pub asynchronous: Option<Asynchronous,>,
 
 }
 
-impl<'a> FunctionDef<'a> {
-    pub fn with_decorators(self, decorators: Vec<Decorator<'a>>) -> Self {
+impl FunctionDef {
+    pub fn with_decorators(self, decorators: Vec<Decorator>) -> Self {
         Self { decorators, ..self }
     }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct For<'a> {
-    pub target: AssignTargetExpression<'a>,
-    pub iter: Expression<'a>,
-    pub body: Suite<'a>,
-    pub orelse: Option<Else<'a>>,
+pub struct For {
+    pub target: AssignTargetExpression,
+    pub iter: Expression,
+    pub body: Suite,
+    pub orelse: Option<Else>,
     pub asynchronous: Option<Asynchronous,>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Global<'a> {
-    pub names: Vec<NameItem<'a>>,
+pub struct Global {
+    pub names: Vec<NameItem>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct If<'a> {
+pub struct If {
     /// The expression that, when evaluated, should give us a truthy value
-    pub test: Expression<'a>,
+    pub test: Expression,
     // The body of this compound statement.
-    pub body: Suite<'a>,
+    pub body: Suite,
 
     /// An optional ``elif`` or ``else`` clause. ``If`` signifies an ``elif`` block.
-    pub orelse: Option<Box<OrElse<'a>>>,
+    pub orelse: Option<Box<OrElse>>,
     pub is_elif: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum ImportNames<'a> {
+pub enum ImportNames {
     Star(ImportStar),
-    Aliases(Vec<ImportAlias<'a>>),
+    Aliases(Vec<ImportAlias>),
 }
 
-// pub struct IndentedBlock<'a> {
+// pub struct IndentedBlock {
 //     /// Sequence of statements belonging to this indented block.
-//     pub body: Vec<Statement<'a>>,
+//     pub body: Vec<Statement>,
 // }
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Match<'a> {
-    pub subject: Expression<'a>,
-    pub cases: Vec<MatchCase<'a>>,
+pub struct Match {
+    pub subject: Expression,
+    pub cases: Vec<MatchCase>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchAs<'a> {
-    pub pattern: Option<MatchPattern<'a>>,
-    pub name: Option<Name<'a>>,
+pub struct MatchAs {
+    pub pattern: Option<MatchPattern>,
+    pub name: Option<Name>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchCase<'a> {
-    pub pattern: MatchPattern<'a>,
-    pub guard: Option<Expression<'a>>,
-    pub body: Suite<'a>,
+pub struct MatchCase {
+    pub pattern: MatchPattern,
+    pub guard: Option<Expression>,
+    pub body: Suite,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchClass<'a> {
-    pub cls: NameOrAttribute<'a>,
-    pub patterns: Vec<MatchSequenceElement<'a>>,
-    pub kwds: Vec<MatchKeywordElement<'a>>,
+pub struct MatchClass {
+    pub cls: NameOrAttribute,
+    pub patterns: Vec<MatchSequenceElement>,
+    pub kwds: Vec<MatchKeywordElement>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchList<'a> {
-    pub patterns: Vec<StarrableMatchSequenceElement<'a>>,
+pub struct MatchList {
+    pub patterns: Vec<StarrableMatchSequenceElement>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchKeywordElement<'a> {
-    pub key: Name<'a>,
-    pub pattern: MatchPattern<'a>,
+pub struct MatchKeywordElement {
+    pub key: Name,
+    pub pattern: MatchPattern,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchMapping<'a> {
-    pub elements: Vec<MatchMappingElement<'a>>,
-    pub rest: Option<Name<'a>>,
+pub struct MatchMapping {
+    pub elements: Vec<MatchMappingElement>,
+    pub rest: Option<Name>,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchMappingElement<'a> {
-    pub key: Expression<'a>,
-    pub pattern: MatchPattern<'a>,
+pub struct MatchMappingElement {
+    pub key: Expression,
+    pub pattern: MatchPattern,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum MatchPattern<'a> {
-    Value(MatchValue<'a>),
-    Singleton(MatchSingleton<'a>),
-    Sequence(MatchSequence<'a>),
-    Mapping(MatchMapping<'a>),
-    Class(MatchClass<'a>),
-    As(Box<MatchAs<'a>>),
-    Or(Box<MatchOr<'a>>),
+pub enum MatchPattern {
+    Value(MatchValue),
+    Singleton(MatchSingleton),
+    Sequence(MatchSequence),
+    Mapping(MatchMapping),
+    Class(MatchClass),
+    As(Box<MatchAs>),
+    Or(Box<MatchOr>),
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchOr<'a> {
-    pub patterns: Vec<MatchOrElement<'a>>,
+pub struct MatchOr {
+    pub patterns: Vec<MatchOrElement>,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchOrElement<'a> {
-    pub pattern: MatchPattern<'a>,
+pub struct MatchOrElement {
+    pub pattern: MatchPattern,
     pub separator: Option<BitOr>,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchTuple<'a> {
-    pub patterns: Vec<StarrableMatchSequenceElement<'a>>,
+pub struct MatchTuple {
+    pub patterns: Vec<StarrableMatchSequenceElement>,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum MatchSequence<'a> {
-    MatchList(MatchList<'a>),
-    MatchTuple(MatchTuple<'a>),
+pub enum MatchSequence {
+    MatchList(MatchList),
+    MatchTuple(MatchTuple),
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchSequenceElement<'a> {
-    pub value: MatchPattern<'a>,
+pub struct MatchSequenceElement {
+    pub value: MatchPattern,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchSingleton<'a> {
-    pub value: Name<'a>,
+pub struct MatchSingleton {
+    pub value: Name,
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchStar<'a> {
-    pub name: Option<Name<'a>>,
-}
-
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct MatchValue<'a> {
-    pub value: Expression<'a>,
+pub struct MatchStar {
+    pub name: Option<Name>,
 }
 
 
-
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct NameItem<'a> {
-    pub name: Name<'a>,
-}
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Nonlocal<'a> {
-    pub names: Vec<NameItem<'a>>,
+pub struct MatchValue {
+    pub value: Expression,
 }
 
+
+
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Statement<'a> {
-    Simple(SimpleStatementLine<'a>),
-    Compound(CompoundStatement<'a>),
+pub struct NameItem {
+    pub name: Name,
+}
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Nonlocal {
+    pub names: Vec<NameItem>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum Statement {
+    Simple(SimpleStatementLine),
+    Compound(CompoundStatement),
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
-pub enum Suite<'a> {
-    IndentedBlock(IndentedBlock<'a>),
-    SimpleStatementSuite(SimpleStatementSuite<'a>),
+pub enum Suite {
+    IndentedBlock(IndentedBlock),
+    SimpleStatementSuite(SimpleStatementSuite),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct SimpleStatementLine<'a> {
-    pub body: Vec<SmallStatement<'a>>,
+pub struct SimpleStatementLine {
+    pub body: Vec<SmallStatement>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct SimpleStatementSuite<'a> {
+pub struct SimpleStatementSuite {
     /// Sequence of small statements. All but the last statement are required to have
     /// a semicolon.
-    pub body: Vec<SmallStatement<'a>>,
+    pub body: Vec<SmallStatement>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub enum SmallStatement<'a> {
+pub enum SmallStatement {
     Pass,
     //TODO double check that Python doesn't have named break/continues
     Break,
     Continue,
-    Return(Return<'a>),
-    Expr(Expr<'a>),
-    Assert(Assert<'a>),
-    Import(Import<'a>),
-    ImportFrom(ImportFrom<'a>),
-    Assign(Assign<'a>),
-    AnnAssign(AnnAssign<'a>),
-    Raise(Raise<'a>),
-    Global(Global<'a>),
-    Nonlocal(Nonlocal<'a>),
-    AugAssign(AugAssign<'a>),
-    Del(Del<'a>),
+    Return(Return),
+    Expr(Expr),
+    Assert(Assert),
+    Import(Import),
+    ImportFrom(ImportFrom),
+    Assign(Assign),
+    AnnAssign(AnnAssign),
+    Raise(Raise),
+    Global(Global),
+    Nonlocal(Nonlocal),
+    AugAssign(AugAssign),
+    Del(Del),
 }
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub enum StarrableMatchSequenceElement<'a> {
-    Simple(MatchSequenceElement<'a>),
-    Starred(MatchStar<'a>),
+pub enum StarrableMatchSequenceElement {
+    Simple(MatchSequenceElement),
+    Starred(MatchStar),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Raise<'a> {
-    pub exc: Option<Expression<'a>>,
-    pub cause: Option<From<'a>>,
+pub struct Raise {
+    pub exc: Option<Expression>,
+    pub cause: Option<From>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Return<'a> {
-    pub value: Option<Expression<'a>>,
+pub struct Return {
+    pub value: Option<Expression>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Try<'a> {
-    pub body: Suite<'a>,
-    pub handlers: Vec<ExceptHandler<'a>>,
-    pub orelse: Option<Else<'a>>,
-    pub finalbody: Option<Finally<'a>>,
+pub struct Try {
+    pub body: Suite,
+    pub handlers: Vec<ExceptHandler>,
+    pub orelse: Option<Else>,
+    pub finalbody: Option<Finally>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct TryStar<'a> {
-    pub body: Suite<'a>,
-    pub handlers: Vec<ExceptStarHandler<'a>>,
-    pub orelse: Option<Else<'a>>,
-    pub finalbody: Option<Finally<'a>>,
+pub struct TryStar {
+    pub body: Suite,
+    pub handlers: Vec<ExceptStarHandler>,
+    pub orelse: Option<Else>,
+    pub finalbody: Option<Finally>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Expr<'a> {
-    pub value: Expression<'a>,
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct AnnAssign<'a> {
-    pub target: AssignTargetExpression<'a>,
-    pub annotation: Annotation<'a>,
-    pub value: Option<Expression<'a>>,
-    pub equal: Option<AssignEqual<'a>>,
+pub struct Expr {
+    pub value: Expression,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Annotation<'a> {
-    pub annotation: Expression<'a>,
+pub struct AnnAssign {
+    pub target: AssignTargetExpression,
+    pub annotation: Annotation,
+    pub value: Option<Expression>,
+    pub equal: Option<AssignEqual>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Annotation {
+    pub annotation: Expression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct AsName<'a> {
-    pub name: AssignTargetExpression<'a>,
+pub struct AsName {
+    pub name: AssignTargetExpression,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Assert<'a> {
-    pub test: Expression<'a>,
-    pub msg: Option<Expression<'a>>,
+pub struct Assert {
+    pub test: Expression,
+    pub msg: Option<Expression>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Assign<'a> {
-    pub targets: Vec<AssignTarget<'a>>,
-    pub value: Expression<'a>,
+pub struct Assign {
+    pub targets: Vec<AssignTarget>,
+    pub value: Expression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct AssignTarget<'a> {
-    pub target: AssignTargetExpression<'a>,
+pub struct AssignTarget {
+    pub target: AssignTargetExpression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Import<'a> {
-    pub names: Vec<ImportAlias<'a>>,
+pub struct Import {
+    pub names: Vec<ImportAlias>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct ImportAlias<'a> {
-    pub name: NameOrAttribute<'a>,
-    pub asname: Option<AsName<'a>>,
+pub struct ImportAlias {
+    pub name: NameOrAttribute,
+    pub asname: Option<AsName>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct ImportFrom<'a> {
-    pub module: Option<NameOrAttribute<'a>>,
-    pub names: ImportNames<'a>,
+pub struct ImportFrom {
+    pub module: Option<NameOrAttribute>,
+    pub names: ImportNames,
     pub relative: Vec<Dot>,
 }
 
-// pub enum NameOrAttribute<'a> {
-//     N(Box<Name<'a>>),
-//     A(Box<Attribute<'a>>),
+// pub enum NameOrAttribute {
+//     N(Box<Name>),
+//     A(Box<Attribute>),
 // }
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub enum OrElse<'a> {
-    Elif(If<'a>),
-    Else(Else<'a>),
+pub enum OrElse {
+    Elif(If),
+    Else(Else),
 }
 
 
-// pub struct Attribute<'a> {
-//     pub value: Box<Expression<'a>>,
-//     pub attr: Name<'a>,
+// pub struct Attribute {
+//     pub value: Box<Expression>,
+//     pub attr: Name,
 //     pub dot: Dot,
 // }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Decorator<'a> {
-    pub decorator: Expression<'a>,
+pub struct Decorator {
+    pub decorator: Expression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Del<'a> {
-    pub target: DelTargetExpression<'a>,
+pub struct Del {
+    pub target: DelTargetExpression,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub enum DelTargetExpression<'a> {
-    Name(Box<Name<'a>>),
-    Attribute(Box<Attribute<'a>>),
-    Tuple(Box<Tuple<'a>>),
-    List(Box<List<'a>>),
-    Subscript(Box<Subscript<'a>>),
+pub enum DelTargetExpression {
+    Name(Box<Name>),
+    Attribute(Box<Attribute>),
+    Tuple(Box<Tuple>),
+    List(Box<List>),
+    Subscript(Box<Subscript>),
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Dot { }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Else<'a> {
-    pub body: Suite<'a>,
+pub struct Else {
+    pub body: Suite,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct ExceptHandler<'a> {
-    pub body: Suite<'a>,
-    pub r#type: Option<Expression<'a>>,
-    pub name: Option<AsName<'a>>,
+pub struct ExceptHandler {
+    pub body: Suite,
+    pub r#type: Option<Expression>,
+    pub name: Option<AsName>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct ExceptStarHandler<'a> {
-    pub body: Suite<'a>,
-    pub r#type: Expression<'a>,
-    pub name: Option<AsName<'a>>,
+pub struct ExceptStarHandler {
+    pub body: Suite,
+    pub r#type: Expression,
+    pub name: Option<AsName>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Finally<'a> {
-    pub body: Suite<'a>,
+pub struct Finally {
+    pub body: Suite,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct While<'a> {
-    pub test: Expression<'a>,
-    pub body: Suite<'a>,
-    pub orelse: Option<Else<'a>>,
+pub struct While {
+    pub test: Expression,
+    pub body: Suite,
+    pub orelse: Option<Else>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct With<'a> {
-    pub items: Vec<WithItem<'a>>,
-    pub body: Suite<'a>,
+pub struct With {
+    pub items: Vec<WithItem>,
+    pub body: Suite,
     pub asynchronous: Option<Asynchronous,>,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub struct WithItem<'a> {
-    pub item: Expression<'a>,
-    pub asname: Option<AsName<'a>>,
+pub struct WithItem {
+    pub item: Expression,
+    pub asname: Option<AsName>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct IndentedBlock<'a> {
+pub struct IndentedBlock {
     /// Sequence of statements belonging to this indented block.
-    pub body: Vec<Statement<'a>>,
+    pub body: Vec<Statement>,
 
     /// A string represents a specific indentation. A ``None`` value uses the modules's
     /// default indentation. This is included because indentation is allowed to be
@@ -433,19 +433,19 @@ pub struct IndentedBlock<'a> {
     pub indent: Option<&'a str>,
 
 
-    pub(crate) newline_tok: TokenRef<'a>,
-    pub(crate) indent_tok: TokenRef<'a>,
-    pub(crate) dedent_tok: TokenRef<'a>,
+    pub(crate) newline_tok: TokenRef,
+    pub(crate) indent_tok: TokenRef,
+    pub(crate) dedent_tok: TokenRef,
 }
 
-impl<'a> WithComma<'a> for ImportAlias<'a> {
-    fn with_comma(self, comma: Comma) -> ImportAlias<'a> {
+impl WithComma for ImportAlias {
+    fn with_comma(self, comma: Comma) -> ImportAlias {
 
         Self { ..self }
     }
 }
 
-impl<'a> WithComma<'a> for MatchMappingElement<'a> {
+impl WithComma for MatchMappingElement {
     fn with_comma(self, comma: Comma) -> Self {
         Self {
 
@@ -454,7 +454,7 @@ impl<'a> WithComma<'a> for MatchMappingElement<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for MatchSequenceElement<'a> {
+impl WithComma for MatchSequenceElement {
     fn with_comma(self, comma: Comma) -> Self {
         Self {
 
@@ -463,7 +463,7 @@ impl<'a> WithComma<'a> for MatchSequenceElement<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for MatchStar<'a> {
+impl WithComma for MatchStar {
     fn with_comma(self, comma: Comma) -> Self {
         Self {
 
@@ -472,7 +472,7 @@ impl<'a> WithComma<'a> for MatchStar<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for StarrableMatchSequenceElement<'a> {
+impl WithComma for StarrableMatchSequenceElement {
     fn with_comma(self, comma: Comma) -> Self {
         match self {
             Self::Simple(s) => Self::Simple(s.with_comma(comma)),
@@ -481,7 +481,7 @@ impl<'a> WithComma<'a> for StarrableMatchSequenceElement<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for WithItem<'a> {
+impl WithComma for WithItem {
     fn with_comma(self, comma: Comma) -> Self {
         Self {
 
@@ -490,7 +490,7 @@ impl<'a> WithComma<'a> for WithItem<'a> {
     }
 }
 
-impl<'a> WithComma<'a> for MatchKeywordElement<'a> {
+impl WithComma for MatchKeywordElement {
     fn with_comma(self, comma: Comma) -> Self {
         Self {
 
@@ -500,8 +500,8 @@ impl<'a> WithComma<'a> for MatchKeywordElement<'a> {
 }
 
 
-impl<'a> std::convert::From<DelTargetExpression<'a>> for Expression<'a> {
-    fn from(d: DelTargetExpression<'a>) -> Self {
+impl std::convert::From<DelTargetExpression> for Expression {
+    fn from(d: DelTargetExpression) -> Self {
         match d {
             DelTargetExpression::Attribute(a) => Expression::Attribute(a),
             DelTargetExpression::List(l) => Expression::List(l),
@@ -513,8 +513,8 @@ impl<'a> std::convert::From<DelTargetExpression<'a>> for Expression<'a> {
 }
 
 
-impl<'a> std::convert::From<DelTargetExpression<'a>> for Element<'a> {
-    fn from(d: DelTargetExpression<'a>) -> Element {
+impl std::convert::From<DelTargetExpression> for Element {
+    fn from(d: DelTargetExpression) -> Element {
         Element::Simple {
             value: d.into(),
         }
