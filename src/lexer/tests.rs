@@ -629,6 +629,21 @@ mod test {
             println!("{}: {:?}", lno, token);
         }
 
+        let str1 =
+r#""""
+    Hello World
+""""#.to_string();
+
+        let str2 =
+r#""""This is a test
+to see if it works""""#.to_string();
+
+        //test_token_w_position!(tokens[5], TType::EndMarker, (0, 2), (0, 2), "" );
+
+        test_token_w_position!(tokens[3], TType::String, (0,2), (3,4), str1);
+        test_token_w_position!(tokens[7], TType::String, (0,6), (21,7), str2);
+
+
 
     }
 
