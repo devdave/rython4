@@ -2,11 +2,11 @@ use std::rc::Rc;
 
 use crate::tokenizer::Token;
 
-type TokenRef<'a> = Rc<Token<'a>>;
+type TokenRef = Rc<Token>;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct AssignEqual<'a> {
-    pub(crate) tok: TokenRef<'a>,
+pub struct AssignEqual {
+    pub(crate) tok: TokenRef,
 }
 
 
@@ -86,7 +86,7 @@ pub enum CompOp {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub struct Semicolon<'a> {
+pub struct Semicolon {
 
-    pub(crate) tok: TokenRef<'a>,
+    pub(crate) tok: TokenRef,
 }
