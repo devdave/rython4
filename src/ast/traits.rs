@@ -9,12 +9,12 @@ use super::{
 
 use std::ops::Deref;
 
-pub trait WithComma<'a> {
+pub trait WithComma {
     fn with_comma(self, comma: Comma) -> Self;
 }
 
-pub trait WithLeadingLines<'a> {
-    fn leading_lines(&mut self) -> &mut Vec<EmptyLine<'a>>;
+pub trait WithLeadingLines {
+    fn leading_lines(&mut self) -> &mut Vec<EmptyLine>;
 }
 
 //pub type Result<T> = std::result::Result<T, WhitespaceError>;
