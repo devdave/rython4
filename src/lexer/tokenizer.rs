@@ -270,6 +270,7 @@ impl Tokenizer {
                 is_statement = true;
 
             }
+            //Attempt to capture floats - TODO test if still needed
             else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
             }
@@ -288,6 +289,10 @@ impl Tokenizer {
                     state.string_buffer = format!("{}{}", state.string_buffer, found);
                 }
 
+            }
+            //Look for comments
+            else if let Some((new_pos, found)) = code.return_match(COMMENT.to_owned()) {
+                product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
             else {
                 if let Some(sym) = code.get() {
