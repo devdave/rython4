@@ -647,5 +647,16 @@ to see if it works""""#.to_string();
 
     }
 
+    #[test]
+    fn test_correct_newlines() {
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let tokens = tokenizer.process_file("test_fixtures/test_correct_newlines.py").expect("tokens");
+
+        for (lno, token) in tokens.iter().enumerate() {
+            println!("{}: {:?}", lno, token);
+        }
+
+    }
+
 
 }
