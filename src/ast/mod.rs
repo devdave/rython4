@@ -1,6 +1,9 @@
-mod error;
+mod statement;
 mod expression;
 mod op;
-mod statement;
-mod numbers;
+mod module;
+mod error;
+pub mod numbers;
 mod traits;
+mod whitespace;
+
