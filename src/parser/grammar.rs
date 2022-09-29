@@ -12,7 +12,7 @@ FStringEnd, FStringString
 use std::rc::Rc;
 
 use peg::str::LineCol;
-use peg::{parser, Parse, ParseElem, RuleResult};
+use peg::{parser, Parse, ParseElem, RuleResult, ParseSlice};
 
 use crate::ast::*;
 
@@ -83,6 +83,18 @@ impl ParseElem for TokVec {
         }
     }
 }
+
+// use proc_macro2::TokenStream;
+//
+// impl <'a> ParseSlice<'a> for TokVec {
+//     type Slice = Vec<Token>;
+//
+//     fn parse_slice(&'a self, p1: usize, p2: usize) -> Self::Slice {
+//
+//
+//
+//     }
+// }
 
 pub struct ValueNode {
     pub result: u32,
@@ -1495,7 +1507,7 @@ parser! {
 
 
         rule traced<T>(e: rule<T>) -> T =
-            &(input:$([_]* {
+            &(_* {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
@@ -1508,6 +1520,7 @@ parser! {
                 println!("[PEG_TRACE_STOP]");
                 e.ok_or("")
             }
+
 
 
 
@@ -3139,12 +3152,17 @@ mod tests {
     #[test]
     fn basic() {
         let test = "1 + 2".to_string();
-        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
         let tokens = tokenizer.process_single_line(test).expect("tokens");
+
+        for (pos, token) in tokens.clone().into_iter().enumerate() {
+            println!("{pos}: {:?}", token);
+        }
+
         let rctokens = tokens.into_iter().map(Rc::new).collect();
         let vec = TokVec(rctokens);
 
-        let magic = python::expression_input(&vec);
+        let magic = python::statement_input(&vec);
 
         println!("{:?}", magic);
 
