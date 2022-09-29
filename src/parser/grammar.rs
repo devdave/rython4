@@ -3162,7 +3162,7 @@ mod tests {
         let rctokens = tokens.into_iter().map(Rc::new).collect();
         let vec = TokVec(rctokens);
 
-        let magic = python::statement_input(&vec);
+        let magic = python::expression_input(&vec);
 
         println!("{:?}", magic);
 
