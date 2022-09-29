@@ -1469,7 +1469,7 @@ parser! {
 
         //Utility rules
         rule lit(lit:  &'static str) -> TokenRef
-        = [t] {? if t.text == lit {Ok(t)} else {Err(lit)}}
+        = [t] {? if t.text == lit.to_string() {Ok(t)} else {Err(lit)}}
 
         rule tok(tok: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == tok { Ok(t)} else {Err(err)} }
