@@ -3126,14 +3126,27 @@ fn make_match_keyword_element(
 
 #[cfg(test)]
 mod tests {
+    use peg::parser;
     // use crate::parser::grammar::{python, TokenRef, TokVec};
     // use crate::tokenizer::Token;
     // use crate::tokenizer::TType::{Op, Number};
     // use std::rc::Rc;
+    use crate::lexer::{Tokenizer, TConfig};
+    use super::{python, TokVec};
+    use std::rc::Rc;
 
 
     #[test]
     fn basic() {
+        let test = "1 + 2".to_string();
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let tokens = tokenizer.process_single_line(test).expect("tokens");
+        let rctokens = tokens.into_iter().map(Rc::new).collect();
+        let vec = TokVec(rctokens);
+
+        let magic = python::expression_input(&vec);
+
+        println!("{:?}", magic);
 
     }
 }
