@@ -391,7 +391,7 @@ pub struct SimpleString {
     /// The texual representation of the string, including quotes, prefix
     /// characters, and any escape characters present in the original source code,
     /// such as ``r"my string\n"``.
-    pub value: Box<String>,
+    pub value: Box<std::string::String>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ConcatenatedString {
@@ -427,7 +427,7 @@ pub struct FormattedStringText {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct FormattedStringExpression {
     pub expression: Expression,
-    pub conversion: Option<String>,
+    pub conversion: Option<std::string::String>,
     pub format_spec: Option<Vec<FormattedStringContent>>,
     pub equal: Option<AssignEqual>,
 }
