@@ -56,3 +56,28 @@ impl Parse for TokVec {
     }
 
 }
+
+type TokenRef = Rc<Token>;
+
+impl ParseElem for TokVec {
+    type Element = TokenRef;
+
+    fn parse_elem(&self, pos: usize) -> RuleResult<Self::Element> {
+        match self.0.get(pos) {
+            Some(tok) => RuleResult::Matched(pos+1, tok.clone()),
+            None => RuleResult::Failed,
+        }
+    }
+}
+
+pub struct ValueNode {
+    pub result: u32,
+}
+
+impl std::fmt::Debug for ValueNode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ValueNode")
+            .field("result", &self.result)
+            .finish()
+    }
+}
