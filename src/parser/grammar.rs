@@ -1121,7 +1121,7 @@ parser! {
         // todo deal with + infinite loop here
         rule strings() -> String
             = s:(str:tok(STRING, "STRING") t:&_ {( make_string(str), t) }
-                / str:fstring() t:&_ {(String::Formatted(str), t)})+ {
+                / str:fstring() t:&_ {(String::Formatted(Box::new(str)), t)})+ {
                 make_strings(s)
             }
 
@@ -1402,12 +1402,12 @@ parser! {
             = start:tok(FStringStart, "f\"")
                 parts:(_f_string() / _f_replacement())*
                 end:tok(FStringEnd, "\"") {
-                    make_fstring(start.text, parts, end.text)
+                    make_fstring(start.text.clone(), parts, end.text.clone())
             }
 
         rule _f_string() -> FormattedStringContent
             = t:tok(FStringString, "f-string contents") {
-                FormattedStringContent::Text(FormattedStringText { value: t.text })
+                FormattedStringContent::Text(FormattedStringText { value: t.text.clone() })
             }
 
         rule _f_replacement() -> FormattedStringContent
@@ -1425,7 +1425,7 @@ parser! {
             / star_expressions()
             / yield_expr()
 
-        rule _f_conversion() -> String
+        rule _f_conversion() -> std::string::String
             = lit("r") {"r".to_string()} / lit("s") {"s".to_string()} / lit("a") {"a".to_string()}
 
         rule _f_spec() -> Vec<FormattedStringContent>
@@ -1767,7 +1767,7 @@ fn make_unary_operator(tok: TokenRef) -> Result<UnaryOp> {
 }
 
 fn make_number(num: TokenRef) -> Expression {
-    crate::ast::numbers::parse_number(num.text)
+    crate::ast::numbers::parse_number(num.text.clone())
 
 }
 
@@ -1923,7 +1923,7 @@ fn make_name_or_attr(
 
 fn make_name(tok: TokenRef) -> Name {
     Name {
-        value: tok.text,
+        value: tok.text.clone(),
     }
 }
 
@@ -2680,7 +2680,7 @@ fn make_fstring_expression(
     lbrace_tok: TokenRef,
     expression: Expression,
     eq: Option<TokenRef>,
-    conversion_pair: Option<(TokenRef, &str)>,
+    conversion_pair: Option<(TokenRef, std::string::String)>,
     format_pair: Option<(TokenRef, Vec<FormattedStringContent>)>,
     rbrace_tok: TokenRef,
 ) -> FormattedStringExpression {
@@ -2716,9 +2716,9 @@ fn make_fstring_expression(
 }
 
 fn make_fstring(
-    start: &str,
+    start: std::string::String,
     parts: Vec<FormattedStringContent>,
-    end: &str,
+    end: std::string::String,
 ) -> FormattedString {
     FormattedString {
         start,
@@ -2809,7 +2809,7 @@ fn make_try_star(
 fn make_aug_op(tok: TokenRef) -> Result<AugOp> {
 
 
-    Ok(match tok.text {
+    Ok(match tok.text.as_str() {
         "+=" => AugOp::AddAssign {},
         "-=" => AugOp::SubtractAssign {},
         "*=" => AugOp::MultiplyAssign {},
