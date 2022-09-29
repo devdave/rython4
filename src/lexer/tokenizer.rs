@@ -153,7 +153,8 @@ impl Tokenizer {
         }
 
         if self.config.skip_endmarker == false {
-            product.push(Token::quick(TType::EndMarker, source.len()+1, 0, 0, "".to_string()));
+            product.push(Token::quick(TType::NL, source.len()+1, 0, 1, "\n".to_string()));
+            product.push(Token::quick(TType::EndMarker, source.len()+2, 1, 2, "EOF".to_string()));
         }
 
         return Ok(product);
