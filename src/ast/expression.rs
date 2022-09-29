@@ -409,8 +409,8 @@ pub enum String {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct FormattedString {
     pub parts: Vec<FormattedStringContent>,
-    pub start: String,
-    pub end: String,
+    pub start: std::string::String,
+    pub end: std::string::String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -421,7 +421,7 @@ pub enum FormattedStringContent {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct FormattedStringText {
-    pub value: String,
+    pub value: std::string::String,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
