@@ -20,7 +20,7 @@ pub struct Comma {
 
 #[derive(Clone, PartialEq, Eq, Default, Debug)]
 pub struct Name {
-    pub value: String,
+    pub value: std::string::String,
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -32,17 +32,17 @@ pub enum NameOrAttribute {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Integer {
     //Because it can be 1234 and 1_234 it must be stored as a string
-    pub value: String,
+    pub value: std::string::String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Float {
-    pub value: String,
+    pub value: std::string::String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Binary {
-    pub value: String,
+    pub value: std::string::String,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BinaryOperation {
@@ -65,12 +65,12 @@ pub struct BooleanOperation {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Hexidecimal {
-    pub value: String,
+    pub value: std::string::String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Imaginary {
-    pub value: String,
+    pub value: std::string::String,
 }
 
 // Semi-atomic/more complex nodes
@@ -154,7 +154,7 @@ pub struct Arg {
     pub keyword: Option<Name>,
     pub equal: Option<AssignEqual>,
     pub comma: Option<Comma>,
-    pub star: String,
+    pub star: std::string::String,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -499,7 +499,7 @@ impl std::convert::From<String> for Expression {
         match s {
             String::Simple(s) => Self::SimpleString(Box::new(s)),
             String::Concatenated(s) => Self::ConcatenatedString(Box::new(s)),
-            String::Formatted(s) => Self::FormattedString(Box::new(s)),
+            String::Formatted(s) => Self::FormattedString(Box::new(*s)),
         }
     }
 }
