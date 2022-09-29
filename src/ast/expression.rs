@@ -391,7 +391,7 @@ pub struct SimpleString {
     /// The texual representation of the string, including quotes, prefix
     /// characters, and any escape characters present in the original source code,
     /// such as ``r"my string\n"``.
-    pub value: String,
+    pub value: Box<String>,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ConcatenatedString {
@@ -403,7 +403,7 @@ pub struct ConcatenatedString {
 pub enum String {
     Simple(SimpleString),
     Concatenated(ConcatenatedString),
-    Formatted(FormattedString),
+    Formatted(Box<FormattedString>),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
