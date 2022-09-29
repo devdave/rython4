@@ -28,3 +28,32 @@ pub use expression::{
     YieldValue,
 
 };
+
+pub use op::{
+        AugOp, AssignEqual, BinaryOp, BooleanOp, CompOp, UnaryOp, ImportStar,
+    Semicolon, Colon,
+    BitOr,
+
+};
+pub use statement::{
+    AnnAssign, Annotation, AsName, Assert, Assign, AssignTarget, AugAssign,
+    CompoundStatement, Expr, Statement, SmallStatement, OrElse, Suite, Return, Raise, Global, Nonlocal, Del, Import, ImportFrom, ImportNames, ImportAlias,
+    FunctionDef, ClassDef, If, While, For, With, Try, TryStar, ExceptHandler, ExceptStarHandler, Else, WithItem, Finally, Match, MatchPattern, StarrableMatchSequenceElement,
+    Decorator, MatchCase, MatchStar, MatchMappingElement, MatchSequenceElement, MatchKeywordElement, SimpleStatementLine, SimpleStatementSuite,
+    MatchTuple, MatchMapping, MatchClass,
+    DelTargetExpression,
+    IndentedBlock,
+    NameItem,
+    MatchValue,
+    MatchSingleton,
+    MatchSequence,
+    MatchList,
+    MatchAs,
+    MatchOrElement,
+    MatchOr,
+    Dot,
+};
+
+pub use crate::ast::error::ParserError;
+
+pub use traits::WithComma;
