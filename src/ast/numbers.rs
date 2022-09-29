@@ -44,22 +44,24 @@ static IMAGINARY_RE: Lazy<Regex> = Lazy::new(|| {
     .expect("regex")
 });
 
-pub(crate) fn parse_number(raw: &str) -> Expression {
-    if INTEGER_RE.is_match(raw) {
+pub(crate) fn parse_number(raw: String) -> Expression {
+    let test = raw.as_str();
+    if INTEGER_RE.is_match(test) {
         Expression::Integer(Box::new(Integer {
             value: raw,
 
         }))
-    } else if FLOAT_RE.is_match(raw) {
+    } else if FLOAT_RE.is_match(test) {
         Expression::Float(Box::new(Float {
             value: raw,
 
         }))
-    } else if IMAGINARY_RE.is_match(raw) {
+    } else if IMAGINARY_RE.is_match(test) {
         Expression::Imaginary(Box::new(Imaginary {
             value: raw,
 
         }))
+    //TODO match on octal, hex, and binary
     } else {
         Expression::Integer(Box::new(Integer {
             value: raw,
