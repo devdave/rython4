@@ -59,7 +59,7 @@ impl Parse for TokVec {
             start_pos: LineCol {
                 line: tok.start.line,
                 column: tok.start.col,
-                offset: tok.start.col,
+                offset: tok.end.col,
             },
             end_pos: LineCol {
                 line: tok.end.line,
