@@ -23,7 +23,7 @@ pub struct ParseLoc {
 
 impl std::fmt::Display for ParseLoc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.start_pos.fmt(f)
+        std::fmt::Display::fmt(&self.start_pos, f)
     }
 }
 
