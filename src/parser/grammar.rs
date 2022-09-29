@@ -1495,7 +1495,7 @@ parser! {
 
 
         rule traced<T>(e: rule<T>) -> T =
-            &(_* {
+            &(input:$([_]* {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
