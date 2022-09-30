@@ -6,6 +6,7 @@ use super::statement::Statement;
 
 type TokenRef = Rc<Token>;
 
+#[derive(Debug)]
 pub struct Module {
     pub body: Vec<Statement>,
 
