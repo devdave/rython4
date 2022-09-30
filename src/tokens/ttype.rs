@@ -21,3 +21,15 @@ pub enum TType {
     FStringEnd,
     EndMarker,
 }
+
+#[cfg(test)]
+mod test {
+    use super::TType;
+
+    #[test]
+    fn basic() {
+        let a = TType::Name;
+        let b = TType::Name;
+        assert_eq!(a, b);
+    }
+}
