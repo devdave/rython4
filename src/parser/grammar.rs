@@ -1484,7 +1484,13 @@ parser! {
         = [t] {? if t.text == lit.to_string() {Ok(t)} else {Err(lit)}}
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
-        = [t] {? if t.r#type == toktype { Ok(t)} else {Err(err)} }
+        = [t] {? if t.r#type == toktype {
+            println!("{:?} == {:?}", t, toktype);
+            Ok(t)
+            } else {
+            println!("{:?} != {:?}", t, toktype);
+            Err(err)}
+        }
 
         rule name() -> Name
             = !( lit("False") / lit("None") / lit("True") / lit("and") / lit("as") / lit("assert") / lit("async") / lit("await")
@@ -3172,7 +3178,7 @@ mod tests {
 
     #[test]
     fn parse_operators() {
-        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let mut tokenizer = Tokenizer::new(TConfig { skip_encoding: true, skip_endmarker: false });
         let tokens = tokenizer.process_file("test_fixtures/operators.py").expect("tokens");
 
         for (pos, token) in tokens.clone().into_iter().enumerate() {
