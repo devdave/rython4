@@ -274,10 +274,12 @@ impl Tokenizer {
             //Attempt to capture floats - TODO test if still needed
             else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
+                is_statement = true;
             }
             //The "SUPER" Number regex
             else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
+                is_statement = true;
             }
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
                 product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
