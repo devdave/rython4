@@ -162,7 +162,7 @@ impl Tokenizer {
 
     fn process_line(&self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
-        println!("Parsing {}-`{:?}`", lineno, line);
+
 
 
         let mut is_statement = false;
@@ -312,7 +312,7 @@ impl Tokenizer {
                             // TODO is this really the fastest/"best" way to append to a String?
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
-                        else if is_statement == false {
+                        else if true {
                             product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
                         } else {
                             product.push(Token::quick(TType::Newline, lineno, col_pos, code.position(), "\n".to_string()));
