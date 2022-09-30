@@ -1493,7 +1493,7 @@ parser! {
                 / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / lit("raise")
                 / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
             )
-            t:tok(NameTok, "Name") { make_name(t) }
+            t:tok(NameTok, "NameToken") { make_name(t) }
 
         rule _async() -> TokenRef
             = tok(Async, "ASYNC")
@@ -1511,7 +1511,7 @@ parser! {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
-                    println!("{}", input);
+                    // println!("{}", input);
                     println!("[PEG_TRACE_START]");
                 }
             })
