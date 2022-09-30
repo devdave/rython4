@@ -3193,6 +3193,14 @@ mod tests {
         let magic = python::file(&vec, "operators");
 
 
+        if let Ok(module) = magic {
+            for element in module.body.iter() {
+                println!("{:?}", element);
+            }
+        } else {
+            println!("{:?}", magic);
+            assert!(false == true, "Parse error");
+        }
 
         println!("{:?}", magic);
 
