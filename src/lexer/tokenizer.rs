@@ -90,6 +90,12 @@ impl Tokenizer {
         }
     }
 
+    pub fn tokenize_file<P>(filename:P, config: TConfig) -> Result<Vec<Token>, TokError>
+        where P: AsRef<std::path::Path>, {
+        let mut tokenizer = Tokenizer::new(config);
+        return tokenizer.process_file(filename);
+    }
+
     pub fn process_file<P>(&mut self, filename: P) -> Result<Vec<Token>, TokError>
         where P: AsRef<std::path::Path>,  {
 
