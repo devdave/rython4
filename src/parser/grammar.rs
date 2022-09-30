@@ -1483,8 +1483,8 @@ parser! {
         rule lit(lit:  &'static str) -> TokenRef
         = [t] {? if t.text == lit.to_string() {Ok(t)} else {Err(lit)}}
 
-        rule tok(tok: TType, err: &'static str) -> TokenRef
-        = [t] {? if t.r#type == tok { Ok(t)} else {Err(err)} }
+        rule tok(toktype: TType, err: &'static str) -> TokenRef
+        = [t] {? if t.r#type == toktype { Ok(t)} else {Err(err)} }
 
         rule name() -> Name
             = !( lit("False") / lit("None") / lit("True") / lit("and") / lit("as") / lit("assert") / lit("async") / lit("await")
@@ -1493,7 +1493,7 @@ parser! {
                 / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / lit("raise")
                 / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
             )
-            t:tok(NameTok, "NAME") {make_name(t)}
+            t:tok(NameTok, "Name") { make_name(t) }
 
         rule _async() -> TokenRef
             = tok(Async, "ASYNC")
@@ -1923,6 +1923,7 @@ fn make_name_or_attr(
     first_tok: Name,
     mut tail: Vec<(TokenRef, Name)>,
 ) -> NameOrAttribute {
+
     if let Some((dot, name)) = tail.pop() {
         let dot = make_dot(dot);
         return NameOrAttribute::A(Box::new(Attribute {
@@ -3174,10 +3175,18 @@ mod tests {
         let mut tokenizer = Tokenizer::new(TConfig::default());
         let tokens = tokenizer.process_file("test_fixtures/operators.py").expect("tokens");
 
+        for (pos, token) in tokens.clone().into_iter().enumerate() {
+            println!("{pos}: {:?}", token);
+        }
+
         let rctokens = tokens.into_iter().map(Rc::new).collect();
         let vec = TokVec(rctokens);
 
+
+
         let magic = python::file(&vec, "operators");
+
+
 
         println!("{:?}", magic);
 
