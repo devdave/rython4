@@ -3202,8 +3202,13 @@ mod tests {
             assert!(false == true, "Parse error");
         }
 
-        println!("{:?}", magic);
+    }
+
+    #[test]
+    fn parse_hello_world() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/hello_world.py", TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
 
 
     }
+
 }
