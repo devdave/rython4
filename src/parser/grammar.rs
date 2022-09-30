@@ -3147,6 +3147,7 @@ mod tests {
     use crate::lexer::{Tokenizer, TConfig};
     use super::{python, TokVec};
     use std::rc::Rc;
+    use crate::parser::grammar::TokenRef;
 
 
     #[test]
@@ -3165,6 +3166,21 @@ mod tests {
         let magic = python::expression_input(&vec);
 
         println!("{:?}", magic);
+
+    }
+
+    #[test]
+    fn parse_operators() {
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let tokens = tokenizer.process_file("test_fixtures/operators.py").expect("tokens");
+
+        let rctokens = tokens.into_iter().map(Rc::new).collect();
+        let vec = TokVec(rctokens);
+
+        let magic = python::file(&vec, "operators");
+
+        println!("{:?}", magic);
+
 
     }
 }
