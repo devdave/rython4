@@ -3154,7 +3154,9 @@ mod tests {
     use crate::lexer::{Tokenizer, TConfig};
     use super::{python, TokVec};
     use std::rc::Rc;
+    use crate::ast::Module;
     use crate::parser::grammar::TokenRef;
+    use crate::ast::printer::print_module;
 
 
     #[test]
@@ -3207,6 +3209,17 @@ mod tests {
     #[test]
     fn parse_hello_world() {
         let tokens = Tokenizer::tokenize_file("test_fixtures/hello_world.py", TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+        let rctokens = tokens.into_iter().map(Rc::new).collect();
+        let vec = TokVec(rctokens);
+
+        let magic = python::file(&vec, "hello_world");
+        let module: Module = magic.unwrap();
+
+        assert_eq!(module.body.len(), 1);
+
+        print_module(module);
+
 
 
     }
