@@ -6,6 +6,7 @@ mod error;
 pub mod numbers;
 mod traits;
 mod whitespace;
+pub mod printer;
 
 
 pub use module::Module;
