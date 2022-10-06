@@ -77,20 +77,52 @@ fn print_expr(expr: Expr, depth: usize) {
         Expression::Comparison(val) => {
             println!("{}Comparison:{:?}", gen_depth_string(depth+1), val);
         }
-        Expression::UnaryOperation(_) => {}
-        Expression::BinaryOperation(_) => {}
-        Expression::BooleanOperation(_) => {}
-        Expression::Attribute(_) => {}
-        Expression::Tuple(_) => {}
-        Expression::Call(_) => {}
-        Expression::GeneratorExp(_) => {}
-        Expression::ListComp(_) => {}
-        Expression::SetComp(_) => {}
-        Expression::DictComp(_) => {}
-        Expression::List(_) => {}
-        Expression::Set(_) => {}
-        Expression::Dict(_) => {}
-        Expression::Subscript(_) => {}
+        Expression::UnaryOperation(op) => {
+            println!("{}Single/uanary op:{:?}", gen_depth_string(depth+1), op);
+        }
+        Expression::BinaryOperation(op) => {
+            println!("{}Double/binary op:{:?}", gen_depth_string(depth+1), op);
+        }
+        Expression::BooleanOperation(op) => {
+            println!("{}Bool op:{:?}", gen_depth_string(depth+1), op);
+        }
+        Expression::Attribute(attr) => {
+            println!("{}Attr op:{:?}", gen_depth_string(depth+1), attr);
+        }
+        Expression::Tuple(tuple) => {
+            println!("{}Tuple op:{:?}", gen_depth_string(depth+1), tuple);
+        }
+        Expression::Call(call) => {
+            println!("{}Call op:", gen_depth_string(depth+1));
+
+
+            println!("{}Function name: {:?}", gen_depth_string(depth+2), call.func);
+            println!("{}Call.args: {:?}", gen_depth_string(depth+2), call.args);
+        }
+        Expression::GeneratorExp(gen) => {
+            println!("{}Generator:{:?}", gen_depth_string(depth+1), gen);
+        }
+        Expression::ListComp(lcomp) => {
+            println!("{}List comp.:{:?}", gen_depth_string(depth+1), lcomp);
+        }
+        Expression::SetComp(setcomp) => {
+            println!("{}Set comp.:{:?}", gen_depth_string(depth+1), setcomp);
+        }
+        Expression::DictComp(dcomp) => {
+            println!("{}Dict comp.:{:?}", gen_depth_string(depth+1), dcomp);
+        }
+        Expression::List(list) => {
+            println!("{}List.:{:?}", gen_depth_string(depth+1), list);
+        }
+        Expression::Set(set) => {
+            println!("{}Set.:{:?}", gen_depth_string(depth+1), set);
+        }
+        Expression::Dict(dict) => {
+            println!("{}Dict:{:?}", gen_depth_string(depth+1), dict);
+        }
+        Expression::Subscript(sub) => {
+            println!("{}Subscript:{:?}", gen_depth_string(depth+1), sub);
+        }
         Expression::StarredElement(_) => {}
         Expression::IfExp(_) => {}
         Expression::Lambda(_) => {}
