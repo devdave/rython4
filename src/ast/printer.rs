@@ -4,6 +4,10 @@ use super::statement::{
     Statement, SimpleStatementLine
 };
 
+use super::expression::{
+    Arg,
+};
+
 fn gen_depth_string(depth: usize) -> String {
     let mut depth_string: String = String::new();
     for i in 1..depth {
@@ -48,9 +52,11 @@ fn print_statementline(line: SimpleStatementLine, depth: usize) {
 }
 
 fn print_expr(expr: Expr, depth: usize) {
-
     println!("{}Expression: ", gen_depth_string(depth));
-    let body = expr.value;
+    print_expression(expr.value, depth+1);
+}
+
+fn print_expression(body: Expression, depth: usize) {
 
     match body {
         Expression::Name(val) => {
@@ -97,7 +103,10 @@ fn print_expr(expr: Expr, depth: usize) {
 
 
             println!("{}Function name: {:?}", gen_depth_string(depth+2), call.func);
-            println!("{}Call.args: {:?}", gen_depth_string(depth+2), call.args);
+            for (pos, arg) in call.args.into_iter().enumerate() {
+                println!("{}Arg[{}]", gen_depth_string(depth+3), pos);
+                print_arg(arg, depth+4);
+            }
         }
         Expression::GeneratorExp(gen) => {
             println!("{}Generator:{:?}", gen_depth_string(depth+1), gen);
@@ -123,16 +132,42 @@ fn print_expr(expr: Expr, depth: usize) {
         Expression::Subscript(sub) => {
             println!("{}Subscript:{:?}", gen_depth_string(depth+1), sub);
         }
-        Expression::StarredElement(_) => {}
-        Expression::IfExp(_) => {}
-        Expression::Lambda(_) => {}
-        Expression::Yield(_) => {}
-        Expression::Await(_) => {}
-        Expression::SimpleString(_) => {}
-        Expression::ConcatenatedString(_) => {}
-        Expression::FormattedString(_) => {}
-        Expression::NamedExpr(_) => {}
+        Expression::StarredElement(starred) => {
+            println!("{}Starred Element:{:?}", gen_depth_string(depth+1), starred);
+        }
+        Expression::IfExp(ifexp) => {
+            println!("{}If Expression block:{:?}", gen_depth_string(depth+1), ifexp);
+        }
+        Expression::Lambda(lambda) => {
+            println!("{}Lambda:{:?}", gen_depth_string(depth+1), lambda);
+        }
+        Expression::Yield(yieldstatement) => {
+            println!("{}Yield:{:?}", gen_depth_string(depth+1), yieldstatement);
+        }
+        Expression::Await(awaitstatement) => {
+            println!("{}Await:{:?}", gen_depth_string(depth+1), awaitstatement);
+        }
+        Expression::SimpleString(simple) => {
+            println!("{}SimpleString.value = {:?}", gen_depth_string(depth+1), simple.value);
+        }
+        Expression::ConcatenatedString(catted) => {
+            println!("{}Concat. String:{:?}", gen_depth_string(depth+1), catted);
+        }
+        Expression::FormattedString(fstring) => {
+            println!("{}FString:{:?}", gen_depth_string(depth+1), fstring);
+        }
+        Expression::NamedExpr(named) => {
+            println!("{}Named expression:{:?}", gen_depth_string(depth+1), named);
+        }
     }
 
+
+}
+
+fn print_arg(arg: Arg, depth: usize) {
+    println!("{}Arg.value= ", gen_depth_string(depth));
+    print_expression(arg.value, depth+1);
+    println!("{}Arg.keyword= {:?}", gen_depth_string(depth), arg.keyword);
+    println!("{}Arg.equal= {:?}", gen_depth_string(depth), arg.equal);
 
 }
