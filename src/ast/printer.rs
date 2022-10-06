@@ -65,10 +65,18 @@ fn print_expr(expr: Expr, depth: usize) {
         Expression::Float(val) => {
             println!("{}Float:{:?}", gen_depth_string(depth+1), val);
         }
-        Expression::Binary(_) => {}
-        Expression::Hexidecimal(_) => {}
-        Expression::Imaginary(_) => {}
-        Expression::Comparison(_) => {}
+        Expression::Binary(val) => {
+            println!("{}Binary:{:?}", gen_depth_string(depth+1), val);
+        }
+        Expression::Hexidecimal(val) => {
+            println!("{}Hexidecimal:{:?}", gen_depth_string(depth+1), val);
+        }
+        Expression::Imaginary(val) => {
+            println!("{}Imaginary:{:?}", gen_depth_string(depth+1), val);
+        }
+        Expression::Comparison(val) => {
+            println!("{}Comparison:{:?}", gen_depth_string(depth+1), val);
+        }
         Expression::UnaryOperation(_) => {}
         Expression::BinaryOperation(_) => {}
         Expression::BooleanOperation(_) => {}
