@@ -10,18 +10,23 @@ use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
 use crate::tokens::patterns::{
-                                NAME_RE,
-                                COMMENT,
-                                FLOATING_POINT,
-                                POSSIBLE_NAME,
-                                POSSIBLE_ONE_CHAR_NAME,
-                                SPACE_TAB_FORMFEED_RE,
-                                NUMBER,
-                                CAPTURE_QUOTE_STRING,
-                                CAPTURE_APOS_STRING,
-                                TRIPLE_QUOTE_START,
-                                TRIPLE_QUOTE_CLOSE,
+                            NAME_RE,
+                            COMMENT,
+                            FLOATING_POINT,
+                            POSSIBLE_NAME,
+                            POSSIBLE_ONE_CHAR_NAME,
+                            SPACE_TAB_FORMFEED_RE,
+                          NUMBER,
+                          CAPTURE_QUOTE_STRING,
+                          CAPTURE_APOS_STRING,
+                          TRIPLE_QUOTE_START,
+                          TRIPLE_QUOTE_CLOSE,
+                          ANY_NAME
 };
+
+
+
+
 
 //TODO put these somewhere better
 const MAXINDENT: usize = 999;
@@ -302,6 +307,10 @@ impl Tokenizer {
             //Look for comments
             else if let Some((new_pos, found)) = code.return_match(COMMENT.to_owned()) {
                 product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
+            }
+            //Last ditch look for Name's
+            else if let Some((new_pos, found)) = code.return_match(ANY_NAME.to_owned()) {
+
             }
             else {
                 if let Some(sym) = code.get() {
