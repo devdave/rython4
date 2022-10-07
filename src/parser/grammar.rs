@@ -1499,7 +1499,7 @@ parser! {
                 / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / lit("raise")
                 / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
             )
-            t:tok(NameTok, "NameToken") { make_name(t) }
+            t:tok(NameTok, "NameToken - Name rule") { make_name(t) }
 
         rule _async() -> TokenRef
             = tok(Async, "ASYNC")
@@ -3240,8 +3240,13 @@ mod tests {
 
         if let Ok(module) = magic {
             print_module(module);
-        } else {
-            panic!("Failed to parse: {:?}", display_str);
+        } else if let Err(parse_loc) = magic {
+            println!("Failed to parse: {:?} - because {:?}", display_str, parse_loc);
+            for token_ref in vec.0.iter() {
+                println!("Token: {:?}", token_ref);
+            }
+            panic!("Failed to parse!");
+
         }
 
 
