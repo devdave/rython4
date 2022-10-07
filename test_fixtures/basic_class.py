@@ -1,4 +1,3 @@
-
 class Basic:
     """
     A basic class definition
