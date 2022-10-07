@@ -3146,6 +3146,9 @@ fn make_match_keyword_element(
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    use std::fs::read_to_string;
+    use std::io::Read;
     use peg::parser;
     // use crate::parser::grammar::{python, TokenRef, TokVec};
     // use crate::tokenizer::Token;
@@ -3157,6 +3160,8 @@ mod tests {
     use crate::ast::Module;
     use crate::parser::grammar::TokenRef;
     use crate::ast::printer::print_module;
+    use crate::cleaner;
+    use crate::tokens::TType::String;
 
 
     #[test]
@@ -3196,9 +3201,7 @@ mod tests {
 
 
         if let Ok(module) = magic {
-            for element in module.body.iter() {
-                println!("{:?}", element);
-            }
+            print_module(module);
         } else {
             println!("{:?}", magic);
             assert!(false == true, "Parse error");
@@ -3220,8 +3223,62 @@ mod tests {
 
         print_module(module);
 
+    }
+
+    fn attempt_parse_file<P>(filename:P)
+    where P: AsRef<std::path::Path>
+    {
 
 
+        let display_str = filename.as_ref().display().to_string();
+        let tokens = Tokenizer::tokenize_file(filename, TConfig{skip_encoding: true, skip_endmarker: false}).expect("Tokens");
+
+        let rctokens = tokens.into_iter().map(Rc::new).collect();
+        let vec = TokVec(rctokens);
+
+        let magic = python::file(&vec, &display_str.as_str());
+
+        if let Ok(module) = magic {
+            print_module(module);
+        } else {
+            panic!("Failed to parse: {:?}", display_str);
+        }
+
+
+
+
+
+
+
+    }
+
+    #[test]
+    fn parse_all_python_fixtures() {
+        //TODO refactor as this is a mess
+
+
+        let paths = fs::read_dir("test_fixtures/").expect("paths");
+
+        for test_path in paths {
+            let path = test_path.expect("filepath").path();
+            if path.is_file() {
+                if let Some(ext) = path.extension() {
+                    if ext == "py" {
+                        println!("Will parse: {:?}", path.display());
+                        attempt_parse_file(path);
+                    } else {
+                        println!("Will not parse: {:?}", path.display());
+                    }
+
+                } else {
+                    println!("Will not parse: {:?}", path.display());
+                }
+
+            } else {
+                println!("Is not python file: {:?}", path.display());
+            }
+
+        }
     }
 
 }
