@@ -28,12 +28,12 @@ pub static NUMBER: Lazy<Regex> = Lazy::new(||Regex::new(NumberStr).expect("regex
 static POSSIBLE_NAME_STR: &str = r"[a-zA-Z]{1}[\w\d]+";
 static POSSIBLE_NAME_ONE_CHAR: &str = r"[a-zA-Z]{1}";
 
-pub static POSSIBLE_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[a-zA-Z]{1}[\w\d]+").expect("regex"));
+pub static POSSIBLE_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[_a-zA-Z]{1}[\w\d]+").expect("regex"));
 pub static POSSIBLE_ONE_CHAR_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[a-zA-Z]{1}").expect("regex"));
 
 pub static NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(format!(r"\A({}|{})", POSSIBLE_NAME_STR, POSSIBLE_NAME_ONE_CHAR ).as_str()).expect("regex"));
 
-pub static ANY_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[_\W]+").expect("regex"));
+pub static ANY_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[_\w]+").expect("regex"));
 
 pub static SPACE_TAB_FORMFEED_RE: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"\A[ \f\t]+").expect("regex"));
