@@ -727,5 +727,14 @@ to see if it works""""#.to_string();
 
     }
 
+    #[test]
+    fn test_basic_class() {
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let tokens = tokenizer.process_file("test_fixtures/basic_class.py").expect("tokens");
+
+        for (lno, token) in tokens.iter().enumerate() {
+            println!("{}: {:?}", lno, token);
+        }
+    }
 
 }
