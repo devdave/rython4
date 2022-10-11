@@ -2,7 +2,6 @@ class Basic:
     """
     A basic class definition
     """
-
     def __init__(self):
         """
         A basic init
