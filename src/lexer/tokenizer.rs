@@ -311,6 +311,8 @@ impl Tokenizer {
             }
             //Last ditch look for Name's
             else if let Some((new_pos, found)) = code.return_match(ANY_NAME.to_owned()) {
+                //TODO remove once I've caught the bugs that lead to this
+                println!("Captured any name: {:?}", found);
 
             }
             else {
