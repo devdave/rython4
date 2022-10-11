@@ -207,6 +207,7 @@ impl Tokenizer {
                 },
                 Ordering::Less => {
                     //Pop that indent!
+                    //TODO this is flawed and needs to pop only to the correct/new indentation
                     while state.indent_stack.len() > 0 {
                         let last_size = state.indent_stack.pop().unwrap();
                         product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
@@ -327,6 +328,7 @@ impl Tokenizer {
                             // TODO is this really the fastest/"best" way to append to a String?
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
+                        //TODO FIX the parsing grammar mixup between Newline and NL - this is a hack until then
                         else if true {
                             product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
                         } else {
