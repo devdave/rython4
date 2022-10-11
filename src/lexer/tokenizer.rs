@@ -181,13 +181,16 @@ impl Tokenizer {
         //Deal with blank lines
         if  line.len() == 1 && line == "\n"{
             //Blow away the indent stack!
-            if state.indent_stack.len() > 0 {
-                state.indent_stack.pop();
-                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-            }
+            // if state.indent_stack.len() > 0 {
+            //     state.indent_stack.pop();
+            //     product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+            // }
             product.push(Token::quick(TType::NL, lineno, 0, 0, "\n".to_string()));
             return Ok(product);
         }
+
+
+
 
         //Handle indent/dedent here
         if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
