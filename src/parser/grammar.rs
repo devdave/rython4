@@ -3258,6 +3258,11 @@ mod tests {
     }
 
     #[test]
+    fn parse_basic_class_fixture() {
+        attempt_parse_file("test_fixtures/basic_class.py");
+    }
+
+    #[test]
     fn parse_all_python_fixtures() {
         //TODO refactor as this is a mess
 
