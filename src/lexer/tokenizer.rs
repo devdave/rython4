@@ -185,7 +185,7 @@ impl Tokenizer {
             //     state.indent_stack.pop();
             //     product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
             // }
-            product.push(Token::quick(TType::NL, lineno, 0, 0, "\n".to_string()));
+            product.push(Token::quick(TType::NL, lineno, 0, 1, "\n".to_string()));
             return Ok(product);
         }
 
@@ -213,7 +213,13 @@ impl Tokenizer {
                     //TODO this is flawed and needs to pop only to the correct/new indentation
                     while state.indent_stack.len() > 0 {
                         let last_size = state.indent_stack.pop().unwrap();
-                        product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                        if last_size != current_size {
+                            product.push(Token::quick(TType::Dedent, lineno, current_size, current_size, "".to_string()));
+                        } else {
+                            state.indent_stack.push(last_size);
+                            break;
+                        }
+
                         if last_size == current_size {
                             break;
                         }
