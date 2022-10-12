@@ -1485,10 +1485,10 @@ parser! {
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == toktype {
-
+            println!("{:?} == {:?}", toktype, t.r#type);
             Ok(t)
             } else {
-
+            println!("{:?} != {:?}", toktype, t.r#type);
             Err(err)}
         }
 
