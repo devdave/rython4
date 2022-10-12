@@ -341,6 +341,7 @@ parser! {
             / s:simple_stmts() {
                 make_simple_statement_suite(s)
             }
+        //TODO should I add back in invalid_block?
 
         rule decorators() -> Vec<Decorator>
             = (at:lit("@") e:named_expression() nl:tok(NL, "NEWLINE") {
@@ -1485,10 +1486,10 @@ parser! {
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == toktype {
-            println!("{:?} == {:?}", toktype, t.r#type);
+            println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
             Ok(t)
             } else {
-            println!("{:?} != {:?}", toktype, t.r#type);
+            println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
             Err(err)}
         }
 
@@ -3260,6 +3261,11 @@ mod tests {
     #[test]
     fn parse_basic_class_fixture() {
         attempt_parse_file("test_fixtures/basic_class.py");
+    }
+
+    #[test]
+    fn parse_basic_indent() {
+        attempt_parse_file("test_fixtures/basic_indent.py");
     }
 
     #[test]
