@@ -209,6 +209,7 @@ impl Tokenizer {
                     product.push(Token::quick(TType::Indent, lineno, 0, current_size, ws_match.as_str().to_string()));
                 },
                 Ordering::Less => {
+                    println!("L# {lineno} / {current_size} < {last_size}");
                     //Pop that indent!
                     //TODO this is flawed and needs to pop only to the correct/new indentation
                     while state.indent_stack.len() > 0 {
