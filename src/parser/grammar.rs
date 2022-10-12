@@ -335,7 +335,7 @@ parser! {
 
         #[cache]
         rule block() -> Suite
-            = n:tok(NL, "NEWLINE") ind:tok(Indent, "INDENT") s:statements() ded:tok(Dedent, "DEDENT") {
+            = n:tok(NL, "NEWLINE") ind:tok(Indent, "INDENT") s:statements() ded:tok(Dedent, "DEDENT-Close blockT") {
                 make_indented_block(n, ind, s, ded)
             }
             / s:simple_stmts() {
