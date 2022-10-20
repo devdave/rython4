@@ -84,6 +84,14 @@ impl ParseElem for TokVec {
     }
 }
 
+impl<'input> ParseSlice<'input> for TokVec {
+    type Slice = &'input [Rc<Token>];
+
+    fn parse_slice(&'input self, p1: usize, p2: usize) -> Self::Slice {
+        &self.to_owned().0[p1..p2]
+    }
+}
+
 // use proc_macro2::TokenStream;
 //
 // impl <'a> ParseSlice<'a> for TokVec {
@@ -1486,10 +1494,10 @@ parser! {
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == toktype {
-            println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
+            //println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
             Ok(t)
             } else {
-            println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
+            //println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
             Err(err)}
         }
 
@@ -1514,11 +1522,11 @@ parser! {
 
 
         rule traced<T>(e: rule<T>) -> T =
-            &(_* {
+            &(input:$([_]*) {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
-                    // println!("{}", input);
+                    println!("{}", input);
                     println!("[PEG_TRACE_START]");
                 }
             })
