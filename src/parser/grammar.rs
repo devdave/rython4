@@ -1501,6 +1501,116 @@ parser! {
             Err(err)}
         }
 
+        //Names...
+        // Doing this to make debugging easier.
+
+        rule t_False() -> TokenRef
+        = tok:lit("False")
+
+        rule t_None() -> TokenRef
+        = tok:lit("None")
+
+        rule t_True() -> TokenRef
+        = tok:lit("True")
+
+        rule t_and() -> TokenRef
+        = tok:lit("and")
+
+        rule t_as() -> TokenRef
+        = tok:lit("as")
+
+        rule t_assert() -> TokenRef
+        = tok:lit("assert")
+
+        rule t_async() -> TokenRef
+        = tok:lit("async")
+
+        rule t_await() -> TokenRef
+        = tok:lit("await")
+
+        rule t_break() -> TokenRef
+        = tok:lit("break")
+
+        rule t_class() -> TokenRef
+        = tok:lit("class")
+
+        rule t_continue() -> TokenRef
+        = tok:lit("continue")
+
+        rule t_def() -> TokenRef
+        = tok:lit("def")
+
+        rule t_del() -> TokenRef
+        = tok:lit("del")
+
+        rule t_elif() -> TokenRef
+        = tok:lit("elif")
+
+        rule t_else() -> TokenRef
+        = tok:lit("else")
+
+        rule t_except() -> TokenRef
+        = tok:lit("except")
+
+        rule t_finally() -> TokenRef
+        = tok:lit("finally")
+
+        rule t_for() -> TokenRef
+        = tok:lit("for")
+
+        rule t_from() -> TokenRef
+        = tok:lit("from")
+
+        rule t_global() -> TokenRef
+        = tok:lit("global")
+
+        rule t_if() -> TokenRef
+        = tok:lit("if")
+
+        rule t_import() -> TokenRef
+        = tok:lit("import")
+
+        rule t_in() -> TokenRef
+        = tok:lit("in")
+
+        rule t_lambda() -> TokenRef
+        = tok:lit("lambda")
+
+        rule t_nonlocal() -> TokenRef
+        = tok:lit("nonlocal")
+
+        rule t_not() -> TokenRef
+        = tok:lit("not")
+
+        rule t_or() -> TokenRef
+        = tok:lit("or")
+
+        rule t_pass() -> TokenRef
+        = tok:lit("pass")
+
+        rule t_raise() -> TokenRef
+        = tok:lit("raise")
+
+        rule t_return() -> TokenRef
+        = tok:lit("return")
+
+        rule t_try() -> TokenRef
+        = tok:lit("try")
+
+        rule t_while() -> TokenRef
+        = tok:lit("while")
+
+        rule t_with() -> TokenRef
+        = tok:lit("with")
+
+        rule t_yield() -> TokenRef
+        = tok:lit("yield")
+
+
+
+
+        //Catch all for Names rule
+
         rule name() -> Name
             = !( lit("False") / lit("None") / lit("True") / lit("and") / lit("as") / lit("assert") / lit("async") / lit("await")
                 / lit("break") / lit("class") / lit("continue") / lit("def") / lit("del") / lit("elif") / lit("else")
