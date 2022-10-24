@@ -7,7 +7,7 @@ use super::{
     Comma, LeftParen, RightParen, whitespace::EmptyLine,
 };
 
-use std::ops::Deref;
+// use std::ops::Deref;
 
 pub trait WithComma {
     fn with_comma(self, comma: Comma) -> Self;

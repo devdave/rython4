@@ -26,7 +26,7 @@ struct Args {
 
 
 
-fn py_run_file(filename: PathBuf, show_tokens: bool)  {
+fn py_run_file(filename: PathBuf, _show_tokens: bool)  {
     println!("Would read {:?}", filename);
     let display = filename.display();
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
@@ -55,7 +55,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
 
 }
 
-fn py_intrepret_string(line: String, show_tokens: bool) {
+fn py_intrepret_string(line: String, _show_tokens: bool) {
     println!("Would run {}", line);
 }
 

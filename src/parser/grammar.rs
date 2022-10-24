@@ -3,9 +3,12 @@ use crate::tokens::Token;
 use crate::tokens::TType::{
     self, Async,
     Number,
-    Name as NameType,
+    // Name as NameType,
     Name as NameTok,
-    Op as Operator, NL, EndMarker, Newline, Indent, Dedent, Await as AWAIT, String as STRING, FStringStart,
+    // Op as Operator,
+    NL, EndMarker,
+    // Newline,
+    Indent, Dedent, Await as AWAIT, String as STRING, FStringStart,
 FStringEnd, FStringString
 };
 
@@ -3266,9 +3269,9 @@ fn make_match_keyword_element(
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use std::fs::read_to_string;
-    use std::io::Read;
-    use peg::parser;
+
+
+
     // use crate::parser::grammar::{python, TokenRef, TokVec};
     // use crate::tokenizer::Token;
     // use crate::tokenizer::TType::{Op, Number};
@@ -3277,10 +3280,10 @@ mod tests {
     use super::{python, TokVec};
     use std::rc::Rc;
     use crate::ast::Module;
-    use crate::parser::grammar::TokenRef;
+
     use crate::ast::printer::print_module;
-    use crate::cleaner;
-    use crate::tokens::TType::String;
+    // use crate::cleaner;
+    // use crate::tokens::TType::String;
 
 
     #[test]

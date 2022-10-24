@@ -132,7 +132,7 @@ impl Tokenizer {
         return self.generate(lines);
     }
 
-    pub fn process_interactive(&mut self, input: String, state: &State) {
+    pub fn process_interactive(&mut self, _input: String, _state: &State) {
 
     }
 
@@ -158,7 +158,7 @@ impl Tokenizer {
         //Check for indents and push matching dedents
         if state.indent_stack.len() > 0 {
             while state.indent_stack.len() > 0 {
-                let last_size = state.indent_stack.pop().unwrap();
+                // let last_size = state.indent_stack.pop().unwrap();
                 product.push(Token::quick(TType::Dedent, source.len()+1, 0, 0, "".to_string()));
             }
         }

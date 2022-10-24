@@ -1,4 +1,4 @@
-use std::{mem::swap, rc::Rc};
+use std::{rc::Rc};
 
 use crate::tokens::Token;
 
