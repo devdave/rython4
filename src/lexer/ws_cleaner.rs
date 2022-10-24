@@ -1,4 +1,4 @@
-use std::fmt::format;
+
 
 pub fn cleaner(source: String) -> Vec<String> {
     let mut lines: Vec<String> = Vec::new();

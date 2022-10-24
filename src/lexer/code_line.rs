@@ -64,7 +64,7 @@ impl CodeLine {
     pub fn is_empty(&self) -> bool {
         //TODO tell the compiler to fuck off, I want my goddamn parenthesis!
 
-        return (self.len() == 1 && self.line.trim() == "");
+        return self.len() == 1 && self.line.trim() == "";
     }
 
 }

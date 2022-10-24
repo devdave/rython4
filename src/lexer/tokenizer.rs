@@ -10,7 +10,7 @@ use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
 use crate::tokens::patterns::{
-                            NAME_RE,
+                            // NAME_RE,
                             COMMENT,
                             FLOATING_POINT,
                             POSSIBLE_NAME,
