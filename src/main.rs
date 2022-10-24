@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use clap::Parser;
 
 use crate::lexer::{ Tokenizer, TConfig, cleaner};
+use crate::parser::grammar::{python, TokVec};
 
 
 
@@ -26,7 +27,7 @@ struct Args {
 
 
 
-fn py_run_file(filename: PathBuf, _show_tokens: bool)  {
+fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     println!("Would read {:?}", filename);
     let display = filename.display();
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
@@ -42,10 +43,23 @@ fn py_run_file(filename: PathBuf, _show_tokens: bool)  {
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: false, skip_endmarker: false } );
     let outcome = tokenizer.generate(lines);
     if let Ok(tokens) = outcome {
-        println!("I got {} of tokens", tokens.len());
-        for token in tokens.iter() {
-            println!("\t{:?}", token);
+        if show_tokens == true {
+            println!("I got {} of tokens", tokens.len());
+            for token in tokens.iter() {
+                println!("\t{:?}", token);
+            }
         }
+
+
+        let tvector = TokVec::from(tokens);
+        let result = python::file(&tvector, &display.to_string().as_str());
+        if let Ok(ptree) = result {
+            println!("Parsing succeeded!");
+        } else {
+            println!("Failed to parse: {:?}", result);
+        }
+
+
     } else if let Err(issue) = outcome {
         panic!("Failed to process {:?} - token eror", issue);
     }
