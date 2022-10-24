@@ -1508,106 +1508,106 @@ parser! {
         // Doing this to make debugging easier.
 
         rule t_False() -> TokenRef
-        = tok:lit("False")
+        = lit("False")
 
         rule t_None() -> TokenRef
-        = tok:lit("None")
+        = lit("None")
 
         rule t_True() -> TokenRef
-        = tok:lit("True")
+        = lit("True")
 
         rule t_and() -> TokenRef
-        = tok:lit("and")
+        = lit("and")
 
         rule t_as() -> TokenRef
-        = tok:lit("as")
+        = lit("as")
 
         rule t_assert() -> TokenRef
-        = tok:lit("assert")
+        = lit("assert")
 
         rule t_async() -> TokenRef
-        = tok:lit("async")
+        = lit("async")
 
         rule t_await() -> TokenRef
-        = tok:lit("await")
+        = lit("await")
 
         rule t_break() -> TokenRef
-        = tok:lit("break")
+        = lit("break")
 
         rule t_class() -> TokenRef
-        = tok:lit("class")
+        = lit("class")
 
         rule t_continue() -> TokenRef
-        = tok:lit("continue")
+        = lit("continue")
 
         rule t_def() -> TokenRef
-        = tok:lit("def")
+        = lit("def")
 
         rule t_del() -> TokenRef
-        = tok:lit("del")
+        = lit("del")
 
         rule t_elif() -> TokenRef
-        = tok:lit("elif")
+        = lit("elif")
 
         rule t_else() -> TokenRef
-        = tok:lit("else")
+        = lit("else")
 
         rule t_except() -> TokenRef
-        = tok:lit("except")
+        = lit("except")
 
         rule t_finally() -> TokenRef
-        = tok:lit("finally")
+        = lit("finally")
 
         rule t_for() -> TokenRef
-        = tok:lit("for")
+        = lit("for")
 
         rule t_from() -> TokenRef
-        = tok:lit("from")
+        = lit("from")
 
         rule t_global() -> TokenRef
-        = tok:lit("global")
+        = lit("global")
 
         rule t_if() -> TokenRef
-        = tok:lit("if")
+        = lit("if")
 
         rule t_import() -> TokenRef
-        = tok:lit("import")
+        = lit("import")
 
         rule t_in() -> TokenRef
-        = tok:lit("in")
+        = lit("in")
 
         rule t_lambda() -> TokenRef
-        = tok:lit("lambda")
+        = lit("lambda")
 
         rule t_nonlocal() -> TokenRef
-        = tok:lit("nonlocal")
+        = lit("nonlocal")
 
         rule t_not() -> TokenRef
-        = tok:lit("not")
+        = lit("not")
 
         rule t_or() -> TokenRef
-        = tok:lit("or")
+        = lit("or")
 
         rule t_pass() -> TokenRef
-        = tok:lit("pass")
+        = lit("pass")
 
         rule t_raise() -> TokenRef
-        = tok:lit("raise")
+        = lit("raise")
 
         rule t_return() -> TokenRef
-        = tok:lit("return")
+        = lit("return")
 
         rule t_try() -> TokenRef
-        = tok:lit("try")
+        = lit("try")
 
         rule t_while() -> TokenRef
-        = tok:lit("while")
+        = lit("while")
 
         rule t_with() -> TokenRef
-        = tok:lit("with")
+        = lit("with")
 
         rule t_yield() -> TokenRef
-        = tok:lit("yield")
+        = lit("yield")
 
 
 
@@ -3408,7 +3408,7 @@ mod tests {
                     }
 
                 } else {
-                    println!("Will not parse: {:?}", path.display());
+                    println!("Will not parse: failed to get extension {:?}", path.display());
                 }
 
             } else {
