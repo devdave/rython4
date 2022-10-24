@@ -166,11 +166,11 @@ parser! {
         rule simple_stmt() -> SmallStatement
         = assignment()
         / e:star_expressions() { SmallStatement::Expr(Expr { value: e,  }) }
-            / &lit("return") s:return_stmt() { SmallStatement::Return(s) }
+            / &t_return() s:return_stmt() { SmallStatement::Return(s) }
             // this is expanded from the original grammar's import_stmt rule
-            / &lit("import") i:import_name() { SmallStatement::Import(i) }
-            / &lit("from") i:import_from() { SmallStatement::ImportFrom(i) }
-            / &lit("raise") r:raise_stmt() { SmallStatement::Raise(r) }
+            / &t_import() i:import_name() { SmallStatement::Import(i) }
+            / &t_from() i:import_from() { SmallStatement::ImportFrom(i) }
+            / &t_raise() r:raise_stmt() { SmallStatement::Raise(r) }
             / lit("pass") { SmallStatement::Pass }
             / &lit("del") s:del_stmt() { SmallStatement::Del(s) }
             / &lit("yield") s:yield_stmt() { SmallStatement::Expr(Expr { value: s, }) }
@@ -250,7 +250,7 @@ parser! {
 
 
         rule raise_stmt() -> Raise
-            = kw:lit("raise") exc:expression()
+            = kw:t_raise() exc:expression()
                 rest:(f:lit("from") cause:expression() {(f, cause)})?
         {   make_raise(kw, Some(exc), rest)  }
         / kw:lit("Raise") { make_raise(kw, None, None ) }
@@ -363,7 +363,7 @@ parser! {
             / class_def_raw()
 
         rule class_def_raw() -> ClassDef
-            = kw:lit("class") n:name() arg:(l:lpar() a:arguments()? r:rpar() {(l, a, r)})?
+            = kw:t_class() n:name() arg:(l:lpar() a:arguments()? r:rpar() {(l, a, r)})?
                 col:lit(":") b:block() {?
                     make_class_def(kw, n, arg, col, b)
             }
@@ -380,11 +380,11 @@ parser! {
             }
 
         rule function_def_raw() -> FunctionDef
-            = def:lit("def") n:name() op:lit("(") params:params()?
+            = def:t_def() n:name() op:lit("(") params:params()?
                 cp:lit(")") ty:_returns()? c:lit(":") b:block() {
                     make_function_def(None, def, n, op, params, cp, ty, c, b)
             }
-            / asy:tok(Async, "ASYNC") def:lit("def") n:name() op:lit("(") params:params()?
+            / asy:tok(Async, "ASYNC") def:t_def() n:name() op:lit("(") params:params()?
                 cp:lit(")") ty:_returns()? c:lit(":") b:block() {
                     make_function_def(Some(asy), def, n, op, params, cp, ty, c, b)
             }
@@ -480,10 +480,10 @@ parser! {
         // If statement
 
         rule if_stmt() -> If
-            = i:lit("if") a:named_expression() col:lit(":") b:block() elif:elif_stmt() {
+            = i:t_if() a:named_expression() col:lit(":") b:block() elif:elif_stmt() {
                 make_if(i, a, col, b, Some(OrElse::Elif(elif)), false)
             }
-            / i:lit("if") a:named_expression() col:lit(":") b:block() el:else_block()? {
+            / i:t_if() a:named_expression() col:lit(":") b:block() el:else_block()? {
                 make_if(i, a, col, b, el.map(OrElse::Else), false)
             }
 
@@ -514,7 +514,7 @@ parser! {
                 b:block() el:else_block()? {
                     make_for(None, f, t, i, it, c, b, el)
             }
-            / asy:tok(Async, "ASYNC") f:lit("for") t:star_targets() i:lit("in")
+            / asy:tok(Async, "ASYNC") f:t_for() t:star_targets() i:lit("in")
                 it:star_expressions()
                 c:lit(":") b:block() el:else_block()? {
                     make_for(Some(asy), f, t, i, it, c, b, el)
@@ -1615,7 +1615,7 @@ parser! {
             = !( lit("False") / lit("None") / lit("True") / lit("and") / lit("as") / lit("assert") / lit("async") / lit("await")
                 / lit("break") / lit("class") / lit("continue") / lit("def") / lit("del") / lit("elif") / lit("else")
                 / lit("except") / lit("finally") / lit("for") / lit("from") / lit("global") / lit("if") / lit("import")
-                / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / lit("raise")
+                / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / t_raise()
                 / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
             )
             t:tok(NameTok, "NameToken - Name rule") { make_name(t) }
