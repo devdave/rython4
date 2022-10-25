@@ -1495,20 +1495,20 @@ parser! {
         rule lit(lit:  &'static str) -> TokenRef
         = [t] {? if t.text == lit.to_string()
             {
-                println!("lit {:?}", lit);
+                // println!("lit {:?}", lit);
                 Ok(t)
             } else {
-                println!("lit {:?}", lit);
+                // println!("lit {:?}", lit);
                 Err(lit)
             }
         }
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == toktype {
-            println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
+            // println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
             Ok(t)
             } else {
-            println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
+            // println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
             Err(err)}
         }
 
