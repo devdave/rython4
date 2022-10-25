@@ -1493,14 +1493,22 @@ parser! {
 
         //Utility rules
         rule lit(lit:  &'static str) -> TokenRef
-        = [t] {? if t.text == lit.to_string() {Ok(t)} else {Err(lit)}}
+        = [t] {? if t.text == lit.to_string()
+            {
+                println!("lit {:?}", lit);
+                Ok(t)
+            } else {
+                println!("lit {:?}", lit);
+                Err(lit)
+            }
+        }
 
         rule tok(toktype: TType, err: &'static str) -> TokenRef
         = [t] {? if t.r#type == toktype {
-            //println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
+            println!("{:?} == {:?} - {:?}", toktype, t.r#type, t);
             Ok(t)
             } else {
-            //println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
+            println!("{:?} != {:?} - {:?}", toktype, t.r#type, t);
             Err(err)}
         }
 
@@ -1639,7 +1647,7 @@ parser! {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
-                    println!("{}", input);
+                    println!("{:?}", input);
                     println!("[PEG_TRACE_START]");
                 }
             })
