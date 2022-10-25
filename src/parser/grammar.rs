@@ -3355,8 +3355,7 @@ mod tests {
         let display_str = filename.as_ref().display().to_string();
         let tokens = Tokenizer::tokenize_file(filename, TConfig{skip_encoding: true, skip_endmarker: false}).expect("Tokens");
 
-        let rctokens = tokens.into_iter().map(Rc::new).collect();
-        let vec = TokVec(rctokens);
+        let vec = TokVec::from(tokens);
 
         let magic = python::file(&vec, &display_str.as_str());
 
