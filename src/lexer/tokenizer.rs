@@ -319,7 +319,7 @@ impl Tokenizer {
             }
             //Look for comments
             else if let Some((new_pos, found)) = code.return_match(COMMENT.to_owned()) {
-                product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
+                //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
             //Last ditch look for Name's
             else if let Some((new_pos, found)) = code.return_match(ANY_NAME.to_owned()) {
