@@ -3404,6 +3404,11 @@ mod tests {
         attempt_parse_file("test_fixtures/crazy_dents.py");
     }
 
+    #[test]
+    fn parse_multiline_strings() {
+        attempt_parse_file("test_fixtures/multiline_strings.py");
+    }
+
 
     #[test]
     fn parse_all_python_fixtures() {
