@@ -640,9 +640,9 @@ to see if it works""""#.to_string();
 
 
         test_token_w_position!(tokens[0], TType::String, (0, 2), (3, 4), str1);
-        test_token_w_position!(tokens[1], TType::Newline, (3, 4), (3, 4), "" );
+        // test_token_w_position!(tokens[1], TType::Newline, (3, 4), (3, 4), "\n" );
         test_token_w_position!(tokens[2], TType::String, (0, 6), (21, 7), str2 );
-        test_token_w_position!(tokens[3], TType::Newline, (21, 7), (21, 7), "" );
+        // test_token_w_position!(tokens[3], TType::Newline, (21, 7), (21, 7), "\n" );
 
         // test_token_w_position!(tokens[3], TType::String, (0,2), (3,4), str1);
         // test_token_w_position!(tokens[7], TType::String, (0,6), (21,7), str2);
