@@ -192,7 +192,7 @@ impl Tokenizer {
 
 
 
-        //Handle indent/dedent here
+        //Handle indent/dedent here if there is a statement
         if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
             //TODO make sure there is no mixing of tabs, spaces, and form feed.
             //TODO drop support for form feed?
@@ -231,7 +231,9 @@ impl Tokenizer {
                 }
             }
 
-
+        } else if state.indent_stack.len() > 0 {
+            let _last_size = state.indent_stack.pop().unwrap();
+            product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
         }
 
 
