@@ -155,7 +155,7 @@ parser! {
         }
 
         rule simple_stmts() -> SimpleStatementParts
-        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) nl:tok(NL, "NL NewLine")+ {
+        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) tok(NL, "NL NewLine")+ {
             SimpleStatementParts {
                 first_tok,
                 first_statement: stmts.0,
@@ -3398,6 +3398,12 @@ mod tests {
     fn parse_basic_indent() {
         attempt_parse_file("test_fixtures/basic_indent.py");
     }
+
+    #[test]
+    fn parse_crazy_dents() {
+        attempt_parse_file("test_fixtures/crazy_dents.py");
+    }
+
 
     #[test]
     fn parse_all_python_fixtures() {
