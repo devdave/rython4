@@ -54,7 +54,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
         let tvector = TokVec::from(tokens);
         let result = python::file(&tvector, &display.to_string().as_str());
         if let Ok(ptree) = result {
-            println!("Parsing succeeded!");
+            println!("Parsing succeeded! {:?}", ptree);
         } else {
             println!("Failed to parse: {:?}", result);
         }
