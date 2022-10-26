@@ -849,4 +849,12 @@ to see if it works""""#.to_string();
         // test_token_w_position!(tokens[29], TType::EndMarker, (0, 7), (0, 7), "" );
     }
 
+    #[test]
+    fn test_crazy_dents() {
+        let tokens = Tokenizer::tokenize_file(
+            "test_fixtures/crazy_dents.py",
+            TConfig{ skip_encoding: false, skip_endmarker: true}).expect("tokens");
+
+    }
+
 }
