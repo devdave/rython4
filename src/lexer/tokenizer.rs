@@ -325,7 +325,7 @@ impl Tokenizer {
                 //Consume the newline
                 if code.peek().unwrap() == "\n" {
                     code.get();
-                    if col_pos > 0 {
+                    if product.len() > 0 {
                         product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
                     }
                 }
