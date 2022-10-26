@@ -174,28 +174,28 @@ parser! {
             / &t_import() i:import_name() { SmallStatement::Import(i) }
             / &t_from() i:import_from() { SmallStatement::ImportFrom(i) }
             / &t_raise() r:raise_stmt() { SmallStatement::Raise(r) }
-            / lit("pass") { SmallStatement::Pass }
-            / &lit("del") s:del_stmt() { SmallStatement::Del(s) }
-            / &lit("yield") s:yield_stmt() { SmallStatement::Expr(Expr { value: s, }) }
-            / &lit("assert") s:assert_stmt() {SmallStatement::Assert(s)}
-            / lit("break") { SmallStatement::Break }
-            / lit("continue") { SmallStatement::Continue }
-            / &lit("global") s:global_stmt() {SmallStatement::Global(s)}
-            / &lit("nonlocal") s:nonlocal_stmt() {SmallStatement::Nonlocal(s)}
+            / t_pass() { SmallStatement::Pass }
+            / &t_del() s:del_stmt() { SmallStatement::Del(s) }
+            / &t_yield() s:yield_stmt() { SmallStatement::Expr(Expr { value: s, }) }
+            / &t_assert() s:assert_stmt() {SmallStatement::Assert(s)}
+            / t_break() { SmallStatement::Break }
+            / t_continue() { SmallStatement::Continue }
+            / &t_global() s:global_stmt() {SmallStatement::Global(s)}
+            / &t_nonlocal() s:nonlocal_stmt() {SmallStatement::Nonlocal(s)}
 
 
 
         rule compound_stmt() -> CompoundStatement
-            = &(lit("def") / lit("@") / tok(Async, "ASYNC")) f:function_def() {
+            = &(t_def() / lit("@") / tok(Async, "ASYNC")) f:function_def() {
                 CompoundStatement::FunctionDef(f)
             }
-            / &lit("if") f:if_stmt() { CompoundStatement::If(f) }
-            / &(lit("class") / lit("@")) c:class_def() { CompoundStatement::ClassDef(c) }
-            / &(lit("with") / tok(Async, "ASYNC")) w:with_stmt() { CompoundStatement::With(w) }
-            / &(lit("for") / tok(Async, "ASYNC")) f:for_stmt() { CompoundStatement::For(f) }
-            / &lit("try") t:try_stmt() { CompoundStatement::Try(t) }
-            / &lit("try") t:try_star_stmt() { CompoundStatement::TryStar(t) }
-            / &lit("while") w:while_stmt() { CompoundStatement::While(w) }
+            / &t_if() f:if_stmt() { CompoundStatement::If(f) }
+            / &(t_class() / lit("@")) c:class_def() { CompoundStatement::ClassDef(c) }
+            / &(t_with() / tok(Async, "ASYNC")) w:with_stmt() { CompoundStatement::With(w) }
+            / &(t_for() / tok(Async, "ASYNC")) f:for_stmt() { CompoundStatement::For(f) }
+            / &t_try() t:try_stmt() { CompoundStatement::Try(t) }
+            / &t_try() t:try_star_stmt() { CompoundStatement::TryStar(t) }
+            / &t_while() w:while_stmt() { CompoundStatement::While(w) }
             / m:match_stmt() { CompoundStatement::Match(m) }
 
 
@@ -248,15 +248,15 @@ parser! {
 
 
         rule return_stmt() -> Return
-            = kw:lit("return") a:star_expressions()?
+            = kw:t_return() a:star_expressions()?
         { make_return(kw, a) }
 
 
         rule raise_stmt() -> Raise
             = kw:t_raise() exc:expression()
-                rest:(f:lit("from") cause:expression() {(f, cause)})?
+                rest:(f:t_from() cause:expression() {(f, cause)})?
         {   make_raise(kw, Some(exc), rest)  }
-        / kw:lit("Raise") { make_raise(kw, None, None ) }
+        / kw:t_raise() { make_raise(kw, None, None ) }
 
         //TODO play around with this, the greedy star seems like a weird spot to me
         rule global_stmt() -> Global
@@ -1601,6 +1601,8 @@ parser! {
 
         rule t_raise() -> TokenRef
         = lit("raise")
+
+
 
         rule t_return() -> TokenRef
         = lit("return")
