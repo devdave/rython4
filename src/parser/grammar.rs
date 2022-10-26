@@ -155,7 +155,7 @@ parser! {
         }
 
         rule simple_stmts() -> SimpleStatementParts
-        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) nl:tok(NL, "NL NewLine") {
+        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) nl:tok(NL, "NL NewLine")+ {
             SimpleStatementParts {
                 first_tok,
                 first_statement: stmts.0,
