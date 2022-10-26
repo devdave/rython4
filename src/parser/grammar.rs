@@ -161,7 +161,6 @@ parser! {
                 first_statement: stmts.0,
                 rest: stmts.1,
                 last_semi: stmts.2,
-                nl
             }
         }
 
@@ -1682,7 +1681,7 @@ fn make_module(name: &str, body: Vec<Statement>, tok: TokenRef) -> Module{
     }
 }
 
-fn _make_simple_statement(parts: SimpleStatementParts) -> (TokenRef, Vec<SmallStatement>, TokenRef) {
+fn _make_simple_statement(parts: SimpleStatementParts) -> (TokenRef, Vec<SmallStatement>) {
     let mut body = vec![];
 
     let mut current = parts.first_statement;
@@ -1692,12 +1691,12 @@ fn _make_simple_statement(parts: SimpleStatementParts) -> (TokenRef, Vec<SmallSt
     }
     body.push(current);
 
-    (parts.first_tok, body, parts.nl)
+    (parts.first_tok, body)
 }
 
 
 fn make_simple_statement_lines(parts: SimpleStatementParts) -> SimpleStatementLine {
-    let (first_tok, body, newline_tok) = _make_simple_statement(parts);
+    let (first_tok, body) = _make_simple_statement(parts);
     SimpleStatementLine {
         body,
     }
@@ -1944,7 +1943,6 @@ struct SimpleStatementParts {
     first_statement: SmallStatement,
     rest: Vec<(TokenRef, SmallStatement)>, // semicolon, statement pairs
     last_semi: Option<TokenRef>,
-    nl: TokenRef,
 }
 
 fn make_semicolon(tok: TokenRef) -> Semicolon {
@@ -1955,16 +1953,17 @@ fn make_semicolon(tok: TokenRef) -> Semicolon {
 }
 
 fn make_simple_statement_suite(parts: SimpleStatementParts) -> Suite {
-    let (first_tok, body, newline_tok) = _make_simple_statement(parts);
+    let (first_tok, body_tok) = _make_simple_statement(parts);
 
     Suite::SimpleStatementSuite(SimpleStatementSuite {
-        body,
+        body: body_tok,
+
 
     })
 }
 
 fn make_simple_statement_line(parts: SimpleStatementParts) -> SimpleStatementLine {
-    let (first_tok, body, newline_tok) = _make_simple_statement(parts);
+    let (first_tok, body) = _make_simple_statement(parts);
     SimpleStatementLine {
         body,
 
