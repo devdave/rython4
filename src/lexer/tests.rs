@@ -622,7 +622,7 @@ mod test {
     #[test]
     fn test_multiline_strings() {
 
-        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: true});
         let tokens = tokenizer.process_file("test_fixtures/multiline_strings.py").expect("tokens");
 
         for (lno, token) in tokens.iter().enumerate() {
@@ -638,10 +638,14 @@ r#""""
 r#""""This is a test
 to see if it works""""#.to_string();
 
-        //test_token_w_position!(tokens[5], TType::EndMarker, (0, 2), (0, 2), "" );
 
-        test_token_w_position!(tokens[3], TType::String, (0,2), (3,4), str1);
-        test_token_w_position!(tokens[7], TType::String, (0,6), (21,7), str2);
+        test_token_w_position!(tokens[0], TType::String, (0, 2), (3, 4), str1);
+        test_token_w_position!(tokens[1], TType::Newline, (3, 4), (3, 4), "" );
+        test_token_w_position!(tokens[2], TType::String, (0, 6), (21, 7), str2 );
+        test_token_w_position!(tokens[3], TType::Newline, (21, 7), (21, 7), "" );
+
+        // test_token_w_position!(tokens[3], TType::String, (0,2), (3,4), str1);
+        // test_token_w_position!(tokens[7], TType::String, (0,6), (21,7), str2);
 
 
 
