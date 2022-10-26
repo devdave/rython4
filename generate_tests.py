@@ -1,6 +1,6 @@
 import token
 from tokenize import tokenize
-# from tokenize import _generate_tokens_from_c_tokenizer
+from tokenize import _generate_tokens_from_c_tokenizer
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -32,16 +32,17 @@ def token_type_from_python_to_rust(typefield):
             return "TType::Comment"
 
         case default:
-            raise ValueError("Token type Not handled yet {}".format(typefield))
+            return "TType::Unhandled({})".format(typefield)
+            # raise ValueError("Token type Not handled yet {}".format(typefield))
 
 
 def process_file(element:Path):
-    with element.open("rb") as my_file:
+    with element.open("r") as my_file:
         print(f"Processing: {element}")
         print("=" * 80)
         try:
-            tokens = tokenize(my_file.readline)
-
+            # tokens = tokenize(my_file.readline)
+            tokens = _generate_tokens_from_c_tokenizer(my_file.read())
 
             for idx, token in enumerate(tokens):
 
