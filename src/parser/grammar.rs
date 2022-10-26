@@ -309,6 +309,9 @@ parser! {
             }
             / als:import_from_as_names() !lit(",") { (None, ImportNames::Aliases(als), None)}
             / star:lit("*") { (None, ImportNames::Star(ImportStar {}), None) }
+            / invalid_import_from_targets() {
+                (None, ImportNames::Star(ImportStar {}), None)
+            }
 
         rule import_from_as_names() -> Vec<ImportAlias>
             = items:separated(<import_from_as_name()>, <comma()>) {
@@ -1493,6 +1496,10 @@ parser! {
         rule _() -> TokenRef
             = [t] { t }
 
+        //Invalid rules
+
+        rule invalid_import_from_targets() -> TokenRef
+            = import_from_as_names() t:comma() NEWLINE() { panic!("trailing comma not allowed without surrounding parentheses: {:?}", t); }
 
 
         //Utility rules
