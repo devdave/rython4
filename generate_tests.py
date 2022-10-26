@@ -1,5 +1,6 @@
 import token
 from tokenize import tokenize
+# from tokenize import _generate_tokens_from_c_tokenizer
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -27,8 +28,11 @@ def token_type_from_python_to_rust(typefield):
         case token.NL:
             return "TType::NL"
 
+        case token.COMMENT:
+            return "TType::Comment"
+
         case default:
-            raise ValueError("Not handled yet")
+            raise ValueError("Token type Not handled yet {}".format(typefield))
 
 
 def process_file(element:Path):
@@ -37,6 +41,8 @@ def process_file(element:Path):
         print("=" * 80)
         try:
             tokens = tokenize(my_file.readline)
+
+
             for idx, token in enumerate(tokens):
 
                 ttype = f"{token_type_from_python_to_rust(token.type)}"
