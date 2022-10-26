@@ -191,49 +191,50 @@ impl Tokenizer {
 
 
 
+        if state.string_continues == false {
+            //Handle indent/dedent here if there is a statement
+            if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
 
-        //Handle indent/dedent here if there is a statement
-        if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
-            //TODO make sure there is no mixing of tabs, spaces, and form feed.
-            //TODO drop support for form feed?
-            let current_size: usize = ws_match.end() - ws_match.start();
-            let last_size = state.indent_stack.last().unwrap_or(&0);
+                //TODO make sure there is no mixing of tabs, spaces, and form feed.
+                //TODO drop support for form feed?
+                let current_size: usize = ws_match.end() - ws_match.start();
+                let last_size = state.indent_stack.last().unwrap_or(&0);
 
-            match current_size.cmp(last_size) {
-                Ordering::Greater=> {
-                    //push on a new indent
-                    if state.indent_stack.len() + 1 > MAXINDENT {
-                        return Err(TokError::TooDeep);
-                    }
-                    state.indent_stack.push(current_size);
-                    product.push(Token::quick(TType::Indent, lineno, 0, current_size, ws_match.as_str().to_string()));
-                },
-                Ordering::Less => {
-                    
-                    //Pop that indent!
-                    //TODO this is flawed and needs to pop only to the correct/new indentation
-                    while state.indent_stack.len() > 0 {
-                        let last_size = state.indent_stack.pop().unwrap();
-                        if last_size != current_size {
-                            product.push(Token::quick(TType::Dedent, lineno, current_size, current_size, "".to_string()));
-                        } else {
-                            state.indent_stack.push(last_size);
-                            break;
+                match current_size.cmp(last_size) {
+                    Ordering::Greater => {
+                        //push on a new indent
+                        if state.indent_stack.len() + 1 > MAXINDENT {
+                            return Err(TokError::TooDeep);
                         }
+                        state.indent_stack.push(current_size);
+                        product.push(Token::quick(TType::Indent, lineno, 0, current_size, ws_match.as_str().to_string()));
+                    },
+                    Ordering::Less => {
 
-                        if last_size == current_size {
-                            break;
+                        //Pop that indent!
+                        //TODO this is flawed and needs to pop only to the correct/new indentation
+                        while state.indent_stack.len() > 0 {
+                            let last_size = state.indent_stack.pop().unwrap();
+                            if last_size != current_size {
+                                product.push(Token::quick(TType::Dedent, lineno, current_size, current_size, "".to_string()));
+                            } else {
+                                state.indent_stack.push(last_size);
+                                break;
+                            }
+
+                            if last_size == current_size {
+                                break;
+                            }
                         }
+                    },
+                    Ordering::Equal => {
+                        //Do nothing
                     }
-                },
-                Ordering::Equal => {
-                    //Do nothing
                 }
+            } else if state.indent_stack.len() > 0 {
+                let _last_size = state.indent_stack.pop().unwrap();
+                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
             }
-
-        } else if state.indent_stack.len() > 0 {
-            let _last_size = state.indent_stack.pop().unwrap();
-            product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
         }
 
 
@@ -266,6 +267,7 @@ impl Tokenizer {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
                 }
+
 
             }
             //Capture multi-line string start here
