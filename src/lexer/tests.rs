@@ -841,7 +841,7 @@ to see if it works""""#.to_string();
         test_token_w_position!(tokens[21], TType::Indent, (0, 5), (4, 5), "    " );
         test_token_w_position!(tokens[22], TType::Name, (4, 5), (9, 5), "print" );
         test_token_w_position!(tokens[23], TType::Op, (9, 5), (10, 5), "(" );
-        test_token_w_position!(tokens[24], TType::String, (10, 5), (19, 5), "block 2" );
+        test_token_w_position!(tokens[24], TType::String, (10, 5), (19, 5), "\"block 2\"" );
         test_token_w_position!(tokens[25], TType::Op, (19, 5), (20, 5), ")" );
         // test_token_w_position!(tokens[26], TType::Newline, (20, 5), (21, 5), "\n" );
         // test_token_w_position!(tokens[27], TType::NL, (0, 6), (1, 6), "\n" );
