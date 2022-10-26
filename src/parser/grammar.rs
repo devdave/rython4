@@ -1036,9 +1036,9 @@ parser! {
 
         rule atom() -> Expression
             = n:name() { Expression::Name(Box::new(n)) }
-            / n:lit("True") { Expression::Name(Box::new(make_name(n))) }
-            / n:lit("False") { Expression::Name(Box::new(make_name(n))) }
-            / n:lit("None") { Expression::Name(Box::new(make_name(n))) }
+            / n:t_True() { Expression::Name(Box::new(make_name(n))) }
+            / n:t_False() { Expression::Name(Box::new(make_name(n))) }
+            / n:t_None() { Expression::Name(Box::new(make_name(n))) }
             / &(tok(STRING, "") / tok(FStringStart, "")) s:strings() {s.into()}
             / n:tok(Number, "NUMBER") { make_number(n) }
             / &lit("(") e:(tuple() / group() / (g:genexp() {Expression::GeneratorExp(Box::new(g))})) {e}
@@ -1485,6 +1485,9 @@ parser! {
 
         rule rbrace() -> RightCurlyBrace
             = tok:lit("}") { make_right_brace(tok) }
+
+        rule NEWLINE() -> TokenRef
+            = tok(NL, "Newline")
 
         /// matches any token, not just whitespace
         rule _() -> TokenRef
