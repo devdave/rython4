@@ -185,7 +185,7 @@ impl Tokenizer {
             //     state.indent_stack.pop();
             //     product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
             // }
-            product.push(Token::quick(TType::NL, lineno, 0, 1, "\n".to_string()));
+            //product.push(Token::quick(TType::NL, lineno, 0, 1, "\n".to_string()));
             return Ok(product);
         }
 
@@ -319,6 +319,11 @@ impl Tokenizer {
             }
             //Look for comments
             else if let Some((new_pos, found)) = code.return_match(COMMENT.to_owned()) {
+                //Don't add comments into product
+                //Consume the newline
+                if code.peek().unwrap() == "\n" {
+                    code.get();
+                }
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
             //Last ditch look for Name's
