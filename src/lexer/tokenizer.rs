@@ -158,7 +158,7 @@ impl Tokenizer {
         //Check for indents and push matching dedents
         if state.indent_stack.len() > 0 {
             while state.indent_stack.len() > 0 {
-                let last_size = state.indent_stack.pop().unwrap();
+                let _last_size = state.indent_stack.pop().unwrap();
                 product.push(Token::quick(TType::Dedent, source.len()+1, 0, 0, "".to_string()));
             }
         }
@@ -260,14 +260,14 @@ impl Tokenizer {
 
                 } else {
                     //Consume the whole line
-                    if let Some((new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
+                    if let Some((_new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
                 }
 
             }
             //Capture multi-line string start here
-            else if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_START.to_owned()) {
+            else if let Some((_new_pos, found)) = code.return_match(TRIPLE_QUOTE_START.to_owned()) {
                 //Assume this consumed the entire line!
                 state.string_continues = true;
                 state.string_start = Some(Position::m(col_pos, lineno));
