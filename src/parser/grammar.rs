@@ -3409,6 +3409,11 @@ mod tests {
         attempt_parse_file("test_fixtures/multiline_strings.py");
     }
 
+    #[test]
+    fn parse_simple_typing() {
+        attempt_parse_file("test_fixtures/simple_typing.py");
+    }
+
 
     #[test]
     fn parse_all_python_fixtures() {
