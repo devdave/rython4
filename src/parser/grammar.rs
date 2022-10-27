@@ -259,20 +259,20 @@ parser! {
 
         //TODO play around with this, the greedy star seems like a weird spot to me
         rule global_stmt() -> Global
-            = kw:lit("global") init:(n:name() c:comma() {(n, c) })* last:name() {
+            = kw:t_global() init:(n:name() c:comma() {(n, c) })* last:name() {
             make_global(kw, init, last)
         }
 
         rule nonlocal_stmt() -> Nonlocal
-        = kw:lit("nonlocal") init:(n:name() c:comma() {(n, c)})* last:name() {
+        = kw:t_nonlocal() init:(n:name() c:comma() {(n, c)})* last:name() {
                 make_nonlocal(kw, init, last)
         }
 
         rule del_stmt() -> Del
-            = kw:lit("del") t:del_target() &(lit(";") / tok(NL, "NEWLINE")) {
+            = kw:t_del() t:del_target() &(lit(";") / tok(NL, "NEWLINE")) {
                 make_del(kw, t)
             }
-            / kw:lit("del") t:del_targets() &(lit(";") / tok(NL, "NEWLINE")) {
+            / kw:t_del() t:del_targets() &(lit(";") / tok(NL, "NEWLINE")) {
                 make_del(kw, make_del_tuple(None, t, None))
             }
 
