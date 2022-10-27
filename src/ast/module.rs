@@ -8,12 +8,8 @@ type TokenRef = Rc<Token>;
 
 #[derive(Debug)]
 pub struct Module {
+    pub name: String,
     pub body: Vec<Statement>,
-
-    pub default_indent: String,
-    pub default_newline: String,
-    pub has_trailing_newline: bool,
     pub encoding: String,
 
-    pub(crate) eof_tok: TokenRef,
 }

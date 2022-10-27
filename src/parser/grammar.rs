@@ -135,8 +135,8 @@ parser! {
         = traced(<s:statement() tok(EndMarker, "EOF") { s }>)
 
         pub rule _file(name: &str) -> Module
-        = s:statements()? eof:tok(EndMarker, "EOF") {
-                make_module(name, s.unwrap_or_default(), eof)
+        = s:statements()? tok(EndMarker, "EOF") {
+                make_module(name, s.unwrap_or_default())
         }
 
         // pub rule fstring() -> FString
@@ -1680,14 +1680,12 @@ parser! {
 //Beginning of adapters
 //##################################################################################################
 
-fn make_module(name: &str, body: Vec<Statement>, tok: TokenRef) -> Module{
+fn make_module(name: &str, body: Vec<Statement>) -> Module{
     Module {
+        name: name.to_string(),
         body,
-        default_indent: "    ".to_string(),
-        default_newline: "\n".to_string(),
-        has_trailing_newline: false,
         encoding: "utf-8".to_string(),
-        eof_tok: tok
+
     }
 }
 
