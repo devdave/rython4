@@ -1499,7 +1499,7 @@ parser! {
         //Invalid rules
 
         rule invalid_import_from_targets() -> TokenRef
-            = import_from_as_names() t:comma() NEWLINE() { panic!("trailing comma not allowed without surrounding parentheses: {:?}", t); }
+            = import_from_as_names() comma() t:NEWLINE() { panic!("trailing comma not allowed without surrounding parentheses: {:?}", t.start); }
 
 
         //Utility rules
