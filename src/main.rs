@@ -46,7 +46,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
         if show_tokens == true {
             println!("I got {} of tokens", tokens.len());
             for token in tokens.iter() {
-                println!("\t{:?}", token);
+                println!("\t{:#?}", token);
             }
         }
 
@@ -54,9 +54,9 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
         let tvector = TokVec::from(tokens);
         let result = python::file(&tvector, &display.to_string().as_str());
         if let Ok(ptree) = result {
-            println!("Parsing succeeded! {:?}", ptree);
+            println!("Parsing succeeded! \n{:#?}", ptree);
         } else {
-            println!("Failed to parse: {:?}", result);
+            println!("Failed to parse: {:#?}", result);
         }
 
 
