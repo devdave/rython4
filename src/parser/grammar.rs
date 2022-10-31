@@ -3433,6 +3433,11 @@ mod tests {
         for test_path in paths {
             let path = test_path.expect("filepath").path();
             if path.is_file() {
+                //skip invalid/error testing files
+                if let fname= path.as_path().to_str().unwrap().starts_with("error") {
+                    continue;
+                }
+
                 if let Some(ext) = path.extension() {
                     if ext == "py" {
                         println!("Will parse: {:?}", path.display());
