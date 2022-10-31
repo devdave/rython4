@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::{Formatter};
 
 use std::rc::Rc;
 
@@ -17,7 +19,7 @@ pub struct AugAssign {
 }
 
 
-#[derive(Eq, PartialEq, Debug, Clone)]
+#[derive(Eq, Debug, PartialEq, Clone)]
 pub enum CompoundStatement {
     FunctionDef(FunctionDef),
     If(If),
@@ -29,6 +31,24 @@ pub enum CompoundStatement {
     With(With),
     Match(Match),
 }
+
+// impl fmt::Debug for CompoundStatement {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+//         match self {
+//             CompoundStatement::FunctionDef(def) => write!(f, "{:?}", def),
+//             CompoundStatement::If(if_st) => write!(f, "{:?}", if_st),
+//             CompoundStatement::For(for_st) => write!(f, "{:?}", for_st),
+//             CompoundStatement::While(while_st) => write!(f, "{:?}", while_st),
+//             CompoundStatement::ClassDef(classdef) => write!(f, "{:?}", classdef),
+//             CompoundStatement::Try(try_st) => write!(f, "{:?}", try_st),
+//             CompoundStatement::TryStar(try_star) => write!(f, "{:?}", try_star),
+//             CompoundStatement::With(with) => write!(f, "{:?}", with),
+//             CompoundStatement::Match(match_st) => write!(f, "{:?}", match_st),
+//         }
+//     }
+// }
+
+
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct ClassDef {
@@ -210,6 +230,15 @@ pub enum Statement {
     Compound(CompoundStatement),
 }
 
+// impl fmt::Debug for Statement {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+//         match self {
+//             Statement::Simple(simple) => write!(f, "\n\tSimple statement\n{:?}\n", simple),
+//             Statement::Compound(compound) => write!(f, "\n\tComp. statement\n{:?}\n", compound),
+//         }
+//     }
+// }
+
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum Suite {
     IndentedBlock(IndentedBlock),
@@ -220,6 +249,17 @@ pub enum Suite {
 pub struct SimpleStatementLine {
     pub body: Vec<SmallStatement>,
 }
+
+// impl fmt::Debug for SimpleStatementLine {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+//         let mut body = "\t\tSimple Statement Line\n".to_string();
+//         for small in self.body.iter() {
+//             body = format!("{}\t\t{:?}\n", body, small);
+//         }
+//         write!(f, "{}", body)
+//     }
+//
+// }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct SimpleStatementSuite {
