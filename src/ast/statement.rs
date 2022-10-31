@@ -493,14 +493,14 @@ pub struct IndentedBlock {
 }
 
 impl WithComma for ImportAlias {
-    fn with_comma(self, comma: Comma) -> ImportAlias {
+    fn with_comma(self, _comma: Comma) -> ImportAlias {
 
         Self { ..self }
     }
 }
 
 impl WithComma for MatchMappingElement {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         Self {
 
             ..self

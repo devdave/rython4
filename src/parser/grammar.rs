@@ -2608,10 +2608,10 @@ fn add_arguments_trailing_comma(
 fn make_lambda(
     _lambda_tok: TokenRef,
     params: Parameters,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     expr: Expression,
 ) -> Lambda {
-    let colon = make_colon(colon_tok);
+
     Lambda {
         params: Box::new(params),
         body: Box::new(expr),
@@ -2691,13 +2691,13 @@ fn make_raise(
 }
 
 fn make_global(
-    tok: TokenRef,
+    _tok: TokenRef,
     init: Vec<(Name, Comma)>,
     last: Name,
 ) -> Global {
     let mut names: Vec<NameItem> = init
         .into_iter()
-        .map(|(name, c)| NameItem {
+        .map(|(name, _c)| NameItem {
             name,
         })
         .collect();
@@ -2711,13 +2711,13 @@ fn make_global(
 }
 
 fn make_nonlocal(
-    tok: TokenRef,
+    _tok: TokenRef,
     init: Vec<(Name, Comma)>,
     last: Name,
 ) -> Nonlocal {
     let mut names: Vec<NameItem> = init
         .into_iter()
-        .map(|(name, c)| NameItem {
+        .map(|(name, _c)| NameItem {
             name,
         })
         .collect();
@@ -2733,11 +2733,11 @@ fn make_nonlocal(
 #[allow(clippy::too_many_arguments)]
 fn make_for(
     async_tok: Option<TokenRef>,
-    for_tok: TokenRef,
+    _for_tok: TokenRef,
     target: AssignTargetExpression,
-    in_tok: TokenRef,
+    _in_tok: TokenRef,
     iter: Expression,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
     orelse: Option<Else>,
 ) -> For {
@@ -2754,9 +2754,9 @@ fn make_for(
 }
 
 fn make_while(
-    while_tok: TokenRef,
+    _while_tok: TokenRef,
     test: Expression,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
     orelse: Option<Else>,
 ) -> While {
@@ -2768,7 +2768,7 @@ fn make_while(
     }
 }
 
-fn make_await(await_tok: TokenRef, expression: Expression) -> Await {
+fn make_await(_await_tok: TokenRef, expression: Expression) -> Await {
     Await {
         expression: Box::new(expression),
 
@@ -2776,16 +2776,16 @@ fn make_await(await_tok: TokenRef, expression: Expression) -> Await {
 }
 
 fn make_class_def(
-    class_tok: TokenRef,
+    _class_tok: TokenRef,
     name: Name,
     args: Option<(LeftParen, Option<Vec<Arg>>, RightParen)>,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> std::result::Result<ClassDef, &'static str> {
     let mut bases = vec![];
     let mut keywords = vec![];
 
-    if let Some((lpar_, args, rpar_)) = args {
+    if let Some((_lpar_, args, _rpar_)) = args {
         // parens_tok = Some((lpar_.lpar_tok.clone(), rpar_.rpar_tok.clone()));
         // lpar = Some(lpar_);
         // rpar = Some(rpar_);
@@ -2827,7 +2827,7 @@ fn make_string(tok: TokenRef) -> String {
 fn make_strings(s: Vec<(String, TokenRef)>) -> String {
     let mut strings = s.into_iter().rev();
     let (first, _) = strings.next().expect("no strings to make a string of");
-    strings.fold(first, |acc, (str, tok)| {
+    strings.fold(first, |acc, (str, _tok)| {
         let ret: String = String::Concatenated(ConcatenatedString {
             left: Box::new(str),
             right: Box::new(acc),
@@ -2856,7 +2856,7 @@ fn make_fstring_expression(
     } else {
         (None, None)
     };
-    let after_expr_tok = if equal.is_some() {
+    let _after_expr_tok = if equal.is_some() {
         None
     } else if let Some(tok) = conversion_tok {
         Some(tok)
@@ -2890,8 +2890,8 @@ fn make_fstring(
 }
 
 fn make_finally(
-    finally_tok: TokenRef,
-    colon_tok: TokenRef,
+    _finally_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> Finally {
     Finally {
@@ -2901,10 +2901,10 @@ fn make_finally(
 }
 
 fn make_except(
-    except_tok: TokenRef,
+    _except_tok: TokenRef,
     exp: Option<Expression>,
     as_: Option<(TokenRef, Name)>,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> ExceptHandler {
     // TODO: AsName should come from outside
@@ -2918,11 +2918,11 @@ fn make_except(
 }
 
 fn make_except_star(
-    except_tok: TokenRef,
-    star_tok: TokenRef,
+    _except_tok: TokenRef,
+    _star_tok: TokenRef,
     exp: Expression,
     as_: Option<(TokenRef, Name)>,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> ExceptStarHandler {
     // TODO: AsName should come from outside
@@ -2936,7 +2936,7 @@ fn make_except_star(
 }
 
 fn make_try(
-    try_tok: TokenRef,
+    _try_tok: TokenRef,
     body: Suite,
     handlers: Vec<ExceptHandler>,
     orelse: Option<Else>,
@@ -2952,7 +2952,7 @@ fn make_try(
 }
 
 fn make_try_star(
-    try_tok: TokenRef,
+    _try_tok: TokenRef,
     body: Suite,
     handlers: Vec<ExceptStarHandler>,
     orelse: Option<Else>,
@@ -3018,11 +3018,11 @@ fn make_with_item(
 
 fn make_with(
     async_tok: Option<TokenRef>,
-    with_tok: TokenRef,
-    lpar: Option<LeftParen>,
+    _with_tok: TokenRef,
+    _lpar: Option<LeftParen>,
     items: Vec<WithItem>,
-    rpar: Option<RightParen>,
-    colon_tok: TokenRef,
+    _rpar: Option<RightParen>,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> With {
     let asynchronous = async_tok.as_ref().map(|_| Asynchronous {});
@@ -3034,7 +3034,7 @@ fn make_with(
     }
 }
 
-fn make_del(tok: TokenRef, target: DelTargetExpression) -> Del {
+fn make_del(_tok: TokenRef, target: DelTargetExpression) -> Del {
     Del {
         target,
 
@@ -3042,9 +3042,9 @@ fn make_del(tok: TokenRef, target: DelTargetExpression) -> Del {
 }
 
 fn make_del_tuple(
-    lpar: Option<LeftParen>,
+    _lpar: Option<LeftParen>,
     elements: Vec<Element>,
-    rpar: Option<RightParen>,
+    _rpar: Option<RightParen>,
 ) -> DelTargetExpression {
     DelTargetExpression::Tuple(Box::new(Tuple {
         elements,
@@ -3052,7 +3052,7 @@ fn make_del_tuple(
     }))
 }
 
-fn make_named_expr(name: Name, tok: TokenRef, expr: Expression) -> NamedExpr {
+fn make_named_expr(name: Name, _tok: TokenRef, expr: Expression) -> NamedExpr {
     NamedExpr {
         target: Box::new(Expression::Name(Box::new(name))),
         value: Box::new(expr),
@@ -3061,12 +3061,12 @@ fn make_named_expr(name: Name, tok: TokenRef, expr: Expression) -> NamedExpr {
 }
 
 fn make_match(
-    match_tok: TokenRef,
+    _match_tok: TokenRef,
     subject: Expression,
-    colon_tok: TokenRef,
-    indent_tok: TokenRef,
+    _colon_tok: TokenRef,
+    _indent_tok: TokenRef,
     cases: Vec<MatchCase>,
-    dedent_tok: TokenRef,
+    _dedent_tok: TokenRef,
 ) -> Match {
     Match {
         subject,
@@ -3076,14 +3076,14 @@ fn make_match(
 }
 
 fn make_case(
-    case_tok: TokenRef,
+    _case_tok: TokenRef,
     pattern: MatchPattern,
     guard: Option<(TokenRef, Expression)>,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> MatchCase {
-    let (if_tok, guard) = match guard {
-        Some((if_tok, guard)) => (Some(if_tok), Some(guard)),
+    let (_if_tok, guard) = match guard {
+        Some((_if_tok, guard)) => (Some(_if_tok), Some(guard)),
         None => (None, None),
     };
     MatchCase {
@@ -3103,9 +3103,9 @@ fn make_match_singleton(value: Name) -> MatchPattern {
 }
 
 fn make_list_pattern(
-    lbracket: Option<LeftSquareBracket>,
+    _lbracket: Option<LeftSquareBracket>,
     patterns: Vec<StarrableMatchSequenceElement>,
-    rbracket: Option<RightSquareBracket>,
+    _rbracket: Option<RightSquareBracket>,
 ) -> MatchSequence {
     MatchSequence::MatchList(MatchList {
         patterns,
@@ -3115,7 +3115,7 @@ fn make_list_pattern(
 
 fn make_as_pattern(
     pattern: Option<MatchPattern>,
-    as_tok: Option<TokenRef>,
+    _as_tok: Option<TokenRef>,
     name: Option<Name>,
 ) -> MatchPattern {
     MatchPattern::As(Box::new(MatchAs {
@@ -3125,7 +3125,7 @@ fn make_as_pattern(
     }))
 }
 
-fn make_bit_or(tok: TokenRef) -> BitOr {
+fn make_bit_or(_tok: TokenRef) -> BitOr {
     BitOr {}
 }
 
@@ -3172,9 +3172,9 @@ fn ensure_imaginary_number(tok: TokenRef) -> GrammarResult<Expression> {
 }
 
 fn make_tuple_pattern(
-    lpar: LeftParen,
+    _lpar: LeftParen,
     patterns: Vec<StarrableMatchSequenceElement>,
-    rpar: RightParen,
+    _rpar: RightParen,
 ) -> MatchSequence {
     MatchSequence::MatchTuple(MatchTuple {
         patterns,
@@ -3184,7 +3184,7 @@ fn make_tuple_pattern(
 
 fn make_open_sequence_pattern(
     first: StarrableMatchSequenceElement,
-    comma: Comma,
+    _comma: Comma,
     mut rest: Vec<StarrableMatchSequenceElement>,
 ) -> Vec<StarrableMatchSequenceElement> {
     rest.insert(0, first);
@@ -3197,7 +3197,7 @@ fn make_match_sequence_element(value: MatchPattern) -> MatchSequenceElement {
     }
 }
 
-fn make_match_star(star_tok: TokenRef, name: Option<Name>) -> MatchStar {
+fn make_match_star(_star_tok: TokenRef, name: Option<Name>) -> MatchStar {
     MatchStar {
         name,
 
@@ -3208,13 +3208,12 @@ fn make_match_mapping(
     _lbrace: LeftCurlyBrace,
     mut elements: Vec<MatchMappingElement>,
     el_comma: Option<Comma>,
-    star_tok: Option<TokenRef>,
+    _star_tok: Option<TokenRef>,
     rest: Option<Name>,
-    trailing_comma: Option<Comma>,
+    _trailing_comma: Option<Comma>,
     _rbrace: RightCurlyBrace,
 ) -> MatchPattern {
-    if let Some(c) = el_comma {
-
+    if let Some(_c) = el_comma {
         // TODO: else raise error
     }
     MatchPattern::Mapping(MatchMapping {
@@ -3226,7 +3225,7 @@ fn make_match_mapping(
 
 fn make_match_mapping_element(
     key: Expression,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     pattern: MatchPattern,
 ) -> MatchMappingElement {
     MatchMappingElement {
@@ -3238,12 +3237,12 @@ fn make_match_mapping_element(
 
 fn make_class_pattern(
     cls: NameOrAttribute,
-    lpar_tok: TokenRef,
+    _lpar_tok: TokenRef,
     mut patterns: Vec<MatchSequenceElement>,
     pat_comma: Option<Comma>,
     mut kwds: Vec<MatchKeywordElement>,
     kwd_comma: Option<Comma>,
-    rpar_tok: TokenRef,
+    _rpar_tok: TokenRef,
 ) -> MatchPattern {
     if let Some(_c) = pat_comma {
         if let Some(el) = patterns.pop() {
