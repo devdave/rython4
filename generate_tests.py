@@ -16,7 +16,7 @@ def token_type_from_python_to_rust(typefield):
         case token.OP:
             return "TType::Op"
         case token.NEWLINE:
-            return "TType::Newline"
+            return "TType::NL"
         case token.NUMBER:
             return "TType::Number"
         case token.INDENT:
@@ -32,7 +32,8 @@ def token_type_from_python_to_rust(typefield):
             return "TType::Comment"
 
         case default:
-            return "TType::Unhandled({})".format(typefield)
+            # Assume these are operators
+            return "TType::Op".format(typefield)
             # raise ValueError("Token type Not handled yet {}".format(typefield))
 
 
@@ -47,8 +48,8 @@ def process_file(element:Path):
             for idx, token in enumerate(tokens):
 
                 ttype = f"{token_type_from_python_to_rust(token.type)}"
-                if token.string == "\r\n":
-                    positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]-1}, {token.end[0]})"
+                if token.string in ("\r\n", "\n", "\r"):
+                    positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
                     print(f"test_token_w_position!(tokens[{idx}], {ttype}, {positions}, \"\\n\" );")
                 else:
                     positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
