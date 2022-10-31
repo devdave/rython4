@@ -751,17 +751,17 @@ parser! {
             / star:lit("*") t:wildcard_pattern() { make_match_star(star, None) }
 
         rule mapping_pattern() -> MatchPattern
-            = l:lbrace() r:rbrace() {
+            = l:_lbrace() r:_rbrace() {
                 make_match_mapping(l, vec![], None, None, None, None, r)
             }
-            / l:lbrace() rest:double_star_pattern() trail:comma()? r:rbrace() {
+            / l:_lbrace() rest:double_star_pattern() trail:comma()? r:_rbrace() {
                 make_match_mapping(l, vec![], None, Some(rest.0), Some(rest.1), trail, r)
             }
-            / l:lbrace() items:items_pattern() c:comma() rest:double_star_pattern()
-                trail:comma()? r:rbrace() {
+            / l:_lbrace() items:items_pattern() c:comma() rest:double_star_pattern()
+                trail:comma()? r:_rbrace() {
                     make_match_mapping(l, items, Some(c), Some(rest.0), Some(rest.1), trail, r)
                 }
-            / l:lbrace() items:items_pattern() trail:comma()? r:rbrace() {
+            / l:_lbrace() items:items_pattern() trail:comma()? r:_rbrace() {
                 make_match_mapping(l, items, trail, None, None, None, r)
             }
 
@@ -1172,15 +1172,15 @@ parser! {
                 Expression::Tuple(Box::new(Tuple::default()))}
 
         rule set() -> Expression
-            = lbrace:lbrace() e:star_named_expressions()? rbrace:rbrace() {
-                Expression::Set(Box::new(make_set(lbrace, e.unwrap_or_default(), rbrace)))
+            = _lbrace:_lbrace() e:star_named_expressions()? _rbrace:_rbrace() {
+                Expression::Set(Box::new(make_set(_lbrace, e.unwrap_or_default(), _rbrace)))
             }
 
         // Dicts
 
         rule dict() -> Expression
-            = lbrace:lbrace() els:double_starred_keypairs()? rbrace:rbrace() {
-                Expression::Dict(Box::new(make_dict(lbrace, els.unwrap_or_default(), rbrace)))
+            = _lbrace:_lbrace() els:double_starred_keypairs()? _rbrace:_rbrace() {
+                Expression::Dict(Box::new(make_dict(_lbrace, els.unwrap_or_default(), _rbrace)))
             }
 
 
@@ -1224,7 +1224,7 @@ parser! {
             }
 
         rule setcomp() -> Expression
-            = l:lbrace() elt:named_expression() comp:for_if_clauses() r:rbrace() {
+            = l:_lbrace() elt:named_expression() comp:for_if_clauses() r:_rbrace() {
                 Expression::SetComp(Box::new(make_set_comp(l, elt, comp, r)))
             }
 
@@ -1239,8 +1239,8 @@ parser! {
             }
 
         rule dictcomp() -> Expression
-            = lbrace:lbrace() elt:kvpair() comp:for_if_clauses() rbrace:rbrace() {
-                Expression::DictComp(Box::new(make_dict_comp(lbrace, elt, comp, rbrace)))
+            = _lbrace:_lbrace() elt:kvpair() comp:for_if_clauses() _rbrace:_rbrace() {
+                Expression::DictComp(Box::new(make_dict_comp(_lbrace, elt, comp, _rbrace)))
             }
 
         // Function call arguments
@@ -1483,10 +1483,10 @@ parser! {
         rule rbrak() -> RightSquareBracket
             = tok:lit("]") { make_right_bracket(tok) }
 
-        rule lbrace() -> LeftCurlyBrace
+        rule _lbrace() -> LeftCurlyBrace
             = tok:lit("{") { make_left_brace(tok) }
 
-        rule rbrace() -> RightCurlyBrace
+        rule _rbrace() -> RightCurlyBrace
             = tok:lit("}") { make_right_brace(tok) }
 
         rule NEWLINE() -> TokenRef
@@ -1693,7 +1693,7 @@ fn _make_simple_statement(parts: SimpleStatementParts) -> (TokenRef, Vec<SmallSt
     let mut body = vec![];
 
     let mut current = parts.first_statement;
-    for (semi, next) in parts.rest {
+    for (_, next) in parts.rest {
         body.push(current);
         current = next;
     }
@@ -1704,7 +1704,7 @@ fn _make_simple_statement(parts: SimpleStatementParts) -> (TokenRef, Vec<SmallSt
 
 
 fn make_simple_statement_lines(parts: SimpleStatementParts) -> SimpleStatementLine {
-    let (first_tok, body) = _make_simple_statement(parts);
+    let (_, body) = _make_simple_statement(parts);
     SimpleStatementLine {
         body,
     }
@@ -1730,13 +1730,13 @@ fn make_ann_assignment(
 #[allow(clippy::too_many_arguments)]
 fn make_function_def(
     async_tok: Option<TokenRef>,
-    def_tok: TokenRef,
+    _def_tok: TokenRef,
     name: Name,
-    open_paren_tok: TokenRef,
+    _open_paren_tok: TokenRef,
     params: Option<Parameters>,
-    close_paren_tok: TokenRef,
+    _close_paren_tok: TokenRef,
     returns: Option<Annotation>,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     body: Suite,
 ) -> FunctionDef {
     let asynchronous = async_tok.as_ref().map(|_| Asynchronous {});
@@ -1751,9 +1751,9 @@ fn make_function_def(
 }
 
 fn make_decorator(
-    at_tok: TokenRef,
+    _at_tok: TokenRef,
     name: Expression,
-    newline_tok: TokenRef,
+    _newline_tok: TokenRef,
 ) -> Decorator {
     Decorator {
         decorator: name,
@@ -1961,7 +1961,7 @@ fn make_semicolon(tok: TokenRef) -> Semicolon {
 }
 
 fn make_simple_statement_suite(parts: SimpleStatementParts) -> Suite {
-    let (first_tok, body_tok) = _make_simple_statement(parts);
+    let (_first_tok, body_tok) = _make_simple_statement(parts);
 
     Suite::SimpleStatementSuite(SimpleStatementSuite {
         body: body_tok,
@@ -1971,7 +1971,7 @@ fn make_simple_statement_suite(parts: SimpleStatementParts) -> Suite {
 }
 
 fn make_simple_statement_line(parts: SimpleStatementParts) -> SimpleStatementLine {
-    let (first_tok, body) = _make_simple_statement(parts);
+    let (_first_tok, body) = _make_simple_statement(parts);
     SimpleStatementLine {
         body,
 
@@ -1979,9 +1979,9 @@ fn make_simple_statement_line(parts: SimpleStatementParts) -> SimpleStatementLin
 }
 
 fn make_if(
-    if_tok: TokenRef,
+    _if_tok: TokenRef,
     cond: Expression,
-    colon_tok: TokenRef,
+    _colon_tok: TokenRef,
     block: Suite,
     orelse: Option<OrElse>,
     is_elif: bool,
@@ -1995,7 +1995,7 @@ fn make_if(
     }
 }
 
-fn make_else(else_tok: TokenRef, colon_tok: TokenRef, block: Suite) -> Else {
+fn make_else(_else_tok: TokenRef, _colon_tok: TokenRef, block: Suite) -> Else {
     Else {
         body: block,
     }
@@ -2031,7 +2031,7 @@ fn add_param_default(
     def: Option<(AssignEqual, Expression)>,
     comma_tok: Option<TokenRef>,
 ) -> Param {
-    let comma = comma_tok.map(make_comma);
+    let _comma = comma_tok.map(make_comma);
 
     let (equal, default) = match def {
         Some((a, b)) => (Some(a), Some(b)),
@@ -2044,7 +2044,7 @@ fn add_param_default(
     }
 }
 
-fn add_param_star(param: Param, star: TokenRef) -> Param {
+fn add_param_star(param: Param, _star: TokenRef) -> Param {
 
     Param {
         ..param
@@ -2057,9 +2057,9 @@ fn make_assign_equal(tok: TokenRef) -> AssignEqual {
     }
 }
 
-fn make_comma(tok: TokenRef) -> Comma {
-    Comma {
-    }
+fn make_comma(_tok: TokenRef) -> Comma {
+    //todo cull
+    Comma { }
 }
 
 fn concat<T>(a: Vec<T>, b: Vec<T>) -> Vec<T> {
@@ -2072,7 +2072,7 @@ fn make_name_or_attr(
 ) -> NameOrAttribute {
 
     if let Some((dot, name)) = tail.pop() {
-        let dot = make_dot(dot);
+        let _dot = make_dot(dot);
         return NameOrAttribute::A(Box::new(Attribute {
             attr: name,
             value: Box::new(make_name_or_attr(first_tok, tail).into()),
@@ -2088,7 +2088,7 @@ fn make_name(tok: TokenRef) -> Name {
     }
 }
 
-fn make_dot(tok: TokenRef) -> Dot {
+fn make_dot(_tok: TokenRef) -> Dot {
     Dot {
 
     }
@@ -2104,7 +2104,7 @@ fn make_import_alias(
     }
 }
 
-fn make_as_name(as_tok: TokenRef, name: AssignTargetExpression) -> AsName {
+fn make_as_name(_as_tok: TokenRef, name: AssignTargetExpression) -> AsName {
     AsName {
         name,
     }
@@ -2117,13 +2117,13 @@ type ParenthesizedImportNames = (
 );
 
 fn make_import_from(
-    from_tok: TokenRef,
+    _from_tok: TokenRef,
     dots: Vec<Dot>,
     module: Option<NameOrAttribute>,
-    import_tok: TokenRef,
+    _import_tok: TokenRef,
     aliases: ParenthesizedImportNames,
 ) -> ImportFrom {
-    let (lpar, names, rpar) = aliases;
+    let (_lpar, names, _rpar) = aliases;
 
     ImportFrom {
         module,
@@ -2132,7 +2132,7 @@ fn make_import_from(
     }
 }
 
-fn make_import(import_tok: TokenRef, names: Vec<ImportAlias>) -> Import {
+fn make_import(_import_tok: TokenRef, names: Vec<ImportAlias>) -> Import {
     Import {
         names,
     }
@@ -2144,7 +2144,7 @@ fn make_import_from_as_names(
 ) -> Vec<ImportAlias> {
     let mut ret = vec![];
     let mut cur = first;
-    for (comma, alias) in tail {
+    for (_comma, alias) in tail {
         ret.push(cur);
         cur = alias;
     }
@@ -2160,7 +2160,7 @@ fn make_rpar(tok: TokenRef) -> RightParen {
     RightParen { tok }
 }
 
-fn make_attribute(value: Expression, dot: TokenRef, attr: Name) -> Attribute {
+fn make_attribute(value: Expression, _dot: TokenRef, attr: Name) -> Attribute {
 
     Attribute {
         attr,
@@ -2168,7 +2168,7 @@ fn make_attribute(value: Expression, dot: TokenRef, attr: Name) -> Attribute {
     }
 }
 
-fn make_starred_element(star_tok: TokenRef, rest: Element) -> StarredElement {
+fn make_starred_element(_star_tok: TokenRef, rest: Element) -> StarredElement {
     let value = match rest {
         Element::Simple { value, .. } => value,
         _ => panic!("Internal error while making starred element"),
@@ -2205,7 +2205,7 @@ fn make_assignment(
     rhs: Expression,
 ) -> Assign {
     let mut targets = vec![];
-    for (target, equal_tok) in lhs {
+    for (target, _equal_tok) in lhs {
         targets.push(AssignTarget {
             target,
         });
@@ -2229,8 +2229,8 @@ fn make_tuple(
     first: Element,
     rest: Vec<(Comma, Element)>,
     trailing_comma: Option<Comma>,
-    lpar: Option<LeftParen>,
-    rpar: Option<RightParen>,
+    _lpar: Option<LeftParen>,
+    _rpar: Option<RightParen>,
 ) -> Tuple {
     let elements = comma_separate(first, rest, trailing_comma);
 
@@ -2271,9 +2271,9 @@ fn make_star_arg(star: TokenRef, expr: Expression) -> Arg {
 
 fn make_call(
     func: Expression,
-    lpar_tok: TokenRef,
+    _lpar_tok: TokenRef,
     args: Vec<Arg>,
-    rpar_tok: TokenRef,
+    _rpar_tok: TokenRef,
 ) -> Call {
 
     let func = Box::new(func);
@@ -2327,9 +2327,9 @@ fn make_comp_if(if_tok: TokenRef, test: Expression) -> CompIf {
 
 fn make_for_if(
     async_tok: Option<TokenRef>,
-    for_tok: TokenRef,
+    _for_tok: TokenRef,
     target: AssignTargetExpression,
-    in_tok: TokenRef,
+    _in_tok: TokenRef,
     iter: Expression,
     ifs: Vec<CompIf>,
 ) -> CompFor {
@@ -2390,10 +2390,10 @@ fn make_right_brace(tok: TokenRef) -> RightCurlyBrace {
 }
 
 fn make_list_comp(
-    lbracket: LeftSquareBracket,
+    _lbracket: LeftSquareBracket,
     elt: Expression,
     for_in: CompFor,
-    rbracket: RightSquareBracket,
+    _rbracket: RightSquareBracket,
 ) -> ListComp {
     ListComp {
         elt: Box::new(elt),
@@ -2403,10 +2403,10 @@ fn make_list_comp(
 }
 
 fn make_set_comp(
-    lbrace: LeftCurlyBrace,
+    _lbrace: LeftCurlyBrace,
     elt: Expression,
     for_in: CompFor,
-    rbrace: RightCurlyBrace,
+    __rbrace: RightCurlyBrace,
 ) -> SetComp {
     SetComp {
         elt: Box::new(elt),
@@ -2416,12 +2416,12 @@ fn make_set_comp(
 }
 
 fn make_dict_comp(
-    lbrace: LeftCurlyBrace,
+    _lbrace: LeftCurlyBrace,
     kvpair: (Expression, TokenRef, Expression),
     for_in: CompFor,
-    rbrace: RightCurlyBrace,
+    _rbrace: RightCurlyBrace,
 ) -> DictComp {
-    let (key, colon_tok, value) = kvpair;
+    let (key, _colon_tok, value) = kvpair;
 
     DictComp {
         key: Box::new(key),
@@ -2433,9 +2433,9 @@ fn make_dict_comp(
 }
 
 fn make_list(
-    lbracket: LeftSquareBracket,
+    _lbracket: LeftSquareBracket,
     elements: Vec<Element>,
-    rbracket: RightSquareBracket,
+    _rbracket: RightSquareBracket,
 ) -> List {
     List {
         elements,
@@ -2444,9 +2444,9 @@ fn make_list(
 }
 
 fn make_set(
-    lbrace: LeftCurlyBrace,
+    _lbrace: LeftCurlyBrace,
     elements: Vec<Element>,
-    rbrace: RightCurlyBrace,
+    _rbrace: RightCurlyBrace,
 ) -> Set {
     Set {
         elements,
@@ -2475,9 +2475,9 @@ where
 }
 
 fn make_dict(
-    lbrace: LeftCurlyBrace,
+    _lbrace: LeftCurlyBrace,
     elements: Vec<DictElement>,
-    rbrace: RightCurlyBrace,
+    _rbrace: RightCurlyBrace,
 ) -> Dict {
     Dict {
         elements,
@@ -2487,11 +2487,11 @@ fn make_dict(
 fn make_double_starred_keypairs(
     first: DictElement,
     rest: Vec<(Comma, DictElement)>,
-    trailing_comma: Option<Comma>,
+    _trailing_comma: Option<Comma>,
 ) -> Vec<DictElement> {
     let mut elements = vec![];
     let mut current = first;
-    for (comma, next) in rest {
+    for (_comma, next) in rest {
         elements.push(current);
         current = next;
     }
@@ -2505,7 +2505,7 @@ fn make_double_starred_keypairs(
 }
 
 fn make_dict_element(el: (Expression, TokenRef, Expression)) -> DictElement {
-    let (key, colon_tok, value) = el;
+    let (key, _colon_tok, value) = el;
     DictElement::Simple {
         key,
         value,
@@ -2513,7 +2513,7 @@ fn make_dict_element(el: (Expression, TokenRef, Expression)) -> DictElement {
 }
 
 fn make_double_starred_element(
-    star_tok: TokenRef,
+    _star_tok: TokenRef,
     value: Expression,
 ) -> StarredDictElement {
     StarredDictElement {
@@ -2525,7 +2525,7 @@ fn make_index(value: Expression) -> BaseSlice {
     BaseSlice::Index(Box::new(Index { value }))
 }
 
-fn make_colon(tok: TokenRef) -> Colon {
+fn make_colon(_tok: TokenRef) -> Colon {
 
     Colon {}
 }
@@ -2536,8 +2536,8 @@ fn make_slice(
     upper: Option<Expression>,
     rest: Option<(TokenRef, Option<Expression>)>,
 ) -> BaseSlice {
-    let first_colon = make_colon(first_colon);
-    let (second_colon, step) = if let Some((tok, step)) = rest {
+    let _first_colon = make_colon(first_colon);
+    let (_second_colon, step) = if let Some((tok, step)) = rest {
         (Some(make_colon(tok)), step)
     } else {
         (None, None)
@@ -2552,11 +2552,11 @@ fn make_slice(
 fn make_slices(
     first: BaseSlice,
     rest: Vec<(Comma, BaseSlice)>,
-    trailing_comma: Option<Comma>,
+    _trailing_comma: Option<Comma>,
 ) -> Vec<SubscriptElement> {
     let mut elements = vec![];
     let mut current = first;
-    for (comma, next) in rest {
+    for (_comma, next) in rest {
         elements.push(SubscriptElement {
             slice: current,
         });
@@ -2572,9 +2572,9 @@ fn make_subscript(
     value: Expression,
     lbracket: LeftSquareBracket,
     slice: Vec<SubscriptElement>,
-    rbracket: RightSquareBracket,
+    _rbracket: RightSquareBracket,
 ) -> Subscript {
-    let lbracket_tok = lbracket.tok.clone();
+    let _lbracket_tok = lbracket.tok.clone();
     Subscript {
         value: Box::new(value),
         slice,
@@ -2584,9 +2584,9 @@ fn make_subscript(
 
 fn make_ifexp(
     body: Expression,
-    if_tok: TokenRef,
+    _if_tok: TokenRef,
     test: Expression,
-    else_tok: TokenRef,
+    _else_tok: TokenRef,
     orelse: Expression,
 ) -> IfExp {
     IfExp {
@@ -2599,14 +2599,14 @@ fn make_ifexp(
 
 fn add_arguments_trailing_comma(
     mut args: Vec<Arg>,
-    trailing_comma: Option<Comma>,
+    _trailing_comma: Option<Comma>,
 ) -> Vec<Arg> {
 
     args
 }
 
 fn make_lambda(
-    lambda_tok: TokenRef,
+    _lambda_tok: TokenRef,
     params: Parameters,
     colon_tok: TokenRef,
     expr: Expression,
@@ -2619,7 +2619,7 @@ fn make_lambda(
     }
 }
 
-fn make_annotation(tok: TokenRef, ann: Expression) -> Annotation {
+fn make_annotation(_tok: TokenRef, ann: Expression) -> Annotation {
     Annotation {
         annotation: ann,
 
@@ -2628,7 +2628,7 @@ fn make_annotation(tok: TokenRef, ann: Expression) -> Annotation {
 
 
 fn make_yield(
-    yield_tok: TokenRef,
+    _yield_tok: TokenRef,
     f: Option<TokenRef>,
     e: Option<Expression>,
 ) -> Yield {
@@ -2644,14 +2644,14 @@ fn make_yield(
     }
 }
 
-fn make_from(tok: TokenRef, e: Expression) -> From {
+fn make_from(_tok: TokenRef, e: Expression) -> From {
     From {
         item: e,
 
     }
 }
 
-fn make_return(return_tok: TokenRef, value: Option<Expression>) -> Return {
+fn make_return(_return_tok: TokenRef, value: Option<Expression>) -> Return {
     Return {
         value,
 
@@ -2659,11 +2659,11 @@ fn make_return(return_tok: TokenRef, value: Option<Expression>) -> Return {
 }
 
 fn make_assert(
-    assert_tok: TokenRef,
+    _assert_tok: TokenRef,
     test: Expression,
     rest: Option<(Comma, Expression)>,
 ) -> Assert {
-    let (comma, msg) = if let Some((c, msg)) = rest {
+    let (_comma, msg) = if let Some((c, msg)) = rest {
         (Some(c), Some(msg))
     } else {
         (None, None)
@@ -2677,7 +2677,7 @@ fn make_assert(
 }
 
 fn make_raise(
-    raise_tok: TokenRef,
+    _raise_tok: TokenRef,
     exc: Option<Expression>,
     rest: Option<(TokenRef, Expression)>,
 ) -> Raise {
@@ -2838,12 +2838,12 @@ fn make_strings(s: Vec<(String, TokenRef)>) -> String {
 }
 
 fn make_fstring_expression(
-    lbrace_tok: TokenRef,
+    _lbrace_tok: TokenRef,
     expression: Expression,
     eq: Option<TokenRef>,
     conversion_pair: Option<(TokenRef, std::string::String)>,
     format_pair: Option<(TokenRef, Vec<FormattedStringContent>)>,
-    rbrace_tok: TokenRef,
+    _rbrace_tok: TokenRef,
 ) -> FormattedStringExpression {
     let equal = eq.map(make_assign_equal);
     let (conversion_tok, conversion) = if let Some((t, c)) = conversion_pair {
@@ -2863,7 +2863,7 @@ fn make_fstring_expression(
     } else if let Some(tok) = format_tok {
         Some(tok)
     } else {
-        Some(rbrace_tok)
+        Some(_rbrace_tok)
     };
 
     FormattedStringExpression {
@@ -3205,13 +3205,13 @@ fn make_match_star(star_tok: TokenRef, name: Option<Name>) -> MatchStar {
 }
 
 fn make_match_mapping(
-    lbrace: LeftCurlyBrace,
+    _lbrace: LeftCurlyBrace,
     mut elements: Vec<MatchMappingElement>,
     el_comma: Option<Comma>,
     star_tok: Option<TokenRef>,
     rest: Option<Name>,
     trailing_comma: Option<Comma>,
-    rbrace: RightCurlyBrace,
+    _rbrace: RightCurlyBrace,
 ) -> MatchPattern {
     if let Some(c) = el_comma {
 
@@ -3245,13 +3245,13 @@ fn make_class_pattern(
     kwd_comma: Option<Comma>,
     rpar_tok: TokenRef,
 ) -> MatchPattern {
-    if let Some(c) = pat_comma {
+    if let Some(_c) = pat_comma {
         if let Some(el) = patterns.pop() {
             patterns.push(el);
         }
         // TODO: else raise error
     }
-    if let Some(c) = kwd_comma {
+    if let Some(_c) = kwd_comma {
         if let Some(el) = kwds.pop() {
             kwds.push(el);
         }
@@ -3267,7 +3267,7 @@ fn make_class_pattern(
 
 fn make_match_keyword_element(
     key: Name,
-    equal_tok: TokenRef,
+    _equal_tok: TokenRef,
     pattern: MatchPattern,
 ) -> MatchKeywordElement {
     MatchKeywordElement {
@@ -3434,7 +3434,7 @@ mod tests {
             let path = test_path.expect("filepath").path();
             if path.is_file() {
                 //skip invalid/error testing files
-                if let fname= path.as_path().to_str().unwrap().starts_with("error") {
+                if path.as_path().to_str().unwrap().starts_with("error") {
                     continue;
                 }
 

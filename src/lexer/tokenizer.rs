@@ -176,7 +176,7 @@ impl Tokenizer {
 
 
 
-        let mut is_statement = false;
+        // let mut is_statement = false;
 
         //Deal with blank lines
         if  line.len() == 1 && line == "\n"{
@@ -290,29 +290,29 @@ impl Tokenizer {
 
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                is_statement = true;
+                // is_statement = true;
 
             } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                is_statement = true;
+                // is_statement = true;
 
             }
             //Attempt to capture floats - TODO test if still needed
             else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                is_statement = true;
+                // is_statement = true;
             }
             //The "SUPER" Number regex
             else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                is_statement = true;
+                // is_statement = true;
             }
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
                 product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
-                is_statement = true;
+                // is_statement = true;
             }
             //Look for WS
-            else if let Some((new_pos, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
+            else if let Some((_, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
                 //and ignore it
                 if state.string_continues == true {
                     state.string_buffer = format!("{}{}", state.string_buffer, found);
@@ -320,7 +320,7 @@ impl Tokenizer {
 
             }
             //Look for comments
-            else if let Some((new_pos, found)) = code.return_match(COMMENT.to_owned()) {
+            else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
                 //Don't add comments into product
                 //Consume the newline
                 if code.peek().unwrap() == "\n" {
@@ -332,7 +332,7 @@ impl Tokenizer {
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
             //Last ditch look for Name's
-            else if let Some((new_pos, found)) = code.return_match(ANY_NAME.to_owned()) {
+            else if let Some((_, found)) = code.return_match(ANY_NAME.to_owned()) {
                 //TODO remove once I've caught the bugs that lead to this
                 println!("Captured any name: {:?}", found);
 
