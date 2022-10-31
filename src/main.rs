@@ -22,6 +22,9 @@ struct Args {
     interpret: Option<String>,
     #[clap(long, short='S', default_value="false", value_parser)]
     show_tokens: bool,
+    #[clap(long, short='C', value_parser)]
+    check_code: Option<std::path::PathBuf>,
+
 }
 
 
@@ -71,6 +74,8 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
 }
 
 fn py_intrepret_string(line: String, _show_tokens: bool) {
+    //TODO implement repl
+
     println!("Would run {}", line);
 }
 
