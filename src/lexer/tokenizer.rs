@@ -176,7 +176,7 @@ impl Tokenizer {
 
 
 
-        // let mut is_statement = false;
+        let mut is_statement = false;
 
         //Deal with blank lines
         if  line.len() == 1 && line == "\n"{
@@ -289,8 +289,6 @@ impl Tokenizer {
             }
 
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
-                product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                // is_statement = true;
                 //Check for async and await operators
                 if found == "async" {
                     product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
@@ -301,25 +299,26 @@ impl Tokenizer {
                 else {
                     product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 }
+                is_statement = true;
 
             } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                // is_statement = true;
+                is_statement = true;
 
             }
             //Attempt to capture floats - TODO test if still needed
             else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                // is_statement = true;
+                is_statement = true;
             }
             //The "SUPER" Number regex
             else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
                 product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                // is_statement = true;
+                is_statement = true;
             }
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
                 product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
-                // is_statement = true;
+                is_statement = true;
             }
             //Look for WS
             else if let Some((_, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
@@ -335,7 +334,7 @@ impl Tokenizer {
                 //Consume the newline
                 if code.peek().unwrap() == "\n" {
                     code.get();
-                    if product.len() > 0 {
+                    if product.len() > 0 && is_statement == true {
                         product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
                     }
                 }
