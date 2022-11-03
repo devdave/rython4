@@ -118,8 +118,8 @@ pub enum Expression {
     Ellipsis,
     Integer(Box<Integer>),
     Float(Box<Float>),
-    Binary(Box<Binary>),
-    Hexidecimal(Box<Hexidecimal>),
+    Binary(Box<Binary>),  //TODO compiler says this is never used!
+    Hexidecimal(Box<Hexidecimal>), //TODO compiler says this is never used!
     Imaginary(Box<Imaginary>),
     Comparison(Box<Comparison>),
     UnaryOperation(Box<UnaryOperation>),
