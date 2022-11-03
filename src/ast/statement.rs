@@ -509,7 +509,7 @@ impl WithComma for MatchMappingElement {
 }
 
 impl WithComma for MatchSequenceElement {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         Self {
 
             ..self
@@ -518,7 +518,7 @@ impl WithComma for MatchSequenceElement {
 }
 
 impl WithComma for MatchStar {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         Self {
 
             ..self
@@ -527,16 +527,16 @@ impl WithComma for MatchStar {
 }
 
 impl WithComma for StarrableMatchSequenceElement {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         match self {
-            Self::Simple(s) => Self::Simple(s.with_comma(comma)),
-            Self::Starred(s) => Self::Starred(s.with_comma(comma)),
+            Self::Simple(s) => Self::Simple(s.with_comma(_comma)),
+            Self::Starred(s) => Self::Starred(s.with_comma(_comma)),
         }
     }
 }
 
 impl WithComma for WithItem {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         Self {
 
             ..self
@@ -545,7 +545,7 @@ impl WithComma for WithItem {
 }
 
 impl WithComma for MatchKeywordElement {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
         Self {
 
             ..self

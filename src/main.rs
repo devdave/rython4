@@ -43,7 +43,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     }
 
 
-    let mut lines = cleaner(buffer);
+    let lines = cleaner(buffer);
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
     let outcome = tokenizer.generate(lines);
     if let Ok(tokens) = outcome {

@@ -10,7 +10,7 @@ use super::expression::{
 
 fn gen_depth_string(depth: usize) -> String {
     let mut depth_string: String = String::new();
-    for i in 1..depth {
+    for _i in 1..depth {
         depth_string.push_str("\t");
     }
 
