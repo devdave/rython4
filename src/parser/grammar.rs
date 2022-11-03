@@ -125,6 +125,7 @@ parser! {
 
         //Starting rules
 
+
         pub rule file(name: &str) -> Module
         = traced(<_file(name)>)
 
@@ -356,6 +357,7 @@ parser! {
             / s:simple_stmts() {
                 make_simple_statement_suite(s)
             }
+        //TODO should I add back in invalid_block?
         //TODO should I add back in invalid_block?
 
         rule decorators() -> Vec<Decorator>
@@ -1498,8 +1500,8 @@ parser! {
 
         //Invalid rules
 
-        rule invalid_import_from_targets() -> TokenRef
-            = import_from_as_names() comma() t:NEWLINE() { error!("trailing comma not allowed") }
+        rule invalid_import_from_targets()
+            = import_from_as_names() c:comma() NEWLINE() {? Err("trailing comma not allowed without surrounding parentheses") }
 
 
         //Utility rules
@@ -1643,6 +1645,7 @@ parser! {
                 / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
             )
             t:tok(NameTok, "NameToken - Name rule") { make_name(t) }
+
 
         rule _async() -> TokenRef
             = tok(Async, "ASYNC")
