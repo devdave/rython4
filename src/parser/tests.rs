@@ -149,6 +149,9 @@ mod tests {
             let path = test_path.expect("filepath").path();
             if path.is_file() {
                 //skip invalid/error testing files
+                if path.as_path().file_name().expect("fname").to_str().expect("fname string").starts_with("error") {
+                    continue;
+                }
                 if path.as_path().to_str().unwrap().starts_with("error") {
                     continue;
                 }
