@@ -1660,7 +1660,7 @@ parser! {
                 #[cfg(feature = "trace")]
                 {
                     println!("[PEG_INPUT_START]");
-                    println!("{:?}", input);
+                    println!("{:#?}", input);
                     println!("[PEG_TRACE_START]");
                 }
             })
