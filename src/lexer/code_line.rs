@@ -24,7 +24,7 @@ impl CodeLine {
         //Return the new cursor position
 
         //TODO is there a faster/more efficient way to do this?
-        let mut remaining: String = self.line.graphemes(true).skip(self.pos).collect();
+        let remaining: String = self.line.graphemes(true).skip(self.pos).collect();
 
         if let Some(result) = pattern.find(remaining.as_str()) {
            let retstr = result.as_str().to_string();
@@ -43,9 +43,9 @@ impl CodeLine {
         self.len.saturating_sub(self.pos)
     }
 
-    pub fn get_line(&self) -> String {
-        self.line.clone()
-    }
+    // pub fn get_line(&self) -> String {
+    //     self.line.clone()
+    // }
 
     pub fn peek(&self) -> Option<&str> {
         return self.line.graphemes(true).nth(self.pos);
@@ -57,15 +57,15 @@ impl CodeLine {
         return retval;
     }
 
-    pub fn len(&self) -> usize {
-        self.line.len()
-    }
+    // pub fn len(&self) -> usize {
+    //     self.line.len()
+    // }
 
-    pub fn is_empty(&self) -> bool {
-        //TODO tell the compiler to fuck off, I want my goddamn parenthesis!
-
-        return self.len() == 1 && self.line.trim() == "";
-    }
+    // pub fn is_empty(&self) -> bool {
+    //     //TODO tell the compiler to fuck off, I want my goddamn parenthesis!
+    //
+    //     return self.len() == 1 && self.line.trim() == "";
+    // }
 
 }
 
