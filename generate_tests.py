@@ -1,4 +1,4 @@
-import token
+import token as ttype
 from tokenize import tokenize
 from tokenize import _generate_tokens_from_c_tokenizer
 from pathlib import Path
@@ -7,28 +7,28 @@ from argparse import ArgumentParser
 
 def token_type_from_python_to_rust(typefield):
     match typefield:
-        case token.ENCODING:
+        case ttype.ENCODING:
             return "TType::Encoding"
-        case token.STRING:
+        case ttype.STRING:
             return "TType::String"
-        case token.NAME:
+        case ttype.NAME:
             return "TType::Name"
-        case token.OP:
+        case ttype.OP:
             return "TType::Op"
-        case token.NEWLINE:
+        case ttype.NEWLINE:
             return "TType::NL"
-        case token.NUMBER:
+        case ttype.NUMBER:
             return "TType::Number"
-        case token.INDENT:
+        case ttype.INDENT:
             return "TType::Indent"
-        case token.DEDENT:
+        case ttype.DEDENT:
             return "TType::Dedent"
-        case token.ENDMARKER:
+        case ttype.ENDMARKER:
             return "TType::EndMarker"
-        case token.NL:
+        case ttype.NL:
             return "TType::NL"
 
-        case token.COMMENT:
+        case ttype.COMMENT:
             return "TType::Comment"
 
         case default:
@@ -47,19 +47,20 @@ def process_file(element:Path):
 
             for idx, token in enumerate(tokens):
 
-                ttype = f"{token_type_from_python_to_rust(token.type)}"
+                type_str = f"{token_type_from_python_to_rust(token.type)}"
                 positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
 
-                if token.string in ("\r\n", "\n", "\r") or token.type in [token.NL, token.NEWLINE]:
+                if token.string in ("\r\n", "\n", "\r") or token.type in [ttype.NEWLINE, ttype.NL]:
                     positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
-                    print(f"test_token_w_position!(tokens[{idx}], {ttype}, {positions}, \"\" );")
-                elif token.type in (token.INDENT, token.DEDENT):
-                    print(f"test_token_w_position!(tokens[{idx}], {ttype}, {positions}, \"\" );")
+                    print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
+                elif token.type in (ttype.INDENT, ttype.DEDENT):
+                    print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
                 else:
                     positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
-                    print(f"test_token_w_position!(tokens[{idx}], {ttype}, {positions}, \"{token.string}\" );")
+                    print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"{token.string}\" );")
         except Exception as exc:
             print(f"Failed to tokenize because {exc}")
+            raise
 
         print("Finished\n")
 
