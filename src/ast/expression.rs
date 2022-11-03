@@ -514,7 +514,7 @@ impl WithComma for Arg {
 }
 
 impl WithComma for DictElement {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
 
         match self {
             Self::Starred(s) => Self::Starred(StarredDictElement { ..s }),
@@ -525,11 +525,11 @@ impl WithComma for DictElement {
 
 
 impl WithComma for Element {
-    fn with_comma(self, comma: Comma) -> Self {
+    fn with_comma(self, _comma: Comma) -> Self {
 
         match self {
             Self::Simple { value, .. } => Self::Simple { value },
-            Self::Starred(mut s) => { Self::Starred(s) }
+            Self::Starred(s) => { Self::Starred(s) }
         }
     }
 }
