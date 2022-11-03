@@ -155,7 +155,7 @@ parser! {
         }
 
         rule simple_stmts() -> SimpleStatementParts
-        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) tok(NL, "NL NewLine")+ {
+        = first_tok:&_ stmts:separated_trailer(<simple_stmt()>, <lit(";")>) tok(NL, "NL/NewLine")+ {
             SimpleStatementParts {
                 first_tok,
                 first_statement: stmts.0,
@@ -200,7 +200,7 @@ parser! {
 
         // "Simple" statemens
         // TODO: there's an extra '(' single_target ')' clause here in upstream
-        // I don't remember this  syntax and will have to hunt it down
+        // I don't remember this syntax and will have to hunt it down
         // a=(lit("(") b=single_target lit(")")) { b }
 
         //         / single_subscript_attribute_target) ':' b=expression c=['=' d=annotated_rhs { d }] {
@@ -280,22 +280,22 @@ parser! {
             = yield_expr()
 
         rule assert_stmt() -> Assert
-            = kw:lit("assert") test:expression() rest:(c:comma() msg:expression() {(c, msg)})? {
+            = kw:t_assert() test:expression() rest:(c:comma() msg:expression() {(c, msg)})? {
                 make_assert(kw, test, rest)
             }
 
         rule import_name() -> Import
-            = kw:lit("import") a:dotted_as_names() {
+            = kw:t_import() a:dotted_as_names() {
                 make_import(kw, a)
             }
 
         rule import_from() -> ImportFrom
-            = from:lit("from") dots:dots()? m:dotted_name()
-                import:lit("import") als:import_from_targets() {
+            = from:t_from() dots:dots()? m:dotted_name()
+                import:t_import() als:import_from_targets() {
                     make_import_from(from, dots.unwrap_or_default(), Some(m), import, als)
             }
-            / from:lit("from") dots:dots()
-                import:lit("import") als:import_from_targets() {
+            / from:t_from() dots:dots()
+                import:t_import() als:import_from_targets() {
                     make_import_from(from, dots, None, import, als)
             }
 
@@ -349,7 +349,7 @@ parser! {
         #[cache]
         rule block() -> Suite
             = n:tok(NL, "NEWLINE") ind:tok(Indent, "INDENT") s:statements() ded:tok(Dedent, "DEDENT-Close block") {
-                println!("Block closed");
+                //println!("Block closed");
                 make_indented_block(n, ind, s, ded)
 
             }
@@ -1953,12 +1953,12 @@ struct SimpleStatementParts {
     last_semi: Option<TokenRef>,
 }
 
-fn make_semicolon(tok: TokenRef) -> Semicolon {
-    Semicolon {
-
-        tok,
-    }
-}
+// fn make_semicolon(tok: TokenRef) -> Semicolon {
+//     Semicolon {
+//
+//         tok,
+//     }
+// }
 
 fn make_simple_statement_suite(parts: SimpleStatementParts) -> Suite {
     let (_first_tok, body_tok) = _make_simple_statement(parts);
@@ -2284,7 +2284,7 @@ fn make_call(
     }
 }
 
-fn make_genexp_call(func: Expression, mut genexp: GeneratorExp) -> Call {
+fn make_genexp_call(func: Expression, genexp: GeneratorExp) -> Call {
     // func ( (genexp) )
     //      ^
     //   lpar_tok
@@ -2598,7 +2598,7 @@ fn make_ifexp(
 }
 
 fn add_arguments_trailing_comma(
-    mut args: Vec<Arg>,
+    args: Vec<Arg>,
     _trailing_comma: Option<Comma>,
 ) -> Vec<Arg> {
 
@@ -3378,7 +3378,10 @@ mod tests {
         let magic = python::file(&vec, &display_str.as_str());
 
         if let Ok(module) = magic {
-            print_module(module);
+            //Quiet this down
+            //print_module(module);
+            println!("Successfully parsed {}", display_str);
+
         } else if let Err(parse_loc) = magic {
             println!("Failed to parse: {:?} - because {:?}", display_str, parse_loc);
             for token_ref in vec.0.iter() {
