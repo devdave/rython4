@@ -291,6 +291,16 @@ impl Tokenizer {
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 // is_statement = true;
+                //Check for async and await operators
+                if found == "async" {
+                    product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
+                }
+                else if found == "await" {
+                    product.push(Token::quick(TType::Await, lineno, col_pos, new_pos, found));
+                }
+                else {
+                    product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
+                }
 
             } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
