@@ -13,3 +13,8 @@ def toptier():
                 if more_to_go_true:
                     more_to_go_true = False
                     return False
+
+
+from foo import (thing1,
+                 thing2_no_indent,
+                 thing3)
