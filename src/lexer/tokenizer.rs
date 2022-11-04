@@ -243,7 +243,7 @@ impl Tokenizer {
                         //Do nothing
                     }
                 }
-            } else if state.indent_stack.len() > 0 {
+            } else if state.indent_stack.len() > 0 && line.trim().chars().nth(0).unwrap_or('N') != '#' {
                 //Pop all indents
 
                 while state.indent_stack.len() > 0 {

@@ -8,6 +8,7 @@ def toptier():
             if still_depth:
                 still_depth = False
                 return True
+# NO DEDENTS
             else:
                 if more_to_go_true:
                     more_to_go_true = False
