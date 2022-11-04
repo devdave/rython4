@@ -33,7 +33,7 @@ def token_type_from_python_to_rust(typefield):
 
         case default:
             # Assume these are operators
-            return "TType::Op".format(typefield)
+            return "TType::Op"
             # raise ValueError("Token type Not handled yet {}".format(typefield))
 
 
