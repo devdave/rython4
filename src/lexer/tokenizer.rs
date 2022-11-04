@@ -201,7 +201,7 @@ impl Tokenizer {
 
 
             //Handle blank lines
-            if line.trim().len() <= 1 {
+            if line.trim().len() == 0 {
                 //We are done!
                 return Ok(product);
             }
