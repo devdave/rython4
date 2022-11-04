@@ -48,15 +48,18 @@ def process_file(element:Path):
             for idx, token in enumerate(tokens):
 
                 type_str = f"{token_type_from_python_to_rust(token.type)}"
-                positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
+                # print(f"//DEBUG {token.start!r} and {token.end!r}")
+                positions = f"({token.start[0]}, {token.start[1]}), ({token.end[0]}, {token.end[1]})"
 
                 if token.string in ("\r\n", "\n", "\r") or token.type in [ttype.NEWLINE, ttype.NL]:
-                    positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
+
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
                 elif token.type in (ttype.INDENT, ttype.DEDENT):
+                    # reading tokenizer.c, the default col offset seems to be -1 and it doesn't look it
+                    #   is changed when the dent tokens are pushed/printed onto the list/stack
+                    positions = f"({token.start[0]}, 0), ({token.end[0]}, 0)"
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
                 else:
-                    positions = f"({token.start[1]}, {token.start[0]}), ({token.end[1]}, {token.end[0]})"
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"{token.string}\" );")
         except Exception as exc:
             print(f"Failed to tokenize because {exc}")
