@@ -720,78 +720,9 @@ fn test_basic_class() {
     let mut tokenizer = Tokenizer::new(TConfig::default());
     let tokens = tokenizer.process_file("test_fixtures/basic_class.py").expect("tokens");
 
-    for (lno, token) in tokens.iter().enumerate() {
-        println!("{}: {:?}", lno, token);
-    }
+    let tokens = Tokenizer::tokenize_file("test_fixtures\basic_class.py", TConfig{skip_encoding: true, skip_endmarker false});
 
-    test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Name, (0, 1), (5, 1), "class" );
-    test_token_w_position!(tokens[2], TType::Name, (6, 1), (11, 1), "Basic" );
-    test_token_w_position!(tokens[3], TType::Op, (11, 1), (12, 1), ":" );
-    test_token_w_position!(tokens[4], TType::NL, (12, 1), (13, 1), "\n" );
-    test_token_w_position!(tokens[5], TType::Indent, (0, 2), (4, 2), "    " );
-    // test_token_w_position!(tokens[6], TType::String, (4, 2), (7, 4), """"
-    //     A basic class definition
-    //     """" );
-    test_token_w_position!(tokens[7], TType::NL, (7, 4), (8, 4), "\n" );
-    test_token_w_position!(tokens[8], TType::Name, (4, 5), (7, 5), "def" );
-    test_token_w_position!(tokens[9], TType::Name, (8, 5), (16, 5), "__init__" );
-    test_token_w_position!(tokens[10], TType::Op, (16, 5), (17, 5), "(" );
-    test_token_w_position!(tokens[11], TType::Name, (17, 5), (21, 5), "self" );
-    test_token_w_position!(tokens[12], TType::Op, (21, 5), (22, 5), ")" );
-    test_token_w_position!(tokens[13], TType::Op, (22, 5), (23, 5), ":" );
-    // test_token_w_position!(tokens[14], TType::Newline, (23, 5), (24, 5), "\n" );
-    test_token_w_position!(tokens[15], TType::Indent, (0, 6), (8, 6), "        " );
-    // test_token_w_position!(tokens[16], TType::String, (8, 6), (11, 8), """"
-    //         A basic init
-    //         """" );
-    // test_token_w_position!(tokens[17], TType::Newline, (11, 8), (12, 8), "\n" );
-    test_token_w_position!(tokens[18], TType::Name, (8, 9), (12, 9), "self" );
-    test_token_w_position!(tokens[19], TType::Op, (12, 9), (13, 9), "." );
-    test_token_w_position!(tokens[20], TType::Name, (13, 9), (14, 9), "c" );
-    test_token_w_position!(tokens[21], TType::Op, (15, 9), (16, 9), "=" );
-    test_token_w_position!(tokens[22], TType::Number, (17, 9), (18, 9), "0" );
-    // test_token_w_position!(tokens[23], TType::Newline, (18, 9), (19, 9), "\n" );
-    // test_token_w_position!(tokens[24], TType::NL, (0, 10), (1, 10), "\n" );
-    test_token_w_position!(tokens[25], TType::Dedent, (4, 11), (4, 11), "" );
-    test_token_w_position!(tokens[26], TType::Name, (4, 11), (7, 11), "def" );
-    test_token_w_position!(tokens[27], TType::Name, (8, 11), (11, 11), "add" );
-    test_token_w_position!(tokens[28], TType::Op, (11, 11), (12, 11), "(" );
-    test_token_w_position!(tokens[29], TType::Name, (12, 11), (16, 11), "self" );
-    test_token_w_position!(tokens[30], TType::Op, (16, 11), (17, 11), "," );
-    test_token_w_position!(tokens[31], TType::Name, (18, 11), (19, 11), "a" );
-    test_token_w_position!(tokens[32], TType::Op, (19, 11), (20, 11), "," );
-    test_token_w_position!(tokens[33], TType::Name, (21, 11), (22, 11), "b" );
-    test_token_w_position!(tokens[34], TType::Op, (22, 11), (23, 11), ")" );
-    test_token_w_position!(tokens[35], TType::Op, (23, 11), (24, 11), ":" );
-    // test_token_w_position!(tokens[36], TType::Newline, (24, 11), (25, 11), "\n" );
-    test_token_w_position!(tokens[37], TType::Indent, (0, 12), (8, 12), "        " );
-    test_token_w_position!(tokens[38], TType::Name, (8, 12), (12, 12), "self" );
-    test_token_w_position!(tokens[39], TType::Op, (12, 12), (13, 12), "." );
-    test_token_w_position!(tokens[40], TType::Name, (13, 12), (14, 12), "c" );
-    test_token_w_position!(tokens[41], TType::Op, (15, 12), (16, 12), "=" );
-    test_token_w_position!(tokens[42], TType::Name, (17, 12), (18, 12), "a" );
-    test_token_w_position!(tokens[43], TType::Op, (19, 12), (20, 12), "+" );
-    test_token_w_position!(tokens[44], TType::Name, (21, 12), (22, 12), "b" );
-    // test_token_w_position!(tokens[45], TType::Newline, (22, 12), (23, 12), "\n" );
-    test_token_w_position!(tokens[46], TType::NL, (0, 13), (1, 13), "\n" );
-    test_token_w_position!(tokens[47], TType::Dedent, (4, 14), (4, 14), "" );
-    test_token_w_position!(tokens[48], TType::Name, (4, 14), (7, 14), "def" );
-    test_token_w_position!(tokens[49], TType::Name, (8, 14), (11, 14), "get" );
-    test_token_w_position!(tokens[50], TType::Op, (11, 14), (12, 14), "(" );
-    test_token_w_position!(tokens[51], TType::Name, (12, 14), (16, 14), "self" );
-    test_token_w_position!(tokens[52], TType::Op, (16, 14), (17, 14), ")" );
-    test_token_w_position!(tokens[53], TType::Op, (17, 14), (18, 14), ":" );
-    // test_token_w_position!(tokens[54], TType::Newline, (18, 14), (19, 14), "\n" );
-    test_token_w_position!(tokens[55], TType::Indent, (0, 15), (8, 15), "        " );
-    test_token_w_position!(tokens[56], TType::Name, (8, 15), (14, 15), "return" );
-    test_token_w_position!(tokens[57], TType::Name, (15, 15), (19, 15), "self" );
-    test_token_w_position!(tokens[58], TType::Op, (19, 15), (20, 15), "." );
-    test_token_w_position!(tokens[59], TType::Name, (20, 15), (21, 15), "c" );
-    // test_token_w_position!(tokens[60], TType::Newline, (21, 15), (22, 15), "\n" );
-    test_token_w_position!(tokens[61], TType::Dedent, (0, 16), (0, 16), "" );
-    test_token_w_position!(tokens[62], TType::Dedent, (0, 16), (0, 16), "" );
-    //test_token_w_position!(tokens[63], TType::EndMarker, (0, 16), (0, 16), "" );
+
 }
 
 #[test]
