@@ -29,7 +29,7 @@ static POSSIBLE_NAME_STR: &str = r"[a-zA-Z]{1}[\w\d]+";
 static POSSIBLE_NAME_ONE_CHAR: &str = r"[a-zA-Z]{1}";
 
 pub static POSSIBLE_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[_a-zA-Z]{1}[\w\d]+").expect("regex"));
-pub static POSSIBLE_ONE_CHAR_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[a-zA-Z]{1}").expect("regex"));
+pub static POSSIBLE_ONE_CHAR_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[_a-zA-Z]{1}").expect("regex"));
 
 pub static NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(format!(r"\A({}|{})", POSSIBLE_NAME_STR, POSSIBLE_NAME_ONE_CHAR ).as_str()).expect("regex"));
 
@@ -61,3 +61,14 @@ pub static TRIPLE_QUOTE_START: Lazy<Regex> =
                             )).expect("regex"));
 
 pub static TRIPLE_QUOTE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*""""#).expect("regex") );
+
+pub static TRIPLE_SINGLE_START:Lazy<Regex> =
+    Lazy::new(|| Regex::new(
+        &*format!(
+            r#"\A{}{}"#,
+            STRING_PREFIXES,
+            r#"'''.*"#
+        )
+    ).expect("regex"));
+
+pub static TRIPLE_SINGLE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*'''"#).expect("regex") );
