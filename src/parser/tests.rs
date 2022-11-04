@@ -1,6 +1,7 @@
 
 use std::fs;
-
+use std::fs::DirEntry;
+use std::path::PathBuf;
 
 
 use crate::parser::grammar::{python, TokenRef, TokVec};
@@ -103,12 +104,6 @@ where P: AsRef<std::path::Path>
 
     }
 
-
-
-
-
-
-
 }
 
 #[test]
@@ -179,3 +174,41 @@ fn match_is_a_structure_and_soft_keyword() {
     attempt_parse_file("test_fixtures/test_match.py");
 }
 
+fn parse_directory(scandir: PathBuf)
+{
+    let contents = scandir.read_dir().expect("directory");
+
+    for test in contents {
+        let path = test.expect("directory").path();
+        let display = path.display();
+
+        if path.is_dir() {
+            parse_directory(path);
+        } else {
+            println!("Attempting {}", display);
+            attempt_parse_file(path);
+        }
+    }
+
+}
+
+#[test]
+fn parse_the_entire_stdlib() {
+    let paths = fs::read_dir("PyLib/").expect("paths");
+
+
+
+    for test in paths {
+        let path = test.expect("path").path();
+        let display = path.display();
+
+        if path.is_dir() {
+            parse_directory(path);
+        } else {
+            println!("Attempting {}", display);
+            attempt_parse_file(path);
+        }
+    }
+
+
+}
