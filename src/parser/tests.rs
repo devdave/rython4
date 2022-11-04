@@ -174,3 +174,8 @@ fn parse_all_python_fixtures() {
     }
 }
 
+#[test]
+fn match_is_a_structure_and_soft_keyword() {
+    attempt_parse_file("test_fixtures/test_match.py");
+}
+
