@@ -57,15 +57,6 @@ impl CodeLine {
         return retval;
     }
 
-    // pub fn len(&self) -> usize {
-    //     self.line.len()
-    // }
-
-    // pub fn is_empty(&self) -> bool {
-    //     //TODO tell the compiler to fuck off, I want my goddamn parenthesis!
-    //
-    //     return self.len() == 1 && self.line.trim() == "";
-    // }
 
 }
 
