@@ -192,7 +192,18 @@ impl Tokenizer {
 
 
         if state.string_continues == false {
+
+
+            //Handle blank lines
+            if line.trim().len() <= 1 {
+                //We are done!
+                return Ok(product);
+            }
+
             //Handle indent/dedent here if there is a statement
+
+
+
             if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
 
                 //TODO make sure there is no mixing of tabs, spaces, and form feed.
@@ -208,23 +219,24 @@ impl Tokenizer {
                         }
                         state.indent_stack.push(current_size);
                         product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
+                        state.indent = current_size;
                     },
                     Ordering::Less => {
 
                         //Pop that indent!
                         //TODO this is flawed and needs to pop only to the correct/new indentation
+
                         while state.indent_stack.len() > 0 {
                             let last_size = state.indent_stack.pop().unwrap();
                             if last_size != current_size {
                                 product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                                state.indent = current_size;
                             } else {
                                 state.indent_stack.push(last_size);
                                 break;
                             }
 
-                            if last_size == current_size {
-                                break;
-                            }
+
                         }
                     },
                     Ordering::Equal => {
@@ -281,6 +293,7 @@ impl Tokenizer {
 
             //Look for "string"
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
+
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             //Look for 'string'
@@ -289,6 +302,9 @@ impl Tokenizer {
             }
 
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
+
+
+
                 //Check for async and await operators
                 if found == "async" {
                     product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
