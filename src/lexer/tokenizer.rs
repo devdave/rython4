@@ -6,6 +6,7 @@ use regex::Regex;
 
 
 use crate::cleaner;
+use crate::lexer::tokenizer::StringType::TripleQuote;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
@@ -21,6 +22,7 @@ use crate::tokens::patterns::{
                           CAPTURE_APOS_STRING,
                           TRIPLE_QUOTE_START,
                           TRIPLE_QUOTE_CLOSE,
+                          CAPTURE_TRIPLE_STRING,
                           ANY_NAME
 };
 
@@ -33,7 +35,7 @@ const MAXINDENT: usize = 999;
 const TABSIZE: usize = 8;
 
 
-
+#[derive(Debug)]
 enum StringType {
     SingleApos,
     TripleApos,
@@ -47,6 +49,7 @@ pub struct TConfig {
     pub skip_endmarker: bool,
 }
 
+#[derive(Debug)]
 struct State {
     // Parenthesis symbol ([{ and starting position
     paren_def: Vec<(char, Position)>,
@@ -151,7 +154,10 @@ impl Tokenizer {
 
             match self.process_line(&mut state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
-                Err(issue) => return Err(issue),
+                Err(issue) => {
+                    println!("tokenizer failure: {:#?}", product);
+                    return Err(issue)
+                },
             }
         }
 
@@ -287,9 +293,15 @@ impl Tokenizer {
                     if let Some((_new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
+
                 }
 
 
+            }
+
+            //Capture single line triple quoted string
+            else if let Some((new_pos, found )) = code.return_match(CAPTURE_TRIPLE_STRING.to_owned()) {
+                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             //Capture multi-line string start here
             else if let Some((_new_pos, found)) = code.return_match(TRIPLE_QUOTE_START.to_owned()) {
@@ -299,7 +311,6 @@ impl Tokenizer {
                 state.string_buffer = found;
                 state.string_type = Some(StringType::TripleQuote);
             }
-
             //Look for "string"
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
 
@@ -309,6 +320,7 @@ impl Tokenizer {
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
+
 
             else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
 
@@ -395,6 +407,7 @@ impl Tokenizer {
                         break;
                     } else {
                         println!("Bad character @ {}:{}", lineno, col_pos);
+                        println!("State; {:#?}", state);
                         return Err(TokError::BadCharacter(sym.chars().nth(0).expect("char")));
                     }
                 }
