@@ -207,7 +207,7 @@ impl Tokenizer {
                             return Err(TokError::TooDeep);
                         }
                         state.indent_stack.push(current_size);
-                        product.push(Token::quick(TType::Indent, lineno, 0, current_size, ws_match.as_str().to_string()));
+                        product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
                     },
                     Ordering::Less => {
 
@@ -216,7 +216,7 @@ impl Tokenizer {
                         while state.indent_stack.len() > 0 {
                             let last_size = state.indent_stack.pop().unwrap();
                             if last_size != current_size {
-                                product.push(Token::quick(TType::Dedent, lineno, current_size, current_size, "".to_string()));
+                                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
                             } else {
                                 state.indent_stack.push(last_size);
                                 break;
@@ -335,7 +335,7 @@ impl Tokenizer {
                 if code.peek().unwrap() == "\n" {
                     code.get();
                     if product.len() > 0 && is_statement == true {
-                        product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
+                        product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "".to_string()));
                     }
                 }
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
@@ -363,9 +363,9 @@ impl Tokenizer {
                         }
                         //TODO FIX the parsing grammar mixup between Newline and NL - this is a hack until then
                         else if true {
-                            product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "\n".to_string()));
+                            product.push(Token::quick(TType::NL, lineno, col_pos, code.position().saturating_sub(1), "".to_string()));
                         } else {
-                            product.push(Token::quick(TType::Newline, lineno, col_pos, code.position(), "\n".to_string()));
+                            product.push(Token::quick(TType::Newline, lineno, col_pos, code.position(), "".to_string()));
                         }
                         break;
                     } else {
