@@ -1,3 +1,4 @@
+"""This is a triple quote on one line!"""
 
 """
     Hello World
