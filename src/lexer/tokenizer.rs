@@ -244,8 +244,17 @@ impl Tokenizer {
                     }
                 }
             } else if state.indent_stack.len() > 0 {
-                let _last_size = state.indent_stack.pop().unwrap();
-                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                //Pop all indents
+
+                while state.indent_stack.len() > 0 {
+                    let last_size = state.indent_stack.pop().unwrap();
+
+                    product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                }
+
+                state.indent = 0;
+
+
             }
         }
 
