@@ -7,8 +7,8 @@ macro_rules! test_token_w_position{
 
         assert_eq!($token.text, $content, "Testing for text/content with {:?} != {:?} for a/{:?} e/{:?}", $token.text, $content, $token.r#type, $ttype);
         assert_eq!($token.r#type, $ttype, "Testing for type with {:?} {:?} != {:?}", $token.text, $token.r#type, $ttype);
-        assert_eq!($token.start, Position::t($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
-        assert_eq!($token.end, Position::t($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
+        assert_eq!($token.start, Position::t2($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
+        assert_eq!($token.end, Position::t2($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
 
     }
 }
@@ -919,5 +919,64 @@ fn test_crazy_dents() {
     test_token_w_position!(tokens[61], TType::Dedent, (0, 14), (0, 14), "" );
     test_token_w_position!(tokens[62], TType::Dedent, (0, 14), (0, 14), "" );
     test_token_w_position!(tokens[63], TType::Dedent, (0, 14), (0, 14), "" );
+
+}
+
+
+#[test]
+fn test_match() {
+    let tokens = Tokenizer::tokenize_file(
+        "test_fixtures/test_match.py",
+        TConfig{skip_encoding: true, skip_endmarker: false}
+    ).expect("tokens");
+
+    test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
+    test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
+    test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 7), "123" );
+    test_token_w_position!(tokens[3], TType::NL, (1, 7), (1, 7), "" );
+    test_token_w_position!(tokens[4], TType::Name, (3, 0), (3, 5), "match" );
+    test_token_w_position!(tokens[5], TType::Name, (3, 6), (3, 7), "x" );
+    test_token_w_position!(tokens[6], TType::Op, (3, 7), (3, 8), ":" );
+    test_token_w_position!(tokens[7], TType::NL, (3, 8), (3, 8), "" );
+    test_token_w_position!(tokens[8], TType::Indent, (4, 0), (4, 0), "" );
+    test_token_w_position!(tokens[9], TType::Name, (4, 4), (4, 8), "case" );
+    test_token_w_position!(tokens[10], TType::Name, (4, 9), (4, 10), "x" );
+    test_token_w_position!(tokens[11], TType::Name, (4, 11), (4, 13), "if" );
+    test_token_w_position!(tokens[12], TType::Name, (4, 14), (4, 15), "x" );
+    test_token_w_position!(tokens[13], TType::Op, (4, 16), (4, 17), ">" );
+    test_token_w_position!(tokens[14], TType::Number, (4, 18), (4, 19), "1" );
+    test_token_w_position!(tokens[15], TType::Op, (4, 19), (4, 20), ":" );
+    test_token_w_position!(tokens[16], TType::NL, (4, 20), (4, 20), "" );
+    test_token_w_position!(tokens[17], TType::Indent, (5, 0), (5, 0), "" );
+    test_token_w_position!(tokens[18], TType::Name, (5, 8), (5, 13), "print" );
+    test_token_w_position!(tokens[19], TType::Op, (5, 13), (5, 14), "(" );
+    test_token_w_position!(tokens[20], TType::String, (5, 14), (5, 27), "\"Hello World\"" );
+    test_token_w_position!(tokens[21], TType::Op, (5, 27), (5, 28), ")" );
+    test_token_w_position!(tokens[22], TType::NL, (5, 28), (5, 28), "" );
+    test_token_w_position!(tokens[23], TType::Dedent, (6, 0), (6, 0), "" );
+    test_token_w_position!(tokens[24], TType::Name, (6, 4), (6, 8), "case" );
+    test_token_w_position!(tokens[25], TType::Name, (6, 9), (6, 10), "x" );
+    test_token_w_position!(tokens[26], TType::Name, (6, 11), (6, 13), "if" );
+    test_token_w_position!(tokens[27], TType::Name, (6, 14), (6, 15), "x" );
+    test_token_w_position!(tokens[28], TType::Op, (6, 16), (6, 17), "<" );
+    test_token_w_position!(tokens[29], TType::Number, (6, 18), (6, 19), "0" );
+    test_token_w_position!(tokens[30], TType::Op, (6, 19), (6, 20), ":" );
+    test_token_w_position!(tokens[31], TType::NL, (6, 20), (6, 20), "" );
+    test_token_w_position!(tokens[32], TType::Indent, (7, 0), (7, 0), "" );
+    test_token_w_position!(tokens[33], TType::Name, (7, 8), (7, 13), "print" );
+    test_token_w_position!(tokens[34], TType::Op, (7, 13), (7, 14), "(" );
+    test_token_w_position!(tokens[35], TType::String, (7, 14), (7, 24), "\"Good bye\"" );
+    test_token_w_position!(tokens[36], TType::Op, (7, 24), (7, 25), ")" );
+    test_token_w_position!(tokens[37], TType::NL, (7, 25), (7, 25), "" );
+    test_token_w_position!(tokens[38], TType::Dedent, (9, 0), (9, 0), "" );
+    test_token_w_position!(tokens[39], TType::Dedent, (9, 0), (9, 0), "" );
+    test_token_w_position!(tokens[40], TType::Name, (9, 0), (9, 1), "x" );
+    test_token_w_position!(tokens[41], TType::Op, (9, 2), (9, 3), "=" );
+    test_token_w_position!(tokens[42], TType::String, (9, 4), (9, 15), "\"new block\"" );
+    test_token_w_position!(tokens[43], TType::NL, (9, 15), (9, 15), "" );
+    test_token_w_position!(tokens[44], TType::Name, (10, 0), (10, 5), "match" );
+    test_token_w_position!(tokens[45], TType::Op, (10, 6), (10, 7), "=" );
+    test_token_w_position!(tokens[46], TType::String, (10, 8), (10, 21), "\"softkeyword\"" );
+    test_token_w_position!(tokens[47], TType::NL, (10, 21), (10, 21), "" );
 
 }
