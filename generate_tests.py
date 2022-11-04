@@ -54,11 +54,18 @@ def process_file(element:Path):
                 if token.string in ("\r\n", "\n", "\r") or token.type in [ttype.NEWLINE, ttype.NL]:
 
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
+
+                elif token.string.lower() == "async":
+                    print(f"test_token_w_position!(tokens[{idx}], TType::Async, {positions}, \"{token.string.lower()}\" );")
+                elif token.string.lower() == "await":
+                    print(f"test_token_w_position!(tokens[{idx}], TType::Await, {positions}, \"{token.string.lower()}\" );")
                 elif token.type in (ttype.INDENT, ttype.DEDENT):
                     # reading tokenizer.c, the default col offset seems to be -1 and it doesn't look it
                     #   is changed when the dent tokens are pushed/printed onto the list/stack
                     positions = f"({token.start[0]}, 0), ({token.end[0]}, 0)"
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"\" );")
+                elif token.type == ttype.STRING:
+                    print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"{token.string}\" );" )
                 else:
                     print(f"test_token_w_position!(tokens[{idx}], {type_str}, {positions}, \"{token.string}\" );")
         except Exception as exc:
