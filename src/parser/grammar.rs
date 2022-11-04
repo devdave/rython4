@@ -1642,7 +1642,7 @@ parser! {
                 / lit("break") / lit("class") / lit("continue") / lit("def") / lit("del") / lit("elif") / lit("else")
                 / lit("except") / lit("finally") / lit("for") / lit("from") / lit("global") / lit("if") / lit("import")
                 / lit("in") / lit("is") / lit("lambda") / lit("nonlocal") / lit("not") / lit("or") / lit("pass") / t_raise()
-                / lit("return") / lit("try") / lit("while") / lit("with") / lit("yield")
+                / t_return() / t_try() / t_while() / t_with() / lit("yield")
             )
             t:tok(NameTok, "NameToken - Name rule") { make_name(t) }
 
