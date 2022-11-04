@@ -22,6 +22,8 @@ use crate::tokens::patterns::{
                           CAPTURE_APOS_STRING,
                           TRIPLE_QUOTE_START,
                           TRIPLE_QUOTE_CLOSE,
+                          TRIPLE_SINGLE_START,
+                          TRIPLE_SINGLE_CLOSE,
                           CAPTURE_TRIPLE_STRING,
                           ANY_NAME
 };
@@ -40,6 +42,7 @@ enum StringType {
     SingleApos,
     TripleApos,
     SingleQuote,
+    TripleSingleQuote,
     TripleQuote,
 }
 
@@ -52,7 +55,7 @@ pub struct TConfig {
 #[derive(Debug)]
 struct State {
     // Parenthesis symbol ([{ and starting position
-    paren_def: Vec<(char, Position)>,
+    paren_depth: Vec<(char, Position)>,
     //For now accept/allow only spaces
     indent_stack: Vec<usize>,
     //string handling logic
@@ -64,12 +67,13 @@ struct State {
     indent: usize,
     tabsize: usize,
     altindentstack: Vec<usize>,
+    line_continues: bool,
 }
 
 impl State {
     fn new() -> Self {
         Self {
-            paren_def: Vec::new(),
+            paren_depth: Vec::new(),
             indent_stack: Vec::new(),
             string_continues: false,
             string_type: None,
@@ -78,6 +82,7 @@ impl State {
             indent: 0,
             tabsize: TABSIZE, //... apparently determined by a fair dice roll.
             altindentstack: Vec::new(),
+            line_continues: false,
 
         }
     }
@@ -155,10 +160,11 @@ impl Tokenizer {
             match self.process_line(&mut state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => {
-                    println!("tokenizer failure: {:#?}", product);
+                    println!("tokenizer failure: {:?}", product);
                     return Err(issue)
                 },
             }
+
         }
 
         //Check for indents and push matching dedents
@@ -167,6 +173,14 @@ impl Tokenizer {
                 let _last_size = state.indent_stack.pop().unwrap();
                 product.push(Token::quick(TType::Dedent, source.len()+1, 0, 0, "".to_string()));
             }
+        }
+
+        if state.paren_depth.len() > 0 {
+            println!("State: {:#?}", state);
+            let (last_paren, pos) = state.paren_depth.pop().expect("paren");
+            println!("tokenizer failure: {:#?}", product);
+
+            return Err(TokError::UnmatchedClosingParen(last_paren));
         }
 
         if self.config.skip_endmarker == false {
@@ -181,20 +195,13 @@ impl Tokenizer {
         let mut product: Vec<Token> = Vec::new();
 
 
-
         let mut is_statement = false;
 
         //Deal with blank lines
-        if  line.len() == 1 && line == "\n"{
-            //Blow away the indent stack!
-            // if state.indent_stack.len() > 0 {
-            //     state.indent_stack.pop();
-            //     product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-            // }
-            //product.push(Token::quick(TType::NL, lineno, 0, 1, "\n".to_string()));
+        if line.len() == 1 && line == "\n" {
+
             return Ok(product);
         }
-
 
 
         if state.string_continues == false {
@@ -206,64 +213,62 @@ impl Tokenizer {
                 return Ok(product);
             }
 
-            //Handle indent/dedent here if there is a statement
+            //only do indent and dedent if we're not inside brackets
+            if state.paren_depth.len() == 0 && state.line_continues == false {
+                //Handle indent/dedent here if there is a statement
+                if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
 
+                    //TODO make sure there is no mixing of tabs, spaces, and form feed.
+                    //TODO drop support for form feed?
+                    let current_size: usize = ws_match.end() - ws_match.start();
+                    let last_size = state.indent_stack.last().unwrap_or(&0);
 
-
-            if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
-
-                //TODO make sure there is no mixing of tabs, spaces, and form feed.
-                //TODO drop support for form feed?
-                let current_size: usize = ws_match.end() - ws_match.start();
-                let last_size = state.indent_stack.last().unwrap_or(&0);
-
-                match current_size.cmp(last_size) {
-                    Ordering::Greater => {
-                        //push on a new indent
-                        if state.indent_stack.len() + 1 > MAXINDENT {
-                            return Err(TokError::TooDeep);
-                        }
-                        state.indent_stack.push(current_size);
-                        product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
-                        state.indent = current_size;
-                    },
-                    Ordering::Less => {
-
-                        //Pop that indent!
-                        //TODO this is flawed and needs to pop only to the correct/new indentation
-
-                        while state.indent_stack.len() > 0 {
-                            let last_size = state.indent_stack.pop().unwrap();
-                            if last_size != current_size {
-                                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-                                state.indent = current_size;
-                            } else {
-                                state.indent_stack.push(last_size);
-                                break;
+                    match current_size.cmp(last_size) {
+                        Ordering::Greater => {
+                            //push on a new indent
+                            if state.indent_stack.len() + 1 > MAXINDENT {
+                                return Err(TokError::TooDeep);
                             }
+                            state.indent_stack.push(current_size);
+                            product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
+                            state.indent = current_size;
+                        },
+                        Ordering::Less => {
 
+                            //Pop that indent!
+                            //TODO this is flawed and needs to pop only to the correct/new indentation
 
+                            while state.indent_stack.len() > 0 {
+                                let last_size = state.indent_stack.pop().unwrap();
+                                if last_size != current_size {
+                                    product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                                    state.indent = current_size;
+                                } else {
+                                    state.indent_stack.push(last_size);
+                                    break;
+                                }
+                            }
+                        },
+                        Ordering::Equal => {
+                            //Do nothing
                         }
-                    },
-                    Ordering::Equal => {
-                        //Do nothing
                     }
+                } else if state.indent_stack.len() > 0 && line.trim().chars().nth(0).unwrap_or('N') != '#' {
+                    //Pop all indents
+
+                    while state.indent_stack.len() > 0 {
+                        let last_size = state.indent_stack.pop().unwrap();
+
+                        product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                    }
+
+                    state.indent = 0;
                 }
-            } else if state.indent_stack.len() > 0 && line.trim().chars().nth(0).unwrap_or('N') != '#' {
-                //Pop all indents
-
-                while state.indent_stack.len() > 0 {
-                    let last_size = state.indent_stack.pop().unwrap();
-
-                    product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-                }
-
-                state.indent = 0;
-
-
             }
         }
 
+        //reset this flag as its served its purpose
+        state.line_continues = false;
 
 
 
@@ -288,7 +293,24 @@ impl Tokenizer {
                     state.string_continues = false;
                     state.string_type = None;
 
-                } else {
+                }
+                else if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
+                    state.string_buffer = format!("{}{}", state.string_buffer, found);
+                    let start = state.string_start.as_ref().unwrap().clone();
+
+                    product.push(
+                        Token::Make(
+                            TType::String,
+                            start,
+                            Position::m(new_pos, lineno),
+                            state.string_buffer.clone(),
+                        )
+                    );
+                    state.string_start = None;
+                    state.string_continues = false;
+                    state.string_type = None;
+                }
+                else {
                     //Consume the whole line
                     if let Some((_new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
@@ -315,6 +337,12 @@ impl Tokenizer {
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
 
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
+            }
+            else if let Some((_, found)) = code.return_match(TRIPLE_SINGLE_START.to_owned()) {
+                state.string_continues = true;
+                state.string_start = Some(Position::m(col_pos, lineno));
+                state.string_buffer = found;
+                state.string_type = Some(StringType::TripleSingleQuote);
             }
             //Look for 'string'
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
@@ -354,6 +382,34 @@ impl Tokenizer {
                 is_statement = true;
             }
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
+
+
+
+                if found == "(" || found == "[" || found == "{" {
+                    state.paren_depth.push(
+                        (found.chars().nth(0).expect("expected char"),
+                            Position::t2((lineno, col_pos))
+                        )
+                    );
+                } else if found == ")" || found == "]" || found == "}" {
+                    let current = found.chars().nth(0).expect("char");
+
+                    if state.paren_depth.len() == 0 {
+                        return Err(TokError::UnmatchedClosingParen(current));
+                    }
+                    if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
+                        if (
+                            (last_paren == '(' && current != ')')
+                            || (last_paren == '[' && current != ']')
+                            || (last_paren == '{' && current != '}')
+                        ) {
+                            return Err(TokError::MismatchedClosingParenOnLine(current, last_paren, lineno));
+                        }
+                    } else {
+                        panic!("Expected element in paren stack but got nothing: {:#?}", state);
+                    }
+                }
+
                 product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
                 is_statement = true;
             }
@@ -380,7 +436,7 @@ impl Tokenizer {
             //Last ditch look for Name's
             else if let Some((_, found)) = code.return_match(ANY_NAME.to_owned()) {
                 //TODO remove once I've caught the bugs that lead to this
-                println!("Captured any name: {:?}", found);
+                println!("Captured any name: {:?} @ {}:{}", found, lineno, col_pos);
 
             }
             else {
@@ -391,10 +447,19 @@ impl Tokenizer {
                         if state.string_continues == true {
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
+                    }
+                    else if sym == "\\" {
+                        //Don't do anything, TODO how to signal a line continuation?
+                        state.line_continues = true;
+                        //abort processing for now, nothing matters after a \
+                        return Ok(product);
+                    }
+                     else if sym == "\n" {
 
-                    } else if sym == "\n" {
-
-                        if state.string_continues == true {
+                        if state.paren_depth.len() > 0 {
+                            continue
+                        }
+                        else if state.string_continues == true {
                             // TODO is this really the fastest/"best" way to append to a String?
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
