@@ -112,7 +112,7 @@ fn test_additive() {
     test_token_w_position!(tokens[16], TType::Op, (34, 1), (35, 1), "[" );
     test_token_w_position!(tokens[17], TType::Number, (35, 1), (36, 1), "5" );
     test_token_w_position!(tokens[18], TType::Op, (36, 1), (37, 1), "]" );
-    test_token_w_position!(tokens[19], TType::Newline, (37, 1), (38, 1), "\n" );
+    test_token_w_position!(tokens[19], TType::NL, (37, 1), (38, 1), "\n" );
     test_token_w_position!(tokens[20], TType::EndMarker, (0, 2), (0, 2), "" );
 
 }
