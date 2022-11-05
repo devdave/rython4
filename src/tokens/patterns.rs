@@ -5,7 +5,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub static COMMENT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A#.*").expect("regex"));
-
+pub static BL_COMMENT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\A[ \f\t]+#.*").expect("regex"));
 
 // TODO consolidate floating points
 //Point either in middle or scientific number with point at start
