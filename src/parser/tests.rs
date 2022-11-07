@@ -100,11 +100,11 @@ where P: AsRef<std::path::Path>
         println!("Successfully parsed {}", display_str);
 
     } else if let Err(parse_loc) = magic {
-        println!("Failed to parse: {:?} - because {:?}", display_str, parse_loc);
+
         for token_ref in vec.0.iter() {
             println!("Token: {:?}", token_ref);
         }
-        panic!("Failed to parse!");
+        println!("Failed to parse: {:?} - because {:?}", display_str, parse_loc);
 
     }
 
