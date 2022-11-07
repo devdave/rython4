@@ -84,6 +84,10 @@ where P: AsRef<std::path::Path>
 
 
     let display_str = filename.as_ref().display().to_string();
+    if display_str.ends_with(".py") == false {
+        return;
+    }
+
     let tokens = Tokenizer::tokenize_file(filename, TConfig{skip_encoding: true, skip_endmarker: false}).expect("Tokens");
 
     let vec = TokVec::from(tokens);
