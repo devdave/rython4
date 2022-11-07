@@ -13,6 +13,7 @@ use super::code_line::CodeLine;
 use crate::tokens::patterns::{
                             // NAME_RE,
                             COMMENT,
+                            BL_COMMENT,
                             FLOATING_POINT,
                             POSSIBLE_NAME,
                             POSSIBLE_ONE_CHAR_NAME,
@@ -204,6 +205,8 @@ impl Tokenizer {
         }
 
 
+
+
         if state.string_continues == false {
 
 
@@ -215,8 +218,14 @@ impl Tokenizer {
 
             //only do indent and dedent if we're not inside brackets
             if state.paren_depth.len() == 0 && state.line_continues == false {
+
+                //Ignore blank lines with comments
+                if let Some(test) = BL_COMMENT.find(&line) {
+
+                }
                 //Handle indent/dedent here if there is a statement
-                if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
+
+                else if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
 
                     //TODO make sure there is no mixing of tabs, spaces, and form feed.
                     //TODO drop support for form feed?
@@ -427,7 +436,7 @@ impl Tokenizer {
                 //Consume the newline
                 if code.peek().unwrap() == "\n" {
                     code.get();
-                    if product.len() > 0 && is_statement == true {
+                    if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
                         product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "".to_string()));
                     }
                 }
