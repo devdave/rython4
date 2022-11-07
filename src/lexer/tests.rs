@@ -565,7 +565,7 @@ fn test_basic_operators() {
 
 #[test]
 fn test_valid_literals() {
-    let VALID_UNDERSCORE_LITERALS: Vec<&str> = vec![
+    let ValidUnderscoreLiterals: Vec<&str> = vec![
         "0_0_0",
         "4_2",
         "1_0000_0000",
@@ -592,7 +592,7 @@ fn test_valid_literals() {
     let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: true, skip_encoding: true});
 
 
-    for value in VALID_UNDERSCORE_LITERALS {
+    for value in ValidUnderscoreLiterals {
         if value.starts_with("(") {
             continue;
         }
