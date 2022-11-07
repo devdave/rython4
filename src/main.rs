@@ -46,6 +46,8 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     let lines = cleaner(buffer);
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
     let outcome = tokenizer.generate(lines);
+    println!("Tokenized!");
+
     if let Ok(tokens) = outcome {
         if show_tokens == true {
             println!("I got {} of tokens", tokens.len());
@@ -58,7 +60,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
         let tvector = TokVec::from(tokens);
         let result = python::file(&tvector, &display.to_string().as_str());
         if let Ok(ptree) = result {
-            println!("Parsing succeeded! \n{:#?}", ptree);
+            println!("Parsing succeeded! \n");
         } else {
             println!("Failed to parse: {:#?}", result);
         }
