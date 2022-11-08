@@ -1,3 +1,5 @@
+extern crate core;
+
 mod lexer;
 mod tokens;
 mod parser;
@@ -37,14 +39,17 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
     let mut buffer = String::new();
 
+    println!("File opened, reading to string");
     match file.read_to_string(&mut buffer) {
         Err(why) => panic!("Couldn't read: {} because `{}`", display, why),
         Ok(len) => println!("{} is {} bytes long", display, len),
     }
 
 
+    println!("Cleaning");
     let lines = cleaner(buffer);
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
+    println!("Tokenizing");
     let outcome = tokenizer.generate(lines);
     println!("Tokenized!");
 
