@@ -1,12 +1,13 @@
 use regex::Regex;
 use std::string::String;
+use regex::internal::Char;
 use unicode_segmentation;
 use unicode_segmentation::UnicodeSegmentation;
 
 
 #[derive(Clone)]
 pub struct CodeLine {
-    line: String,
+    pub line: String,
     len: usize,
     pos: usize,
 }
@@ -49,6 +50,16 @@ impl CodeLine {
 
     pub fn peek(&self) -> Option<&str> {
         return self.line.graphemes(true).nth(self.pos);
+    }
+
+    pub fn peek_char(&mut self) -> Option<char> {
+        return self.line[self.pos..].chars().nth(0);
+    }
+
+    pub fn get_char(&mut self) -> Option<char> {
+        let result = self.peek_char();
+        self.pos = self.pos.saturating_add(1);
+        return result;
     }
 
     pub fn get(&mut self) -> Option<&str> {
