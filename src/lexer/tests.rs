@@ -81,6 +81,18 @@ fn test_float_scientific () {
 }
 
 #[test]
+fn test_integer_literals() {
+    let tokens = Tokenizer::tokenize_file(
+        "test_fixtures/test_integer_literals.py",
+        TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+    for (idx, token) in tokens.iter().enumerate() {
+        println!("{}: {:?}", idx, token);
+    }
+
+}
+
+#[test]
 fn test_additive() {
     let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_additive.py").expect("tokens");
@@ -280,28 +292,26 @@ fn test_int() {
 #[test]
 fn test_long() {
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_long.py").expect("tokens");
+    test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
+    test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
+    test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 5), "0" );
+    test_token_w_position!(tokens[3], TType::NL, (1, 5), (1, 5), "" );
+    test_token_w_position!(tokens[4], TType::Name, (2, 0), (2, 1), "x" );
+    test_token_w_position!(tokens[5], TType::Op, (2, 2), (2, 3), "=" );
+    test_token_w_position!(tokens[6], TType::Number, (2, 4), (2, 17), "0xfffffffffff" );
+    test_token_w_position!(tokens[7], TType::NL, (2, 17), (2, 17), "" );
+    test_token_w_position!(tokens[8], TType::Name, (3, 0), (3, 1), "x" );
+    test_token_w_position!(tokens[9], TType::Op, (3, 2), (3, 3), "=" );
+    test_token_w_position!(tokens[10], TType::Number, (3, 4), (3, 25), "123141242151251616110" );
+    test_token_w_position!(tokens[11], TType::NL, (3, 25), (3, 25), "" );
+    test_token_w_position!(tokens[12], TType::Name, (4, 0), (4, 1), "x" );
+    test_token_w_position!(tokens[13], TType::Op, (4, 2), (4, 3), "=" );
+    test_token_w_position!(tokens[14], TType::Op, (4, 4), (4, 5), "-" );
+    test_token_w_position!(tokens[15], TType::Number, (4, 5), (4, 22), "15921590215012591" );
+    test_token_w_position!(tokens[16], TType::NL, (4, 22), (4, 22), "" );
 
-    test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Name, (0, 1), (1, 1), "x" );
-    test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "=" );
-    test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "0" );
-    test_token_w_position!(tokens[4], TType::Newline, (5, 1), (6, 1), "\n" );
-    test_token_w_position!(tokens[5], TType::Name, (0, 2), (1, 2), "x" );
-    test_token_w_position!(tokens[6], TType::Op, (2, 2), (3, 2), "=" );
-    test_token_w_position!(tokens[7], TType::Number, (4, 2), (17, 2), "0xfffffffffff" );
-    test_token_w_position!(tokens[8], TType::Newline, (17, 2), (18, 2), "\n" );
-    test_token_w_position!(tokens[9], TType::Name, (0, 3), (1, 3), "x" );
-    test_token_w_position!(tokens[10], TType::Op, (2, 3), (3, 3), "=" );
-    test_token_w_position!(tokens[11], TType::Number, (4, 3), (25, 3), "123141242151251616110" );
-    test_token_w_position!(tokens[12], TType::Newline, (25, 3), (26, 3), "\n" );
-    test_token_w_position!(tokens[13], TType::Name, (0, 4), (1, 4), "x" );
-    test_token_w_position!(tokens[14], TType::Op, (2, 4), (3, 4), "=" );
-    test_token_w_position!(tokens[15], TType::Op, (4, 4), (5, 4), "-" );
-    test_token_w_position!(tokens[16], TType::Number, (5, 4), (22, 4), "15921590215012591" );
-    test_token_w_position!(tokens[17], TType::Newline, (22, 4), (23, 4), "\n" );
-    test_token_w_position!(tokens[18], TType::EndMarker, (0, 5), (0, 5), "" );
 }
 
 #[test]
@@ -913,5 +923,19 @@ fn test_match() {
     test_token_w_position!(tokens[45], TType::Op, (10, 6), (10, 7), "=" );
     test_token_w_position!(tokens[46], TType::String, (10, 8), (10, 21), "\"softkeyword\"" );
     test_token_w_position!(tokens[47], TType::NL, (10, 21), (10, 21), "" );
+
+}
+
+
+#[test]
+fn test_and_profile_tokenizing_stdlib_astpy(){
+
+    let tokens = Tokenizer::tokenize_file("PyLib/ast.py",
+                                          TConfig{skip_encoding: true,
+                                              skip_endmarker: false})
+        .expect("tokens");
+
+
+
 
 }
