@@ -358,32 +358,39 @@ impl Tokenizer {
                         break;
                     }
                 }
-                found.push(c);
+                found.push(code.get_char().unwrap());
+
             }
 
-            let c = code.get_char().unwrap();
-
-            if (c == '"' || c == '\'') {
-                return Tokenizer::attempt_string(found, code, state);
+            let mut test = code.get_char();
+            match test {
+                Some('"') | Some('\'') => {
+                    found.push(test.unwrap());
+                    return Tokenizer::attempt_string(found, code, state);
+                }
+                _ => {}
             }
 
             let mut nonasci = false;
 
-            while (Tokenizer::is_potential_identifier_char(c)) {
+            while (Tokenizer::is_potential_identifier_char(test)) && code.remaining() > 0  {
                 //TODO fix me
                 // if (c >= 128) {
                 //     nonasci = true;
                 // }
-                found.push(c);
-                let c = code.get_char().unwrap();
+                found.push(test.unwrap());
+
+                test = code.get_char();
             }
 
-            if nonasci == true {
-                return Err(TokError::BadCharacter(c));
-            }
+            //c is not a potential identifier char!
+            code.rewind();
 
+            // if nonasci == true {
+            //     return Err(TokError::BadCharacter(test));
+            // }
+            return Ok(Some( (TType::Name, found)));
 
-            code.rewind()
         }
 
         return Ok(None);
