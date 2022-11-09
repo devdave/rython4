@@ -23,15 +23,31 @@ struct Args {
     interpret: Option<String>,
     #[clap(long, short='S', default_value="false", value_parser)]
     show_tokens: bool,
-    #[clap(long, short='C', value_parser)]
-    check_code: Option<std::path::PathBuf>,
+    #[clap(long, short='C', default_value="false", value_parser)]
+    check_code: bool,
 
+}
+
+fn py_check_code(filepath: PathBuf) {
+    if filepath.is_dir() {
+        for entry in filepath.read_dir().expect("directory") {
+            if let Ok(test_path) = entry {
+                if test_path.path().is_dir() {
+                    return py_check_code(test_path.path());
+                } else {
+                    py_run_file(test_path.path(), false, true);
+                }
+            }
+        }
+    } else {
+        py_run_file(filepath, false, true);
+    }
 }
 
 
 
 
-fn py_run_file(filename: PathBuf, show_tokens: bool)  {
+fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
     println!("Would read {:?}", filename);
     //Wow I need to find a better way to do this
     let display = filename.file_name().unwrap().to_str().unwrap().to_string();
@@ -50,7 +66,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     let lines = cleaner(buffer);
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
     println!("Tokenizing");
-    let outcome = tokenizer.generate(lines);
+    let outcome = tokenizer.generate(&lines);
     println!("Tokenized!");
 
     if let Ok(tokens) = outcome {
@@ -66,8 +82,23 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
         let result = python::file(&tvector, &display.to_string().as_str());
         if let Ok(ptree) = result {
             println!("Parsing succeeded! \n");
-        } else {
+        }
+        else if let Err(parse_err) = result {
+            println!("Failed to parse: {:#?}", parse_err);
+            println!("Line error @ {:#?}:{:#?}", parse_err.location.start_pos.line, parse_err.location.start_pos.column);
+            let lineno = parse_err.location.start_pos.line;
+            let line = lines.get(lineno).unwrap();
+            println!("{:#?}", line);
+            for token_ref in tvector.0 {
+                if token_ref.start.line >= lineno-1 || token_ref.start.line == lineno {
+                    println!("{:?} ({}, {}) {:?}", token_ref.r#type, token_ref.start.line, token_ref.start.col, token_ref.text);
+                }
+            }
+        }
+        else {
             println!("Failed to parse: {:#?}", result);
+
+
         }
 
 
@@ -94,8 +125,14 @@ fn main() {
     println!("Hello, world! {:?}", args);
     //TODO - Check if file is being pushed in via stdin
     //Check for filename argument
+
     if let Some(filename) = args.filename {
-        py_run_file(filename, args.show_tokens);
+        if args.check_code == true {
+            py_check_code(filename);
+        } else {
+            py_run_file(filename, args.show_tokens, false);
+        }
+
     }
     //Check for interpret
     else if let Some(interpret_line) = args.interpret {
