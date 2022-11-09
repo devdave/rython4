@@ -1,4 +1,5 @@
-#[test]
+
+#[cfg(test)]
 mod test {
     use ntest::timeout;
 
