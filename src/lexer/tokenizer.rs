@@ -141,19 +141,19 @@ impl Tokenizer {
         let lines: Vec<String> = cleaner(buffer);
 
         println!("Tokenizing now");
-        return self.generate(lines);
+        return self.generate(&lines);
     }
 
     pub fn process_single_line(&mut self, raw_line: String) -> Result<Vec<Token>, TokError> {
         let lines: Vec<String> = cleaner(raw_line);
 
-        return self.generate(lines);
+        return self.generate(&lines);
     }
 
     pub fn process_interactive(&mut self, _input: String, _state: &State) {}
 
 
-    pub fn generate(&mut self, source: Vec<String>) -> Result<Vec<Token>, TokError> {
+    pub fn generate(&mut self, source: &Vec<String>) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
         let mut state = State::new();
 
@@ -845,9 +845,9 @@ impl Tokenizer {
                          } else {
                              println!("Failed to match @ {}:{}", lineno, col_pos);
                          }
-
                      }
                  }
+                is_statement = true;
             }
 
             //Fetch numbers
