@@ -1,6 +1,7 @@
 
 #[cfg(test)]
 mod test {
+
     use ntest::timeout;
 
     use crate::lexer::tokenizer::{TConfig, Tokenizer};
@@ -28,7 +29,6 @@ mod test {
     fn test_float() {
         let tokens = Tokenizer::tokenize_file("test_fixtures/test_float.py", TConfig { skip_encoding: true, skip_endmarker: false }).expect("tokens");
 
-
         test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
         test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
         test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 11), "3.14159" );
@@ -53,6 +53,213 @@ mod test {
         test_token_w_position!(tokens[21], TType::Op, (7, 2), (7, 3), "=" );
         test_token_w_position!(tokens[22], TType::Number, (7, 4), (7, 12), "3.14e159" );
         test_token_w_position!(tokens[23], TType::NL, (7, 12), (7, 12), "" );
+        test_token_w_position!(tokens[24], TType::Name, (8, 0), (8, 1), "x" );
+        test_token_w_position!(tokens[25], TType::Op, (8, 2), (8, 3), "=" );
+        test_token_w_position!(tokens[26], TType::Number, (8, 4), (8, 7), "0.0" );
+        test_token_w_position!(tokens[27], TType::NL, (8, 7), (8, 7), "" );
+    }
+
+    #[test]
+    fn test_aifc_issue1() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/test_aifc_issue1.py", TConfig::default()).expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "f" );
+        test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
+        test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 7), "0.0" );
+        test_token_w_position!(tokens[3], TType::NL, (1, 7), (1, 7), "" );
+
+    }
+
+    #[test]
+    fn test_issue1_asyncio_base_events() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/test_issue1_asyncio_base_events.py", TConfig::default()).expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Async, (1, 0), (1, 5), "async" );
+        test_token_w_position!(tokens[1], TType::Name, (1, 6), (1, 9), "def" );
+        test_token_w_position!(tokens[2], TType::Name, (1, 10), (1, 33), "_sock_sendfile_fallback" );
+        test_token_w_position!(tokens[3], TType::Op, (1, 33), (1, 34), "(" );
+        test_token_w_position!(tokens[4], TType::Name, (1, 34), (1, 38), "self" );
+        test_token_w_position!(tokens[5], TType::Op, (1, 38), (1, 39), "," );
+        test_token_w_position!(tokens[6], TType::Name, (1, 40), (1, 44), "sock" );
+        test_token_w_position!(tokens[7], TType::Op, (1, 44), (1, 45), "," );
+        test_token_w_position!(tokens[8], TType::Name, (1, 46), (1, 50), "file" );
+        test_token_w_position!(tokens[9], TType::Op, (1, 50), (1, 51), "," );
+        test_token_w_position!(tokens[10], TType::Name, (1, 52), (1, 58), "offset" );
+        test_token_w_position!(tokens[11], TType::Op, (1, 58), (1, 59), "," );
+        test_token_w_position!(tokens[12], TType::Name, (1, 60), (1, 65), "count" );
+        test_token_w_position!(tokens[13], TType::Op, (1, 65), (1, 66), ")" );
+        test_token_w_position!(tokens[14], TType::Op, (1, 66), (1, 67), ":" );
+        test_token_w_position!(tokens[15], TType::NL, (1, 67), (1, 67), "" );
+        test_token_w_position!(tokens[16], TType::Indent, (2, 0), (2, 0), "" );
+        test_token_w_position!(tokens[17], TType::Name, (2, 4), (2, 6), "if" );
+        test_token_w_position!(tokens[18], TType::Name, (2, 7), (2, 13), "offset" );
+        test_token_w_position!(tokens[19], TType::Op, (2, 13), (2, 14), ":" );
+        test_token_w_position!(tokens[20], TType::NL, (2, 14), (2, 14), "" );
+        test_token_w_position!(tokens[21], TType::Indent, (3, 0), (3, 0), "" );
+        test_token_w_position!(tokens[22], TType::Name, (3, 8), (3, 12), "file" );
+        test_token_w_position!(tokens[23], TType::Op, (3, 12), (3, 13), "." );
+        test_token_w_position!(tokens[24], TType::Name, (3, 13), (3, 17), "seek" );
+        test_token_w_position!(tokens[25], TType::Op, (3, 17), (3, 18), "(" );
+        test_token_w_position!(tokens[26], TType::Name, (3, 18), (3, 24), "offset" );
+        test_token_w_position!(tokens[27], TType::Op, (3, 24), (3, 25), ")" );
+        test_token_w_position!(tokens[28], TType::NL, (3, 25), (3, 25), "" );
+        test_token_w_position!(tokens[29], TType::Dedent, (4, 0), (4, 0), "" );
+        test_token_w_position!(tokens[30], TType::Name, (4, 4), (4, 13), "blocksize" );
+        test_token_w_position!(tokens[31], TType::Op, (4, 14), (4, 15), "=" );
+        test_token_w_position!(tokens[32], TType::Op, (4, 16), (4, 17), "(" );
+        test_token_w_position!(tokens[33], TType::Name, (5, 8), (5, 11), "min" );
+        test_token_w_position!(tokens[34], TType::Op, (5, 11), (5, 12), "(" );
+        test_token_w_position!(tokens[35], TType::Name, (5, 12), (5, 17), "count" );
+        test_token_w_position!(tokens[36], TType::Op, (5, 17), (5, 18), "," );
+        test_token_w_position!(tokens[37], TType::Name, (5, 19), (5, 28), "constants" );
+        test_token_w_position!(tokens[38], TType::Op, (5, 28), (5, 29), "." );
+        test_token_w_position!(tokens[39], TType::Name, (5, 29), (5, 62), "SENDFILE_FALLBACK_READBUFFER_SIZE" );
+        test_token_w_position!(tokens[40], TType::Op, (5, 62), (5, 63), ")" );
+        test_token_w_position!(tokens[41], TType::Name, (6, 8), (6, 10), "if" );
+        test_token_w_position!(tokens[42], TType::Name, (6, 11), (6, 16), "count" );
+        test_token_w_position!(tokens[43], TType::Name, (6, 17), (6, 21), "else" );
+        test_token_w_position!(tokens[44], TType::Name, (6, 22), (6, 31), "constants" );
+        test_token_w_position!(tokens[45], TType::Op, (6, 31), (6, 32), "." );
+        test_token_w_position!(tokens[46], TType::Name, (6, 32), (6, 65), "SENDFILE_FALLBACK_READBUFFER_SIZE" );
+        test_token_w_position!(tokens[47], TType::Op, (7, 4), (7, 5), ")" );
+        test_token_w_position!(tokens[48], TType::NL, (7, 5), (7, 5), "" );
+        test_token_w_position!(tokens[49], TType::Name, (8, 4), (8, 7), "buf" );
+        test_token_w_position!(tokens[50], TType::Op, (8, 8), (8, 9), "=" );
+        test_token_w_position!(tokens[51], TType::Name, (8, 10), (8, 19), "bytearray" );
+        test_token_w_position!(tokens[52], TType::Op, (8, 19), (8, 20), "(" );
+        test_token_w_position!(tokens[53], TType::Name, (8, 20), (8, 29), "blocksize" );
+        test_token_w_position!(tokens[54], TType::Op, (8, 29), (8, 30), ")" );
+        test_token_w_position!(tokens[55], TType::NL, (8, 30), (8, 30), "" );
+        test_token_w_position!(tokens[56], TType::Name, (9, 4), (9, 14), "total_sent" );
+        test_token_w_position!(tokens[57], TType::Op, (9, 15), (9, 16), "=" );
+        test_token_w_position!(tokens[58], TType::Number, (9, 17), (9, 18), "0" );
+        test_token_w_position!(tokens[59], TType::NL, (9, 18), (9, 18), "" );
+        test_token_w_position!(tokens[60], TType::Name, (10, 4), (10, 7), "try" );
+        test_token_w_position!(tokens[61], TType::Op, (10, 7), (10, 8), ":" );
+        test_token_w_position!(tokens[62], TType::NL, (10, 8), (10, 8), "" );
+        test_token_w_position!(tokens[63], TType::Indent, (11, 0), (11, 0), "" );
+        test_token_w_position!(tokens[64], TType::Name, (11, 8), (11, 13), "while" );
+        test_token_w_position!(tokens[65], TType::Name, (11, 14), (11, 18), "True" );
+        test_token_w_position!(tokens[66], TType::Op, (11, 18), (11, 19), ":" );
+        test_token_w_position!(tokens[67], TType::NL, (11, 19), (11, 19), "" );
+        test_token_w_position!(tokens[68], TType::Indent, (12, 0), (12, 0), "" );
+        test_token_w_position!(tokens[69], TType::Name, (12, 12), (12, 14), "if" );
+        test_token_w_position!(tokens[70], TType::Name, (12, 15), (12, 20), "count" );
+        test_token_w_position!(tokens[71], TType::Op, (12, 20), (12, 21), ":" );
+        test_token_w_position!(tokens[72], TType::NL, (12, 21), (12, 21), "" );
+        test_token_w_position!(tokens[73], TType::Indent, (13, 0), (13, 0), "" );
+        test_token_w_position!(tokens[74], TType::Name, (13, 16), (13, 25), "blocksize" );
+        test_token_w_position!(tokens[75], TType::Op, (13, 26), (13, 27), "=" );
+        test_token_w_position!(tokens[76], TType::Name, (13, 28), (13, 31), "min" );
+        test_token_w_position!(tokens[77], TType::Op, (13, 31), (13, 32), "(" );
+        test_token_w_position!(tokens[78], TType::Name, (13, 32), (13, 37), "count" );
+        test_token_w_position!(tokens[79], TType::Op, (13, 38), (13, 39), "-" );
+        test_token_w_position!(tokens[80], TType::Name, (13, 40), (13, 50), "total_sent" );
+        test_token_w_position!(tokens[81], TType::Op, (13, 50), (13, 51), "," );
+        test_token_w_position!(tokens[82], TType::Name, (13, 52), (13, 61), "blocksize" );
+        test_token_w_position!(tokens[83], TType::Op, (13, 61), (13, 62), ")" );
+        test_token_w_position!(tokens[84], TType::NL, (13, 62), (13, 62), "" );
+        test_token_w_position!(tokens[85], TType::Name, (14, 16), (14, 18), "if" );
+        test_token_w_position!(tokens[86], TType::Name, (14, 19), (14, 28), "blocksize" );
+        test_token_w_position!(tokens[87], TType::Op, (14, 29), (14, 31), "<=" );
+        test_token_w_position!(tokens[88], TType::Number, (14, 32), (14, 33), "0" );
+        test_token_w_position!(tokens[89], TType::Op, (14, 33), (14, 34), ":" );
+        test_token_w_position!(tokens[90], TType::NL, (14, 34), (14, 34), "" );
+        test_token_w_position!(tokens[91], TType::Indent, (15, 0), (15, 0), "" );
+        test_token_w_position!(tokens[92], TType::Name, (15, 20), (15, 25), "break" );
+        test_token_w_position!(tokens[93], TType::NL, (15, 25), (15, 25), "" );
+        test_token_w_position!(tokens[94], TType::Dedent, (16, 0), (16, 0), "" );
+        test_token_w_position!(tokens[95], TType::Dedent, (16, 0), (16, 0), "" );
+        test_token_w_position!(tokens[96], TType::Name, (16, 12), (16, 16), "view" );
+        test_token_w_position!(tokens[97], TType::Op, (16, 17), (16, 18), "=" );
+        test_token_w_position!(tokens[98], TType::Name, (16, 19), (16, 29), "memoryview" );
+        test_token_w_position!(tokens[99], TType::Op, (16, 29), (16, 30), "(" );
+        test_token_w_position!(tokens[100], TType::Name, (16, 30), (16, 33), "buf" );
+        test_token_w_position!(tokens[101], TType::Op, (16, 33), (16, 34), ")" );
+        test_token_w_position!(tokens[102], TType::Op, (16, 34), (16, 35), "[" );
+        test_token_w_position!(tokens[103], TType::Op, (16, 35), (16, 36), ":" );
+        test_token_w_position!(tokens[104], TType::Name, (16, 36), (16, 45), "blocksize" );
+        test_token_w_position!(tokens[105], TType::Op, (16, 45), (16, 46), "]" );
+        test_token_w_position!(tokens[106], TType::NL, (16, 46), (16, 46), "" );
+        test_token_w_position!(tokens[107], TType::Name, (17, 12), (17, 16), "read" );
+        test_token_w_position!(tokens[108], TType::Op, (17, 17), (17, 18), "=" );
+        test_token_w_position!(tokens[109], TType::Await, (17, 19), (17, 24), "await" );
+        test_token_w_position!(tokens[110], TType::Name, (17, 25), (17, 29), "self" );
+        test_token_w_position!(tokens[111], TType::Op, (17, 29), (17, 30), "." );
+        test_token_w_position!(tokens[112], TType::Name, (17, 30), (17, 45), "run_in_executor" );
+        test_token_w_position!(tokens[113], TType::Op, (17, 45), (17, 46), "(" );
+        test_token_w_position!(tokens[114], TType::Name, (17, 46), (17, 50), "None" );
+        test_token_w_position!(tokens[115], TType::Op, (17, 50), (17, 51), "," );
+        test_token_w_position!(tokens[116], TType::Name, (17, 52), (17, 56), "file" );
+        test_token_w_position!(tokens[117], TType::Op, (17, 56), (17, 57), "." );
+        test_token_w_position!(tokens[118], TType::Name, (17, 57), (17, 65), "readinto" );
+        test_token_w_position!(tokens[119], TType::Op, (17, 65), (17, 66), "," );
+        test_token_w_position!(tokens[120], TType::Name, (17, 67), (17, 71), "view" );
+        test_token_w_position!(tokens[121], TType::Op, (17, 71), (17, 72), ")" );
+        test_token_w_position!(tokens[122], TType::NL, (17, 72), (17, 72), "" );
+        test_token_w_position!(tokens[123], TType::Name, (18, 12), (18, 14), "if" );
+        test_token_w_position!(tokens[124], TType::Name, (18, 15), (18, 18), "not" );
+        test_token_w_position!(tokens[125], TType::Name, (18, 19), (18, 23), "read" );
+        test_token_w_position!(tokens[126], TType::Op, (18, 23), (18, 24), ":" );
+        test_token_w_position!(tokens[127], TType::NL, (18, 24), (18, 24), "" );
+        test_token_w_position!(tokens[128], TType::Indent, (19, 0), (19, 0), "" );
+        test_token_w_position!(tokens[129], TType::Name, (19, 16), (19, 21), "break" );
+        test_token_w_position!(tokens[130], TType::NL, (19, 23), (19, 28), "" );
+        test_token_w_position!(tokens[131], TType::Dedent, (20, 0), (20, 0), "" );
+        test_token_w_position!(tokens[132], TType::Await, (20, 12), (20, 17), "await" );
+        test_token_w_position!(tokens[133], TType::Name, (20, 18), (20, 22), "self" );
+        test_token_w_position!(tokens[134], TType::Op, (20, 22), (20, 23), "." );
+        test_token_w_position!(tokens[135], TType::Name, (20, 23), (20, 35), "sock_sendall" );
+        test_token_w_position!(tokens[136], TType::Op, (20, 35), (20, 36), "(" );
+        test_token_w_position!(tokens[137], TType::Name, (20, 36), (20, 40), "sock" );
+        test_token_w_position!(tokens[138], TType::Op, (20, 40), (20, 41), "," );
+        test_token_w_position!(tokens[139], TType::Name, (20, 42), (20, 46), "view" );
+        test_token_w_position!(tokens[140], TType::Op, (20, 46), (20, 47), "[" );
+        test_token_w_position!(tokens[141], TType::Op, (20, 47), (20, 48), ":" );
+        test_token_w_position!(tokens[142], TType::Name, (20, 48), (20, 52), "read" );
+        test_token_w_position!(tokens[143], TType::Op, (20, 52), (20, 53), "]" );
+        test_token_w_position!(tokens[144], TType::Op, (20, 53), (20, 54), ")" );
+        test_token_w_position!(tokens[145], TType::NL, (20, 54), (20, 54), "" );
+        test_token_w_position!(tokens[146], TType::Name, (21, 12), (21, 22), "total_sent" );
+        test_token_w_position!(tokens[147], TType::Op, (21, 23), (21, 25), "+=" );
+        test_token_w_position!(tokens[148], TType::Name, (21, 26), (21, 30), "read" );
+        test_token_w_position!(tokens[149], TType::NL, (21, 30), (21, 30), "" );
+        test_token_w_position!(tokens[150], TType::Dedent, (22, 0), (22, 0), "" );
+        test_token_w_position!(tokens[151], TType::Name, (22, 8), (22, 14), "return" );
+        test_token_w_position!(tokens[152], TType::Name, (22, 15), (22, 25), "total_sent" );
+        test_token_w_position!(tokens[153], TType::NL, (22, 25), (22, 25), "" );
+        test_token_w_position!(tokens[154], TType::Dedent, (23, 0), (23, 0), "" );
+        test_token_w_position!(tokens[155], TType::Name, (23, 4), (23, 11), "finally" );
+        test_token_w_position!(tokens[156], TType::Op, (23, 11), (23, 12), ":" );
+        test_token_w_position!(tokens[157], TType::NL, (23, 12), (23, 12), "" );
+        test_token_w_position!(tokens[158], TType::Indent, (24, 0), (24, 0), "" );
+        test_token_w_position!(tokens[159], TType::Name, (24, 8), (24, 10), "if" );
+        test_token_w_position!(tokens[160], TType::Name, (24, 11), (24, 21), "total_sent" );
+        test_token_w_position!(tokens[161], TType::Op, (24, 22), (24, 23), ">" );
+        test_token_w_position!(tokens[162], TType::Number, (24, 24), (24, 25), "0" );
+        test_token_w_position!(tokens[163], TType::Name, (24, 26), (24, 29), "and" );
+        test_token_w_position!(tokens[164], TType::Name, (24, 30), (24, 37), "hasattr" );
+        test_token_w_position!(tokens[165], TType::Op, (24, 37), (24, 38), "(" );
+        test_token_w_position!(tokens[166], TType::Name, (24, 38), (24, 42), "file" );
+        test_token_w_position!(tokens[167], TType::Op, (24, 42), (24, 43), "," );
+        test_token_w_position!(tokens[168], TType::String, (24, 44), (24, 50), "'seek'" );
+        test_token_w_position!(tokens[169], TType::Op, (24, 50), (24, 51), ")" );
+        test_token_w_position!(tokens[170], TType::Op, (24, 51), (24, 52), ":" );
+        test_token_w_position!(tokens[171], TType::NL, (24, 52), (24, 52), "" );
+        test_token_w_position!(tokens[172], TType::Indent, (25, 0), (25, 0), "" );
+        test_token_w_position!(tokens[173], TType::Name, (25, 12), (25, 16), "file" );
+        test_token_w_position!(tokens[174], TType::Op, (25, 16), (25, 17), "." );
+        test_token_w_position!(tokens[175], TType::Name, (25, 17), (25, 21), "seek" );
+        test_token_w_position!(tokens[176], TType::Op, (25, 21), (25, 22), "(" );
+        test_token_w_position!(tokens[177], TType::Name, (25, 22), (25, 28), "offset" );
+        test_token_w_position!(tokens[178], TType::Op, (25, 29), (25, 30), "+" );
+        test_token_w_position!(tokens[179], TType::Name, (25, 31), (25, 41), "total_sent" );
+        test_token_w_position!(tokens[180], TType::Op, (25, 41), (25, 42), ")" );
+        test_token_w_position!(tokens[181], TType::NL, (25, 42), (25, 42), "" );
+        test_token_w_position!(tokens[182], TType::Dedent, (25, 0), (25, 0), "" );
+        test_token_w_position!(tokens[183], TType::Dedent, (25, 0), (25, 0), "" );
+        test_token_w_position!(tokens[184], TType::Dedent, (25, 0), (25, 0), "" );
+
     }
 
     #[test]
