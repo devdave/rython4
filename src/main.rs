@@ -35,6 +35,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool)  {
     println!("Would read {:?}", filename);
     //Wow I need to find a better way to do this
     let display = filename.file_name().unwrap().to_str().unwrap().to_string();
+
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
     let mut buffer = String::new();
 
