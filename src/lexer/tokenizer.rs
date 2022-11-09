@@ -944,7 +944,7 @@ impl Tokenizer {
                 if code.peek().unwrap() == "\n" {
                     code.get();
                     if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
-                        product.push(Token::quick(TType::NL, lineno, col_pos, code.position(), "".to_string()));
+                        product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
                     }
                 }
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
