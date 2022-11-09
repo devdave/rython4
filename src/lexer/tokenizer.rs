@@ -760,7 +760,7 @@ impl Tokenizer {
             //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
             //     is_statement = true;
             // }
-            //The "SUPER" Number regex
+            //Fetch numbers
             else if let Some('0'..='9') = code.peek_char() {
                 match self.attempt_number(&mut code, &state) {
                     Ok(Some(found)) => {
@@ -859,11 +859,7 @@ impl Tokenizer {
                 }
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
-            //Last ditch look for Name's
-            else if let Some((_, found)) = code.return_match(ANY_NAME.to_owned()) {
-                //TODO remove once I've caught the bugs that lead to this
-                println!("Captured any name: {:?} @ {}:{}", found, lineno, col_pos);
-            } else {
+            else {
                 if let Some(sym) = code.get() {
                     if sym == " " {
                         //skipping white space
