@@ -338,18 +338,25 @@ impl Tokenizer {
 
         if Tokenizer::is_potential_identifier_start(code.peek_char()) {
             while (code.remaining() > 0) {
-                let c = code.get_char().unwrap();
+                let test = code.peek_char();
 
-                if (!(saw_b || saw_u || saw_f)) && (c == 'b' || c == 'B') {
-                    saw_b = true;
-                } else if (!(saw_b || saw_u || saw_r || saw_f) && (c == 'u' || c == 'U')) {
-                    saw_u = true;
-                } else if (!(saw_r || saw_u) && (c == 'r' || c == 'R')) {
-                    saw_r = true;
-                } else if (!(saw_f || saw_b || saw_u) && (c == 'f' || c == 'F')) {
-                    saw_f = true;
-                } else {
-                    break;
+                match test {
+                    Some('b') | Some('B') if !(saw_b || saw_u || saw_f) => {
+                        saw_b = true;
+                    },
+                    Some('u') | Some('U') if !(saw_b || saw_u || saw_r || saw_f) => {
+                        saw_u = true;
+                    },
+                    Some('r') | Some('R') if !(saw_r || saw_u ) => {
+                        saw_r = true;
+                    },
+                    Some('f') | Some('F') if !(saw_f || saw_b || saw_u ) => {
+                        saw_f = true;
+                    },
+                    _ => {
+                        //We are likely not in a valid string prefix
+                        break;
+                    }
                 }
                 found.push(c);
             }
