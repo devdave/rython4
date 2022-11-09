@@ -11,6 +11,9 @@ debug = 1
 [features]
 trace = ["peg/trace"]
 
+[dev-dependencies]
+ntest = "*"
+
 [dependencies]
 clap = { version = "3.2.22", features = ["derive"] }
 regex = "1.6.0"
