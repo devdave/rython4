@@ -47,10 +47,20 @@ enum StringType {
     TripleQuote,
 }
 
-#[derive(Default)]
 pub struct TConfig {
     pub skip_encoding: bool,
     pub skip_endmarker: bool,
+}
+
+impl TConfig {
+
+    pub fn default() -> Self {
+        Self {
+            skip_encoding: true,
+            skip_endmarker: false,
+        }
+    }
+
 }
 
 #[derive(Debug)]
