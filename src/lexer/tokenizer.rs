@@ -211,7 +211,8 @@ impl Tokenizer {
                 },
                 _ => {
                     //Err how did we get here?
-                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                    // panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                    return Ok(Some(found));
                 }
             }
         }
