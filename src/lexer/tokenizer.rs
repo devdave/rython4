@@ -1,4 +1,3 @@
-
 use std::cmp::Ordering;
 
 use std::io::Read;
@@ -370,62 +369,69 @@ impl Tokenizer {
         let mut found: String = String::new();
         let hint = code.get_char();
 
-        if let Some(starting_digit) = hint {
-            if starting_digit == '0' {
-                match code.peek_char() {
-                    Some('x') | Some('x') => {
-                        code.get_char();
-                        return self.fetch_hexidecimal(code, state);
-                    },
-                    Some('b') | Some('B') => {
-                        code.get_char();
-                        return self.fetch_binary(code, state);
-                    },
-                    Some('o') | Some('O') => {
-                        code.get_char();
-                        return self.fetch_octal(code, state);
+        match hint {
+                Some('0') => {
+                    match code.peek_char() {
+                        Some('x') | Some('x') => {
+                            code.get_char();
+                            return self.fetch_hexidecimal(code, state);
+                        },
+                        Some('b') | Some('B') => {
+                            code.get_char();
+                            return self.fetch_binary(code, state);
+                        },
+                        Some('o') | Some('O') => {
+                            code.get_char();
+                            return self.fetch_octal(code, state);
+                        }
+                        Some('0'..='9') => {
+                            let sym = code.get_char().unwrap();
+                            found.push('0');
+                            found.push(sym);
+                        }
+                        Some('e') | Some('E') => {
+                            found.push('0');
+                            found.push(code.get_char().unwrap());
+                            return self.fetch_float_body(found, code, state);
+                        }
+                        _ => {
+                            println!("I am confused @ {:?} - {}", code.line, code.remaining());
+                            //got something non numeric
+                            // found.push(starting_digit);
+                            //lets break out.
+                            return Ok(Some(found));
+                        }
                     }
-                    Some('0'..='9') => {
-                        found.push(starting_digit);
-                    }
-                    Some('e') | Some('E') => {
-                        found.push('0');
-                        found.push(code.get_char().unwrap());
-                        return self.fetch_float_body(found, code, state );
-                    }
-                    _ => {
-                        //got something non numeric
-                        found.push(starting_digit);
-                        //lets break out.
-                        return Ok(Some(found));
-                    }
+                },
+                Some('1'..='9') => {
+                    found.push(hint.unwrap());
+                },
+                _ => {
+                    panic!("How did we get here? {:?}@{}", code.line, code.remaining());
                 }
-            } else {
-                found.push(starting_digit);
-            }
+        }
 
-            while code.remaining() > 0 {
-                match code.peek_char() {
-                    None => {
-                        break;
-                    }
-                    Some('0'..='9') => {
-                        let sym = code.get_char().unwrap();
-                        found.push(sym);
-                    },
-                    Some('e') | Some('E') | Some('.') => {
-                        let sym = code.get_char().unwrap();
-                        found.push(sym);
-                        return self.fetch_float_body(found, code, state);
-                    }
-                    Some('_') => {
-                        //skip over
-                        let sym = code.get_char().unwrap();
-                    },
-                    _ => {
-                        //unexpected char!
-                        return Ok(Some(found));
-                    }
+        while code.remaining() > 0 {
+            match code.peek_char() {
+                None => {
+                    break;
+                }
+                Some('0'..='9') => {
+                    let sym = code.get_char().unwrap();
+                    found.push(sym);
+                },
+                Some('e') | Some('E') | Some('.') => {
+                    let sym = code.get_char().unwrap();
+                    found.push(sym);
+                    return self.fetch_float_body(found, code, state);
+                }
+                Some('_') => {
+                    //skip over
+                    let sym = code.get_char().unwrap();
+                },
+                _ => {
+                    //unexpected char!
+                    return Ok(Some(found));
                 }
             }
         }
@@ -434,8 +440,32 @@ impl Tokenizer {
         return Ok(None);
     }
 
+    fn attempt_floating_point(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError> {
+        let mut found: String = String::new();
+        let point_sym = code.get_char().unwrap();
+        assert_eq!(point_sym, '.', "How did we get here?");
+
+        found.push(point_sym);
+
+        match code.peek_char() {
+            Some('0'..='9') => {
+                let digit = code.get_char().unwrap();
+                found.push(digit);
+            },
+
+            _ => {
+                code.rewind(); //"push" the dot back onto unprocessed "stack"
+                return Ok(None);
+            }
+        }
+
+        return self.fetch_float_body(found, code, state);
+
+    }
+
     fn fetch_float_body(&mut self, mut found: String, code: &mut CodeLine, state: &State ) -> Result<Option<String>, TokError> {
-        let mut seen_e = true;
+        let mut seen_e = found.contains('e') || found.contains('E');
+
         let mut seen_op = false;
 
         while code.remaining() > 0 {
@@ -453,10 +483,20 @@ impl Tokenizer {
                     let sym = code.get_char().unwrap();
                     return Err(TokError::BadCharacter(sym));
                 }
-                Some('.') => {
+                Some('.')  => {
                     let sym = code.get_char().unwrap();
                     found.push(sym);
+                },
+                Some('e') | Some('E') if seen_e == false => {
+                    let sym = code.get_char().unwrap();
+                    found.push(sym);
+
+                },
+                Some('e') | Some('E') if seen_e == false => {
+                    let sym = code.get_char().unwrap();
+                    return Err(TokError::BadCharacter(sym));
                 }
+
                 Some('_') => {
                     //nop
                 }
@@ -636,11 +676,11 @@ impl Tokenizer {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 is_statement = true;
             }
-            //Attempt to capture floats - TODO test if still needed
-            else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
-                product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                is_statement = true;
-            }
+            // //Attempt to capture floats - TODO test if still needed
+            // else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
+            //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
+            //     is_statement = true;
+            // }
             //The "SUPER" Number regex
             else if let Some('0'..='9') = code.peek_char() {
                 match self.attempt_number(&mut code, &state) {
@@ -652,6 +692,24 @@ impl Tokenizer {
                     }
                     _ => {
                         //Assume failed or didn't match which will be problematic
+                    }
+                }
+            }
+            else if let Some('.') = code.peek_char() {
+                match self.attempt_floating_point(&mut code, &state){
+                    Ok(Some(found)) => {
+                        product.push(Token::quick(
+                            TType::Number,
+                            lineno, col_pos, col_pos+found.len(),
+                            found
+                        ));
+                    },
+                    Err(err_token) => {
+                        println!("Syntax error @ {}:{}", lineno, col_pos);
+                        return Err(err_token);
+                    },
+                    _=> {
+                        //Assume failed and didn't match
                     }
                 }
             }
