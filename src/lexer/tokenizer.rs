@@ -692,22 +692,69 @@ impl Tokenizer {
             //Look for 'string'
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
-
-
-                //Check for async and await operators
-                if found == "async" {
-                    product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
-                } else if found == "await" {
-                    product.push(Token::quick(TType::Await, lineno, col_pos, new_pos, found));
-                } else {
-                    product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                }
-                is_statement = true;
-            } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
-                product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-                is_statement = true;
             }
+            //Look for identifier/Name tokens
+            else if Tokenizer::is_potential_identifier_start(code.peek_char()) == true {
+                 match self.attempt_identifiers(&mut code, state) {
+                     Ok(Some((token_type, found))) => {
+
+                         if token_type == TType::Name && found == "async".to_string() {
+                             product.push(
+                                 Token::quick(TType::Async,
+                                    lineno, col_pos, col_pos+found.len(),
+                                     found
+                                 )
+                             );
+                         }
+                         else if token_type == TType::Name && found == "await".to_string() {
+                             product.push(
+                                 Token::quick(TType::Await,
+                                    lineno, col_pos, col_pos+found.len(),
+                                     found
+                                 )
+                             );
+                         }
+                         else if token_type == TType::Name || token_type == TType::String {
+                             product.push(
+                                 Token::quick(token_type,
+                                    lineno, col_pos, col_pos+found.len(),
+                                     found
+                                 )
+                             );
+                         } else {
+                             panic!("How did I get here? {:?}{:?}", token_type, found );
+                         }
+
+                     }
+                     Err(err_token) => {
+                         println!("Syntax error @ {}:{}", lineno, col_pos);
+                         return Err(err_token);
+
+                     }
+                     _ => {
+                         println!("Failed to match @ {}:{}", lineno, col_pos);
+                     }
+                 }
+            }
+
+            // else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
+            //
+            //
+            //     //Check for async and await operators
+            //     if found == "async" {
+            //         product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
+            //     } else if found == "await" {
+            //         product.push(Token::quick(TType::Await, lineno, col_pos, new_pos, found));
+            //     } else {
+            //         product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
+            //     }
+            //     is_statement = true;
+            // }
+            //Look for single char identifiers
+            // else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
+            //     product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
+            //     is_statement = true;
+            // }
             // //Attempt to capture floats - TODO test if still needed
             // else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
             //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
