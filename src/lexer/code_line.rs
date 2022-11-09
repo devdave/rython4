@@ -60,6 +60,10 @@ impl CodeLine {
         return self.line[self.pos..].chars().nth(0);
     }
 
+    pub fn peek_ahead_char(&mut self, skip: usize) -> Option<char> {
+        return self.line[(self.pos+skip)..].chars().nth(0);
+    }
+
     pub fn get_char(&mut self) -> Option<char> {
         let result = self.peek_char();
         self.pos = self.pos.saturating_add(1);
