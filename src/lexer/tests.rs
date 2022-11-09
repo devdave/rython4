@@ -568,7 +568,7 @@ fn test_string() {
 
 #[test]
 fn test_unary() {
-    let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: false, skip_encoding: false});
+    let mut tokenizer = Tokenizer::new(TConfig::default());
     let tokens = tokenizer.process_file("test_fixtures/test_unary.py").expect("tokens");
 
     test_token_w_position!(tokens[0], TType::Op, (1, 0), (1, 1), "~" );
@@ -983,6 +983,27 @@ fn test_and_profile_tokenizing_stdlib_astpy(){
                                           TConfig{skip_encoding: true,
                                               skip_endmarker: false})
         .expect("tokens");
+}
+
+#[test]
+fn test_attempt_identifiers() {
+    let valid_names= vec![
+        "hello_world",
+        "a",
+        "_",
+        "__",
+        "rtest",
+    ];
+
+    let mut tokenizer = Tokenizer::new(TConfig::default());
+
+    for valid_name in valid_names {
+        let tokens = tokenizer.process_single_line(valid_name.to_string()).expect("tokens");
+
+        assert_eq!(tokens[0].r#type, TType::Name);
+        assert_eq!(tokens[0].text, valid_name.to_string() );
+
+    }
 
 
 
