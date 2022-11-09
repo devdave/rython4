@@ -962,6 +962,7 @@ fn test_match() {
 #[test]
 fn test_and_profile_tokenizing_stdlib_astpy(){
 
+    return; //Disable for now!
     let tokens = Tokenizer::tokenize_file("PyLib/ast.py",
                                           TConfig{skip_encoding: true,
                                               skip_endmarker: false})
