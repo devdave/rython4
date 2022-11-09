@@ -25,6 +25,7 @@ fn test_float() {
 
     let tokens = Tokenizer::tokenize_file("test_fixtures/test_float.py", TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
 
+
     test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
     test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
     test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 11), "3.14159" );
@@ -282,8 +283,9 @@ test_token_w_position!(tokens[44], TType::NL, (9, 18), (9, 18), "" );
 #[test]
 fn test_long() {
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
-    let tokens = tokenizer.process_file("test_fixtures/test_long.py").expect("tokens");
+    let tokens = Tokenizer::tokenize_file("test_fixtures" , TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+
     test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
     test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
     test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 5), "0" );
