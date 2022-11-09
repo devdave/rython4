@@ -509,6 +509,10 @@ impl Tokenizer {
                             found.push(code.get_char().unwrap());
                             return self.fetch_float_body(found, code, state);
                         }
+                        Some('.') => {
+
+                            return self.fetch_float_body(found, code, state);
+                        }
                         _ => {
                             //got something non numeric
                             //lets break out.
