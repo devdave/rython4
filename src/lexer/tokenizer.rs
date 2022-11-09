@@ -707,7 +707,18 @@ impl Tokenizer {
                         return Err(err_token);
                     },
                     _=> {
-                        //Assume failed and didn't match
+                        //Assume didn't match
+                        //This is definitely a hack but we need to shift the code index forward
+                        //and if this isn't a float it's a . operator
+                        let dot = code.get().unwrap().to_string();
+                        product.push(
+                            Token::quick(
+                                TType::Op,
+                                    lineno, col_pos, col_pos+1,
+                                    dot
+                            )
+                        );
+
                     }
                 }
             }
