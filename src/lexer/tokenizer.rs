@@ -301,7 +301,7 @@ impl Tokenizer {
         let test = code.get_char();
 
         if test != None && test.unwrap() == quote {
-            
+
             body.push(test.unwrap());
 
             let next_test = code.get_char();
@@ -324,11 +324,14 @@ impl Tokenizer {
             }
 
             let sym = next.unwrap();
+            let mut escaped = false;
+
             if sym == quote {
                 end_quote_size += 1;
             } else {
                 end_quote_size = 0;
                 if sym == '\\' {
+                    escaped = true;
                     body.push(sym);
                     if code.remaining() > 0 {
                         let escaped = code.get_char().unwrap();
@@ -338,7 +341,10 @@ impl Tokenizer {
                     }
                 }
             }
-            body.push(sym);
+            if escaped != true {
+                body.push(sym);
+            }
+
         }
 
         if end_quote_size != quote_size {
