@@ -385,7 +385,7 @@ impl Tokenizer {
                 Some('0') => {
                     found.push('0');
                     match code.peek_char() {
-                        Some('x') | Some('x') => {
+                        Some('x') | Some('X') => {
                             code.get_char();
                             return self.fetch_hexidecimal(code, state);
                         },
