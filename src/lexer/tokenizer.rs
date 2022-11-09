@@ -367,11 +367,14 @@ impl Tokenizer {
     }
 
     fn is_potential_identifier_start(test: Option<char>) -> bool {
+
+        let char_code: usize = test.unwrap_or_default() as usize;
+        if char_code > 128 {
+            return true;
+        }
+
         match test {
             Some('a'..='z') | Some('A'..='Z') | Some('_') => {
-                true
-            },
-            Some('\'') | Some('"') => {
                 true
             },
             _ => {
@@ -382,6 +385,12 @@ impl Tokenizer {
     }
 
     fn is_potential_identifier_char(test: Option<char>) -> bool {
+
+        let char_code: usize = test.unwrap_or_default() as usize;
+        if char_code > 128 {
+            return true;
+        }
+
         match test {
             Some('a'..='z') | Some('A'..='Z') | Some('_') => {
                 true
