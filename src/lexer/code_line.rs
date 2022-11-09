@@ -48,6 +48,10 @@ impl CodeLine {
     //     self.line.clone()
     // }
 
+    pub fn rewind(&mut self) {
+        self.pos = self.pos.saturating_sub(1);
+    }
+
     pub fn peek(&self) -> Option<&str> {
         return self.line.graphemes(true).nth(self.pos);
     }
