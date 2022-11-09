@@ -309,11 +309,19 @@ impl Tokenizer {
         }
     }
 
-    fn is_potential_identifier_char(c: char) -> bool {
-        return (c >= 'a' && c <= 'z')
-            || (c >= 'A' && c <= 'Z')
-            || (c >= '0' && c <= '9')
-            || c == '_'
+    fn is_potential_identifier_char(test: Option<char>) -> bool {
+        match test {
+            Some('a'..='z') | Some('A'..='Z') | Some('_') => {
+                true
+            },
+            Some('0'..='9') => {
+                true
+            },
+            _ => {
+                //This is not a valid start to a name
+                false
+            }
+        }
 
     }
 
