@@ -283,7 +283,13 @@ test_token_w_position!(tokens[44], TType::NL, (9, 18), (9, 18), "" );
 #[test]
 fn test_long() {
 
-    let tokens = Tokenizer::tokenize_file("test_fixtures" , TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+    let tokens = Tokenizer::tokenize_file("test_fixtures/test_long.py" ,
+                                          TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+
+    for (idx, token) in tokens.iter().enumerate() {
+        println!("{}:{:?}", idx, token);
+    }
 
 
     test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
