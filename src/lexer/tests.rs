@@ -419,21 +419,31 @@ fn test_selector() {
     //import sys, time
     // x = sys.modules['time'].time()
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: true});
+    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_selector.py").expect("tokens");
 
     for (lineno, token) in tokens.iter().enumerate() {
         println!("{}: {:?}", lineno, token);
     }
 
-    test_token!(tokens[0], TType::Name, "import");
-    test_token!(tokens[1], TType::Name, "sys");
-    test_token!(tokens[2], TType::Op, ",");
-    test_token!(tokens[3], TType::Name, "time");
-
-    test_token!(tokens[11], TType::String, "'time'");
-
-    assert_eq!(tokens.len(), 18);
+    test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 6), "import" );
+    test_token_w_position!(tokens[1], TType::Name, (1, 7), (1, 10), "sys" );
+    test_token_w_position!(tokens[2], TType::Op, (1, 10), (1, 11), "," );
+    test_token_w_position!(tokens[3], TType::Name, (1, 12), (1, 16), "time" );
+    test_token_w_position!(tokens[4], TType::NL, (1, 16), (1, 16), "" );
+    test_token_w_position!(tokens[5], TType::Name, (2, 0), (2, 1), "x" );
+    test_token_w_position!(tokens[6], TType::Op, (2, 2), (2, 3), "=" );
+    test_token_w_position!(tokens[7], TType::Name, (2, 4), (2, 7), "sys" );
+    test_token_w_position!(tokens[8], TType::Op, (2, 7), (2, 8), "." );
+    test_token_w_position!(tokens[9], TType::Name, (2, 8), (2, 15), "modules" );
+    test_token_w_position!(tokens[10], TType::Op, (2, 15), (2, 16), "[" );
+    test_token_w_position!(tokens[11], TType::String, (2, 16), (2, 22), "'time'" );
+    test_token_w_position!(tokens[12], TType::Op, (2, 22), (2, 23), "]" );
+    test_token_w_position!(tokens[13], TType::Op, (2, 23), (2, 24), "." );
+    test_token_w_position!(tokens[14], TType::Name, (2, 24), (2, 28), "time" );
+    test_token_w_position!(tokens[15], TType::Op, (2, 28), (2, 29), "(" );
+    test_token_w_position!(tokens[16], TType::Op, (2, 29), (2, 30), ")" );
+    test_token_w_position!(tokens[17], TType::NL, (2, 30), (2, 30), "" );
 }
 
 #[test]
