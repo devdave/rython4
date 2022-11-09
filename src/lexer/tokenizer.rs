@@ -749,6 +749,51 @@ impl Tokenizer {
                     }
                 }
             }
+            else if let Some('"') = code.peek_char() {
+                let sym = code.get_char().unwrap();
+                match Tokenizer::attempt_string('"',
+                                                       "\"".to_string(),
+                                                       &mut code, state
+                ) {
+                    Ok(Some((token_type, found_str))) => {
+                        assert_eq!(token_type, TType::String);
+                        product.push(Token::quick(
+                            token_type,
+                            lineno, col_pos, col_pos+found_str.len(),
+                            found_str
+                        ));
+                    },
+                    _ => {
+                        if state.string_continues == true {
+                             state.string_start = Some(Position::t2((lineno, col_pos)));
+                         } else {
+                             println!("Failed to match @ {}:{}", lineno, col_pos);
+                         }
+                    }
+                }
+
+            }
+            else if let Some('\'') = code.peek_char() {
+                let sym = code.get_char().unwrap();
+                match Tokenizer::attempt_string('\'', "'".to_string(),
+                &mut code, state) {
+                    Ok(Some((token_type, found_str))) => {
+                        assert_eq!(token_type, TType::String);
+                        product.push(Token::quick(
+                            token_type,
+                            lineno, col_pos, col_pos+found_str.len(),
+                            found_str
+                        ));
+                    },
+                    _ => {
+                        if state.string_continues == true {
+                             state.string_start = Some(Position::t2((lineno, col_pos)));
+                         } else {
+                             println!("Failed to match @ {}:{}", lineno, col_pos);
+                         }
+                    }
+                }
+            }
 
             //Look for identifier/Name tokens
             else if Tokenizer::is_potential_identifier_start(code.peek_char()) == true {
