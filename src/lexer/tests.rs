@@ -23,38 +23,32 @@ macro_rules! test_token{
 #[test]
 fn test_float() {
 
-
-    let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: false, skip_encoding: true });
-    let tokens = tokenizer.process_file("test_fixtures/test_float.py").expect("tokens");
-
-    for token in tokens.iter() {
-        println!("{:?}", token);
-    }
+    let tokens = Tokenizer::tokenize_file("test_fixtures/test_float.py", TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
 
     test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
-test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
-test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 11), "3.14159" );
-test_token_w_position!(tokens[3], TType::NL, (1, 11), (1, 11), "" );
-test_token_w_position!(tokens[4], TType::Name, (2, 0), (2, 1), "x" );
-test_token_w_position!(tokens[5], TType::Op, (2, 2), (2, 3), "=" );
-test_token_w_position!(tokens[6], TType::Number, (2, 4), (2, 11), "314159." );
-test_token_w_position!(tokens[7], TType::NL, (2, 11), (2, 11), "" );
-test_token_w_position!(tokens[8], TType::Name, (3, 0), (3, 1), "x" );
-test_token_w_position!(tokens[9], TType::Op, (3, 2), (3, 3), "=" );
-test_token_w_position!(tokens[10], TType::Number, (3, 4), (3, 11), ".314159" );
-test_token_w_position!(tokens[11], TType::NL, (3, 11), (3, 11), "" );
-test_token_w_position!(tokens[12], TType::Name, (4, 0), (4, 1), "x" );
-test_token_w_position!(tokens[13], TType::Op, (4, 2), (4, 3), "=" );
-test_token_w_position!(tokens[14], TType::Number, (4, 4), (4, 9), "3e141" );
-test_token_w_position!(tokens[15], TType::NL, (4, 9), (4, 9), "" );
-test_token_w_position!(tokens[16], TType::Name, (5, 0), (5, 1), "x" );
-test_token_w_position!(tokens[17], TType::Op, (5, 2), (5, 3), "=" );
-test_token_w_position!(tokens[18], TType::Number, (5, 4), (5, 9), "3E123" );
-test_token_w_position!(tokens[19], TType::NL, (5, 9), (5, 9), "" );
-test_token_w_position!(tokens[20], TType::Name, (7, 0), (7, 1), "x" );
-test_token_w_position!(tokens[21], TType::Op, (7, 2), (7, 3), "=" );
-test_token_w_position!(tokens[22], TType::Number, (7, 4), (7, 12), "3.14e159" );
-test_token_w_position!(tokens[23], TType::NL, (7, 12), (7, 12), "" );
+    test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
+    test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 11), "3.14159" );
+    test_token_w_position!(tokens[3], TType::NL, (1, 11), (1, 11), "" );
+    test_token_w_position!(tokens[4], TType::Name, (2, 0), (2, 1), "x" );
+    test_token_w_position!(tokens[5], TType::Op, (2, 2), (2, 3), "=" );
+    test_token_w_position!(tokens[6], TType::Number, (2, 4), (2, 11), "314159." );
+    test_token_w_position!(tokens[7], TType::NL, (2, 11), (2, 11), "" );
+    test_token_w_position!(tokens[8], TType::Name, (3, 0), (3, 1), "x" );
+    test_token_w_position!(tokens[9], TType::Op, (3, 2), (3, 3), "=" );
+    test_token_w_position!(tokens[10], TType::Number, (3, 4), (3, 11), ".314159" );
+    test_token_w_position!(tokens[11], TType::NL, (3, 11), (3, 11), "" );
+    test_token_w_position!(tokens[12], TType::Name, (4, 0), (4, 1), "x" );
+    test_token_w_position!(tokens[13], TType::Op, (4, 2), (4, 3), "=" );
+    test_token_w_position!(tokens[14], TType::Number, (4, 4), (4, 9), "3e141" );
+    test_token_w_position!(tokens[15], TType::NL, (4, 9), (4, 9), "" );
+    test_token_w_position!(tokens[16], TType::Name, (5, 0), (5, 1), "x" );
+    test_token_w_position!(tokens[17], TType::Op, (5, 2), (5, 3), "=" );
+    test_token_w_position!(tokens[18], TType::Number, (5, 4), (5, 9), "3E123" );
+    test_token_w_position!(tokens[19], TType::NL, (5, 9), (5, 9), "" );
+    test_token_w_position!(tokens[20], TType::Name, (7, 0), (7, 1), "x" );
+    test_token_w_position!(tokens[21], TType::Op, (7, 2), (7, 3), "=" );
+    test_token_w_position!(tokens[22], TType::Number, (7, 4), (7, 12), "3.14e159" );
+    test_token_w_position!(tokens[23], TType::NL, (7, 12), (7, 12), "" );
 
 }
 
@@ -188,104 +182,100 @@ test_token_w_position!(tokens[58], TType::NL, (11, 5), (11, 5), "" );
 #[test]
 fn test_comparison() {
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false });
-    let tokens = tokenizer.process_file("test_fixtures/test_comparison.py").expect("tokens");
+    let tokens = Tokenizer::tokenize_file("test_fixtures/test_comparison.py",
+    TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 2), "if" );
+test_token_w_position!(tokens[1], TType::Number, (1, 3), (1, 4), "1" );
+test_token_w_position!(tokens[2], TType::Op, (1, 5), (1, 6), "<" );
+test_token_w_position!(tokens[3], TType::Number, (1, 7), (1, 8), "1" );
+test_token_w_position!(tokens[4], TType::Op, (1, 9), (1, 10), ">" );
+test_token_w_position!(tokens[5], TType::Number, (1, 11), (1, 12), "1" );
+test_token_w_position!(tokens[6], TType::Op, (1, 13), (1, 15), "==" );
+test_token_w_position!(tokens[7], TType::Number, (1, 16), (1, 17), "1" );
+test_token_w_position!(tokens[8], TType::Op, (1, 18), (1, 20), ">=" );
+test_token_w_position!(tokens[9], TType::Number, (1, 21), (1, 22), "5" );
+test_token_w_position!(tokens[10], TType::Op, (1, 23), (1, 25), "<=" );
+test_token_w_position!(tokens[11], TType::Number, (1, 26), (1, 30), "0x15" );
+test_token_w_position!(tokens[12], TType::Op, (1, 31), (1, 33), "<=" );
+test_token_w_position!(tokens[13], TType::Number, (1, 34), (1, 38), "0x12" );
+test_token_w_position!(tokens[14], TType::Op, (1, 39), (1, 41), "!=" );
+test_token_w_position!(tokens[15], TType::Number, (1, 42), (1, 43), "1" );
+test_token_w_position!(tokens[16], TType::Name, (1, 44), (1, 47), "and" );
+test_token_w_position!(tokens[17], TType::Number, (1, 48), (1, 49), "5" );
+test_token_w_position!(tokens[18], TType::Name, (1, 50), (1, 52), "in" );
+test_token_w_position!(tokens[19], TType::Number, (1, 53), (1, 54), "1" );
+test_token_w_position!(tokens[20], TType::Name, (1, 55), (1, 58), "not" );
+test_token_w_position!(tokens[21], TType::Name, (1, 59), (1, 61), "in" );
+test_token_w_position!(tokens[22], TType::Number, (1, 62), (1, 63), "1" );
+test_token_w_position!(tokens[23], TType::Name, (1, 64), (1, 66), "is" );
+test_token_w_position!(tokens[24], TType::Number, (1, 67), (1, 68), "1" );
+test_token_w_position!(tokens[25], TType::Name, (1, 69), (1, 71), "or" );
+test_token_w_position!(tokens[26], TType::Number, (1, 72), (1, 73), "5" );
+test_token_w_position!(tokens[27], TType::Name, (1, 74), (1, 76), "is" );
+test_token_w_position!(tokens[28], TType::Name, (1, 77), (1, 80), "not" );
+test_token_w_position!(tokens[29], TType::Number, (1, 81), (1, 82), "1" );
+test_token_w_position!(tokens[30], TType::Op, (1, 82), (1, 83), ":" );
+test_token_w_position!(tokens[31], TType::NL, (1, 83), (1, 83), "" );
+test_token_w_position!(tokens[32], TType::Indent, (2, 0), (2, 0), "" );
+test_token_w_position!(tokens[33], TType::Name, (2, 4), (2, 8), "pass" );
+test_token_w_position!(tokens[34], TType::NL, (2, 8), (2, 8), "" );
+test_token_w_position!(tokens[35], TType::Dedent, (2, 0), (2, 0), "" );
 
 
-
-    test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Name, (0, 1), (2, 1), "if" );
-    test_token_w_position!(tokens[2], TType::Number, (3, 1), (4, 1), "1" );
-    test_token_w_position!(tokens[3], TType::Op, (5, 1), (6, 1), "<" );
-    test_token_w_position!(tokens[4], TType::Number, (7, 1), (8, 1), "1" );
-    test_token_w_position!(tokens[5], TType::Op, (9, 1), (10, 1), ">" );
-    test_token_w_position!(tokens[6], TType::Number, (11, 1), (12, 1), "1" );
-    test_token_w_position!(tokens[7], TType::Op, (13, 1), (15, 1), "==" );
-    test_token_w_position!(tokens[8], TType::Number, (16, 1), (17, 1), "1" );
-    test_token_w_position!(tokens[9], TType::Op, (18, 1), (20, 1), ">=" );
-    test_token_w_position!(tokens[10], TType::Number, (21, 1), (22, 1), "5" );
-    test_token_w_position!(tokens[11], TType::Op, (23, 1), (25, 1), "<=" );
-    test_token_w_position!(tokens[12], TType::Number, (26, 1), (30, 1), "0x15" );
-    test_token_w_position!(tokens[13], TType::Op, (31, 1), (33, 1), "<=" );
-    test_token_w_position!(tokens[14], TType::Number, (34, 1), (38, 1), "0x12" );
-    test_token_w_position!(tokens[15], TType::Op, (39, 1), (41, 1), "!=" );
-    test_token_w_position!(tokens[16], TType::Number, (42, 1), (43, 1), "1" );
-    test_token_w_position!(tokens[17], TType::Name, (44, 1), (47, 1), "and" );
-    test_token_w_position!(tokens[18], TType::Number, (48, 1), (49, 1), "5" );
-    test_token_w_position!(tokens[19], TType::Name, (50, 1), (52, 1), "in" );
-    test_token_w_position!(tokens[20], TType::Number, (53, 1), (54, 1), "1" );
-    test_token_w_position!(tokens[21], TType::Name, (55, 1), (58, 1), "not" );
-    test_token_w_position!(tokens[22], TType::Name, (59, 1), (61, 1), "in" );
-    test_token_w_position!(tokens[23], TType::Number, (62, 1), (63, 1), "1" );
-    test_token_w_position!(tokens[24], TType::Name, (64, 1), (66, 1), "is" );
-    test_token_w_position!(tokens[25], TType::Number, (67, 1), (68, 1), "1" );
-    test_token_w_position!(tokens[26], TType::Name, (69, 1), (71, 1), "or" );
-    test_token_w_position!(tokens[27], TType::Number, (72, 1), (73, 1), "5" );
-    test_token_w_position!(tokens[28], TType::Name, (74, 1), (76, 1), "is" );
-    test_token_w_position!(tokens[29], TType::Name, (77, 1), (80, 1), "not" );
-    test_token_w_position!(tokens[30], TType::Number, (81, 1), (82, 1), "1" );
-    test_token_w_position!(tokens[31], TType::Op, (82, 1), (83, 1), ":" );
-    test_token_w_position!(tokens[32], TType::Newline, (83, 1), (84, 1), "\n" );
-    test_token_w_position!(tokens[33], TType::Indent, (0, 2), (4, 2), "    " );
-    test_token_w_position!(tokens[34], TType::Name, (4, 2), (8, 2), "pass" );
-    test_token_w_position!(tokens[35], TType::Newline, (8, 2), (9, 2), "\n" );
-    test_token_w_position!(tokens[36], TType::Dedent, (0, 3), (0, 3), "" );
-    test_token_w_position!(tokens[37], TType::EndMarker, (0, 3), (0, 3), "" );
 }
 
 #[test]
 fn test_int() {
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_int.py").expect("tokens");
 
-    test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Number, (0, 1), (4, 1), "0xff" );
-    test_token_w_position!(tokens[2], TType::Op, (5, 1), (7, 1), "<=" );
-    test_token_w_position!(tokens[3], TType::Number, (8, 1), (11, 1), "255" );
-    test_token_w_position!(tokens[4], TType::Newline, (11, 1), (12, 1), "\n" );
-    test_token_w_position!(tokens[5], TType::Number, (0, 2), (4, 2), "0b10" );
-    test_token_w_position!(tokens[6], TType::Op, (5, 2), (7, 2), "<=" );
-    test_token_w_position!(tokens[7], TType::Number, (8, 2), (11, 2), "255" );
-    test_token_w_position!(tokens[8], TType::Newline, (11, 2), (12, 2), "\n" );
-    test_token_w_position!(tokens[9], TType::Number, (0, 3), (5, 3), "0o123" );
-    test_token_w_position!(tokens[10], TType::Op, (6, 3), (8, 3), "<=" );
-    test_token_w_position!(tokens[11], TType::Number, (9, 3), (14, 3), "0O123" );
-    test_token_w_position!(tokens[12], TType::Newline, (14, 3), (15, 3), "\n" );
-    test_token_w_position!(tokens[13], TType::Number, (0, 4), (7, 4), "1234567" );
-    test_token_w_position!(tokens[14], TType::Op, (8, 4), (9, 4), ">" );
-    test_token_w_position!(tokens[15], TType::Op, (10, 4), (11, 4), "~" );
-    test_token_w_position!(tokens[16], TType::Number, (11, 4), (15, 4), "0x15" );
-    test_token_w_position!(tokens[17], TType::Newline, (15, 4), (16, 4), "\n" );
-    test_token_w_position!(tokens[18], TType::Number, (0, 5), (7, 5), "2134568" );
-    test_token_w_position!(tokens[19], TType::Op, (8, 5), (10, 5), "!=" );
-    test_token_w_position!(tokens[20], TType::Number, (11, 5), (18, 5), "1231515" );
-    test_token_w_position!(tokens[21], TType::Newline, (18, 5), (19, 5), "\n" );
-    test_token_w_position!(tokens[22], TType::Op, (0, 6), (1, 6), "(" );
-    test_token_w_position!(tokens[23], TType::Op, (1, 6), (2, 6), "-" );
-    test_token_w_position!(tokens[24], TType::Number, (2, 6), (8, 6), "124561" );
-    test_token_w_position!(tokens[25], TType::Op, (8, 6), (9, 6), "-" );
-    test_token_w_position!(tokens[26], TType::Number, (9, 6), (10, 6), "1" );
-    test_token_w_position!(tokens[27], TType::Op, (10, 6), (11, 6), ")" );
-    test_token_w_position!(tokens[28], TType::Op, (12, 6), (13, 6), "&" );
-    test_token_w_position!(tokens[29], TType::Number, (14, 6), (23, 6), "200000000" );
-    test_token_w_position!(tokens[30], TType::Newline, (23, 6), (24, 6), "\n" );
-    test_token_w_position!(tokens[31], TType::Number, (0, 7), (10, 7), "0xdeadbeef" );
-    test_token_w_position!(tokens[32], TType::Op, (11, 7), (13, 7), "!=" );
-    test_token_w_position!(tokens[33], TType::Op, (14, 7), (15, 7), "-" );
-    test_token_w_position!(tokens[34], TType::Number, (15, 7), (16, 7), "1" );
-    test_token_w_position!(tokens[35], TType::Newline, (16, 7), (17, 7), "\n" );
-    test_token_w_position!(tokens[36], TType::Number, (0, 8), (10, 8), "0xdeadc0de" );
-    test_token_w_position!(tokens[37], TType::Op, (11, 8), (12, 8), "&" );
-    test_token_w_position!(tokens[38], TType::Number, (13, 8), (18, 8), "12345" );
-    test_token_w_position!(tokens[39], TType::Newline, (18, 8), (19, 8), "\n" );
-    test_token_w_position!(tokens[40], TType::Number, (0, 9), (4, 9), "0xFF" );
-    test_token_w_position!(tokens[41], TType::Op, (5, 9), (6, 9), "&" );
-    test_token_w_position!(tokens[42], TType::Number, (7, 9), (11, 9), "0x15" );
-    test_token_w_position!(tokens[43], TType::Op, (12, 9), (13, 9), "|" );
-    test_token_w_position!(tokens[44], TType::Number, (14, 9), (18, 9), "1234" );
-    // test_token_w_position!(tokens[45], TType::Newline, (18, 9), (19, 9), "" );
-    test_token_w_position!(tokens[46], TType::EndMarker, (0, 10), (0, 10), "" );
+    test_token_w_position!(tokens[0], TType::Number, (1, 0), (1, 4), "0xff" );
+test_token_w_position!(tokens[1], TType::Op, (1, 5), (1, 7), "<=" );
+test_token_w_position!(tokens[2], TType::Number, (1, 8), (1, 11), "255" );
+test_token_w_position!(tokens[3], TType::NL, (1, 11), (1, 11), "" );
+test_token_w_position!(tokens[4], TType::Number, (2, 0), (2, 4), "0b10" );
+test_token_w_position!(tokens[5], TType::Op, (2, 5), (2, 7), "<=" );
+test_token_w_position!(tokens[6], TType::Number, (2, 8), (2, 11), "255" );
+test_token_w_position!(tokens[7], TType::NL, (2, 11), (2, 11), "" );
+test_token_w_position!(tokens[8], TType::Number, (3, 0), (3, 5), "0o123" );
+test_token_w_position!(tokens[9], TType::Op, (3, 6), (3, 8), "<=" );
+test_token_w_position!(tokens[10], TType::Number, (3, 9), (3, 14), "0o123" );
+test_token_w_position!(tokens[11], TType::NL, (3, 14), (3, 14), "" );
+test_token_w_position!(tokens[12], TType::Number, (4, 0), (4, 7), "1234567" );
+test_token_w_position!(tokens[13], TType::Op, (4, 8), (4, 9), ">" );
+test_token_w_position!(tokens[14], TType::Op, (4, 10), (4, 11), "~" );
+test_token_w_position!(tokens[15], TType::Number, (4, 11), (4, 15), "0x15" );
+test_token_w_position!(tokens[16], TType::NL, (4, 15), (4, 15), "" );
+test_token_w_position!(tokens[17], TType::Number, (5, 0), (5, 7), "2134568" );
+test_token_w_position!(tokens[18], TType::Op, (5, 8), (5, 10), "!=" );
+test_token_w_position!(tokens[19], TType::Number, (5, 11), (5, 18), "1231515" );
+test_token_w_position!(tokens[20], TType::NL, (5, 18), (5, 18), "" );
+test_token_w_position!(tokens[21], TType::Op, (6, 0), (6, 1), "(" );
+test_token_w_position!(tokens[22], TType::Op, (6, 1), (6, 2), "-" );
+test_token_w_position!(tokens[23], TType::Number, (6, 2), (6, 8), "124561" );
+test_token_w_position!(tokens[24], TType::Op, (6, 8), (6, 9), "-" );
+test_token_w_position!(tokens[25], TType::Number, (6, 9), (6, 10), "1" );
+test_token_w_position!(tokens[26], TType::Op, (6, 10), (6, 11), ")" );
+test_token_w_position!(tokens[27], TType::Op, (6, 12), (6, 13), "&" );
+test_token_w_position!(tokens[28], TType::Number, (6, 14), (6, 23), "200000000" );
+test_token_w_position!(tokens[29], TType::NL, (6, 23), (6, 23), "" );
+test_token_w_position!(tokens[30], TType::Number, (7, 0), (7, 10), "0xdeadbeef" );
+test_token_w_position!(tokens[31], TType::Op, (7, 11), (7, 13), "!=" );
+test_token_w_position!(tokens[32], TType::Op, (7, 14), (7, 15), "-" );
+test_token_w_position!(tokens[33], TType::Number, (7, 15), (7, 16), "1" );
+test_token_w_position!(tokens[34], TType::NL, (7, 16), (7, 16), "" );
+test_token_w_position!(tokens[35], TType::Number, (8, 0), (8, 10), "0xdeadc0de" );
+test_token_w_position!(tokens[36], TType::Op, (8, 11), (8, 12), "&" );
+test_token_w_position!(tokens[37], TType::Number, (8, 13), (8, 18), "12345" );
+test_token_w_position!(tokens[38], TType::NL, (8, 18), (8, 18), "" );
+test_token_w_position!(tokens[39], TType::Number, (9, 0), (9, 4), "0xFF" );
+test_token_w_position!(tokens[40], TType::Op, (9, 5), (9, 6), "&" );
+test_token_w_position!(tokens[41], TType::Number, (9, 7), (9, 11), "0x15" );
+test_token_w_position!(tokens[42], TType::Op, (9, 12), (9, 13), "|" );
+test_token_w_position!(tokens[43], TType::Number, (9, 14), (9, 18), "1234" );
+test_token_w_position!(tokens[44], TType::NL, (9, 18), (9, 18), "" );
 
 }
 
@@ -311,6 +301,55 @@ fn test_long() {
     test_token_w_position!(tokens[14], TType::Op, (4, 4), (4, 5), "-" );
     test_token_w_position!(tokens[15], TType::Number, (4, 5), (4, 22), "15921590215012591" );
     test_token_w_position!(tokens[16], TType::NL, (4, 22), (4, 22), "" );
+
+}
+
+#[test]
+fn test_numbers_mixed() {
+    let tokens = Tokenizer::tokenize_file("test_fixtures/test_numbers_mixed.py",
+    TConfig{skip_encoding: true, skip_endmarker: false}).expect("tokens");
+
+    test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 1), "x" );
+    test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "=" );
+    test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 5), "0" );
+    test_token_w_position!(tokens[3], TType::NL, (1, 5), (1, 5), "" );
+    test_token_w_position!(tokens[4], TType::Name, (3, 0), (3, 2), "if" );
+    test_token_w_position!(tokens[5], TType::Name, (3, 3), (3, 4), "x" );
+    test_token_w_position!(tokens[6], TType::Op, (3, 5), (3, 6), ">" );
+    test_token_w_position!(tokens[7], TType::Number, (3, 7), (3, 8), "3" );
+    test_token_w_position!(tokens[8], TType::Op, (3, 8), (3, 9), ":" );
+    test_token_w_position!(tokens[9], TType::NL, (3, 9), (3, 9), "" );
+    test_token_w_position!(tokens[10], TType::Indent, (4, 0), (4, 0), "" );
+    test_token_w_position!(tokens[11], TType::Name, (4, 4), (4, 9), "print" );
+    test_token_w_position!(tokens[12], TType::Op, (4, 9), (4, 10), "(" );
+    test_token_w_position!(tokens[13], TType::Number, (4, 10), (4, 13), "456" );
+    test_token_w_position!(tokens[14], TType::Op, (4, 13), (4, 14), ")" );
+    test_token_w_position!(tokens[15], TType::NL, (4, 14), (4, 14), "" );
+    test_token_w_position!(tokens[16], TType::Dedent, (7, 0), (7, 0), "" );
+    test_token_w_position!(tokens[17], TType::Name, (7, 0), (7, 3), "def" );
+    test_token_w_position!(tokens[18], TType::Name, (7, 4), (7, 7), "foo" );
+    test_token_w_position!(tokens[19], TType::Op, (7, 7), (7, 8), "(" );
+    test_token_w_position!(tokens[20], TType::Name, (7, 8), (7, 11), "bar" );
+    test_token_w_position!(tokens[21], TType::Op, (7, 11), (7, 12), "," );
+    test_token_w_position!(tokens[22], TType::Name, (7, 13), (7, 16), "kwt" );
+    test_token_w_position!(tokens[23], TType::Op, (7, 16), (7, 17), "=" );
+    test_token_w_position!(tokens[24], TType::Name, (7, 17), (7, 21), "None" );
+    test_token_w_position!(tokens[25], TType::Op, (7, 21), (7, 22), ")" );
+    test_token_w_position!(tokens[26], TType::Op, (7, 22), (7, 23), ":" );
+    test_token_w_position!(tokens[27], TType::NL, (7, 23), (7, 23), "" );
+    test_token_w_position!(tokens[28], TType::Indent, (8, 0), (8, 0), "" );
+    test_token_w_position!(tokens[29], TType::Name, (8, 4), (8, 8), "pass" );
+    test_token_w_position!(tokens[30], TType::NL, (8, 8), (8, 8), "" );
+    test_token_w_position!(tokens[31], TType::Dedent, (11, 0), (11, 0), "" );
+    test_token_w_position!(tokens[32], TType::Name, (11, 0), (11, 3), "foo" );
+    test_token_w_position!(tokens[33], TType::Op, (11, 3), (11, 4), "(" );
+    test_token_w_position!(tokens[34], TType::Number, (11, 4), (11, 5), "3" );
+    test_token_w_position!(tokens[35], TType::Op, (11, 5), (11, 6), "," );
+    test_token_w_position!(tokens[36], TType::Name, (11, 7), (11, 10), "kwt" );
+    test_token_w_position!(tokens[37], TType::Op, (11, 10), (11, 11), "=" );
+    test_token_w_position!(tokens[38], TType::Number, (11, 11), (11, 12), "5" );
+    test_token_w_position!(tokens[39], TType::Op, (11, 12), (11, 13), ")" );
+    test_token_w_position!(tokens[40], TType::NL, (11, 13), (11, 13), "" );
 
 }
 
@@ -564,12 +603,11 @@ fn test_basic_operators() {
     let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_basic_operators.py").expect("tokens");
 
-    test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Number, (0, 1), (1, 1), "1" );
-    test_token_w_position!(tokens[2], TType::Op, (2, 1), (3, 1), "+" );
-    test_token_w_position!(tokens[3], TType::Number, (4, 1), (5, 1), "1" );
-    //TODO test_token_w_position!(tokens[4], TType::Newline, (5, 1), (6, 1), "" );
-    test_token_w_position!(tokens[5], TType::EndMarker, (0, 2), (0, 2), "" );
+    test_token_w_position!(tokens[0], TType::Number, (1, 0), (1, 1), "1" );
+    test_token_w_position!(tokens[1], TType::Op, (1, 2), (1, 3), "+" );
+    test_token_w_position!(tokens[2], TType::Number, (1, 4), (1, 5), "1" );
+    test_token_w_position!(tokens[3], TType::NL, (1, 5), (1, 5), "" );
+
 
 }
 
@@ -644,16 +682,16 @@ to see if it works""""#.to_string();
 
 }
 
-#[test]
-fn test_correct_newlines() {
-    let mut tokenizer = Tokenizer::new(TConfig::default());
-    let tokens = tokenizer.process_file("test_fixtures/test_correct_newlines.py").expect("tokens");
-
-    for (lno, token) in tokens.iter().enumerate() {
-        println!("{}: {:?}", lno, token);
-    }
-
-}
+// #[test]
+// fn test_correct_newlines() {
+//     let mut tokenizer = Tokenizer::new(TConfig::default());
+//     let tokens = tokenizer.process_file("test_fixtures/test_correct_newlines.py").expect("tokens");
+//
+//     for (lno, token) in tokens.iter().enumerate() {
+//         println!("{}: {:?}", lno, token);
+//     }
+//
+// }
 
 #[test]
 fn test_function() {
@@ -739,42 +777,36 @@ fn test_basic_indent() {
 
     let tokens = Tokenizer::tokenize_file(
         "test_fixtures/basic_indent.py",
-        TConfig{ skip_encoding: false, skip_endmarker: true}).expect("tokens");
+        TConfig{ skip_encoding: true, skip_endmarker: true}).expect("tokens");
 
-    for (lno, token) in tokens.iter().enumerate() {
-        println!("{}: {:?}", lno, token);
-    }
+    test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 3), "def" );
+    test_token_w_position!(tokens[1], TType::Name, (1, 4), (1, 8), "test" );
+    test_token_w_position!(tokens[2], TType::Op, (1, 8), (1, 9), "(" );
+    test_token_w_position!(tokens[3], TType::Op, (1, 9), (1, 10), ")" );
+    test_token_w_position!(tokens[4], TType::Op, (1, 10), (1, 11), ":" );
+    test_token_w_position!(tokens[5], TType::NL, (1, 11), (1, 11), "" );
+    test_token_w_position!(tokens[6], TType::Indent, (2, 0), (2, 0), "" );
+    test_token_w_position!(tokens[7], TType::Name, (2, 4), (2, 9), "print" );
+    test_token_w_position!(tokens[8], TType::Op, (2, 9), (2, 10), "(" );
+    test_token_w_position!(tokens[9], TType::String, (2, 10), (2, 23), "Hello world" );
+    test_token_w_position!(tokens[10], TType::Op, (2, 23), (2, 24), ")" );
+    test_token_w_position!(tokens[11], TType::NL, (2, 24), (2, 24), "" );
+    test_token_w_position!(tokens[12], TType::Dedent, (4, 0), (4, 0), "" );
+    test_token_w_position!(tokens[13], TType::Name, (4, 0), (4, 3), "def" );
+    test_token_w_position!(tokens[14], TType::Name, (4, 4), (4, 7), "foo" );
+    test_token_w_position!(tokens[15], TType::Op, (4, 7), (4, 8), "(" );
+    test_token_w_position!(tokens[16], TType::Op, (4, 8), (4, 9), ")" );
+    test_token_w_position!(tokens[17], TType::Op, (4, 9), (4, 10), ":" );
+    test_token_w_position!(tokens[18], TType::NL, (4, 10), (4, 10), "" );
+    test_token_w_position!(tokens[19], TType::Indent, (5, 0), (5, 0), "" );
+    test_token_w_position!(tokens[20], TType::Name, (5, 4), (5, 9), "print" );
+    test_token_w_position!(tokens[21], TType::Op, (5, 9), (5, 10), "(" );
+    test_token_w_position!(tokens[22], TType::String, (5, 10), (5, 19), "block 2" );
+    test_token_w_position!(tokens[23], TType::Op, (5, 19), (5, 20), ")" );
+    test_token_w_position!(tokens[24], TType::NL, (5, 20), (5, 20), "" );
+    test_token_w_position!(tokens[25], TType::Dedent, (5, 0), (5, 0), "" );
 
-    // test_token_w_position!(tokens[0], TType::Encoding, (0, 0), (0, 0), "utf-8" );
-    test_token_w_position!(tokens[1], TType::Name, (0, 1), (3, 1), "def" );
-    test_token_w_position!(tokens[2], TType::Name, (4, 1), (8, 1), "test" );
-    test_token_w_position!(tokens[3], TType::Op, (8, 1), (9, 1), "(" );
-    test_token_w_position!(tokens[4], TType::Op, (9, 1), (10, 1), ")" );
-    test_token_w_position!(tokens[5], TType::Op, (10, 1), (11, 1), ":" );
-    // test_token_w_position!(tokens[6], TType::Newline, (11, 1), (12, 1), "\n" );
-    test_token_w_position!(tokens[7], TType::Indent, (0, 2), (4, 2), "    " );
-    test_token_w_position!(tokens[8], TType::Name, (4, 2), (9, 2), "print" );
-    test_token_w_position!(tokens[9], TType::Op, (9, 2), (10, 2), "(" );
-    test_token_w_position!(tokens[10], TType::String, (10, 2), (23, 2), "\"Hello world\"" );
-    test_token_w_position!(tokens[11], TType::Op, (23, 2), (24, 2), ")" );
-    // test_token_w_position!(tokens[12], TType::Newline, (24, 2), (25, 2), "\n" );
-    // test_token_w_position!(tokens[13], TType::NL, (0, 3), (1, 3), "\n" );
-    test_token_w_position!(tokens[14], TType::Dedent, (0, 4), (0, 4), "" );
-    test_token_w_position!(tokens[15], TType::Name, (0, 4), (3, 4), "def" );
-    test_token_w_position!(tokens[16], TType::Name, (4, 4), (7, 4), "foo" );
-    test_token_w_position!(tokens[17], TType::Op, (7, 4), (8, 4), "(" );
-    test_token_w_position!(tokens[18], TType::Op, (8, 4), (9, 4), ")" );
-    test_token_w_position!(tokens[19], TType::Op, (9, 4), (10, 4), ":" );
-    // test_token_w_position!(tokens[20], TType::Newline, (10, 4), (11, 4), "\n" );
-    test_token_w_position!(tokens[21], TType::Indent, (0, 5), (4, 5), "    " );
-    test_token_w_position!(tokens[22], TType::Name, (4, 5), (9, 5), "print" );
-    test_token_w_position!(tokens[23], TType::Op, (9, 5), (10, 5), "(" );
-    test_token_w_position!(tokens[24], TType::String, (10, 5), (19, 5), "\"block 2\"" );
-    test_token_w_position!(tokens[25], TType::Op, (19, 5), (20, 5), ")" );
-    // test_token_w_position!(tokens[26], TType::Newline, (20, 5), (21, 5), "\n" );
-    // test_token_w_position!(tokens[27], TType::NL, (0, 6), (1, 6), "\n" );
-    test_token_w_position!(tokens[28], TType::Dedent, (0, 7), (0, 7), "" );
-    // test_token_w_position!(tokens[29], TType::EndMarker, (0, 7), (0, 7), "" );
+
 }
 
 #[test]
