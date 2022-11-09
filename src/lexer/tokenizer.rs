@@ -291,8 +291,71 @@ impl Tokenizer {
 
 
 
-    fn attempt_string(found: String, code: &mut CodeLine, state: &mut State) -> Result<Option<(TType, String)>, TokError>
+    fn attempt_string(quote: char, found: String, code: &mut CodeLine, state: &mut State) -> Result<Option<(TType, String)>, TokError>
     {
+        //Assume we have STR_PREFIX + ( ' or " ) in found
+        let mut quote_size = 1;
+        let mut end_quote_size = 0;
+        let mut body = found.clone();
+
+        let test = code.get_char();
+
+        if test != None && test.unwrap() == quote {
+            
+            body.push(test.unwrap());
+
+            let next_test = code.get_char();
+            if next_test != None && next_test.unwrap() == quote {
+                body.push(next_test.unwrap());
+                quote_size = 3
+            } else {
+                code.rewind();
+                end_quote_size = 1;
+            }
+        } else {
+            code.rewind();
+        }
+
+
+        while (end_quote_size != quote_size) && code.remaining() > 0 {
+            let next = code.get_char();
+            if next == None || (next.unwrap() == '\n' && quote_size == 1)  {
+                return Err(TokError::UnterminatedString);
+            }
+
+            let sym = next.unwrap();
+            if sym == quote {
+                end_quote_size += 1;
+            } else {
+                end_quote_size = 0;
+                if sym == '\\' {
+                    body.push(sym);
+                    if code.remaining() > 0 {
+                        let escaped = code.get_char().unwrap();
+                        body.push(escaped);
+                    } else if quote_size != 3 {
+                        return Err(TokError::UnterminatedString);
+                    }
+                }
+            }
+            body.push(sym);
+        }
+
+        if end_quote_size != quote_size {
+            if quote_size == 3 {
+                state.string_continues = true;
+                state.string_buffer = body;
+                if quote ==  '"' {
+                    state.string_type = Some(StringType::TripleQuote);
+                } else {
+                    state.string_type = Some(StringType::TripleApos);
+                }
+                return Ok(None);
+            }
+        } else {
+            return Ok(Some((TType::String, body)));
+        }
+
 
         return Ok(None);
     }
@@ -301,7 +364,10 @@ impl Tokenizer {
         match test {
             Some('a'..='z') | Some('A'..='Z') | Some('_') => {
                 true
-            }
+            },
+            Some('\'') | Some('"') => {
+                true
+            },
             _ => {
                 //This is not a valid start to a name
                 false
@@ -365,8 +431,9 @@ impl Tokenizer {
             let mut test = code.get_char();
             match test {
                 Some('"') | Some('\'') => {
-                    found.push(test.unwrap());
-                    return Tokenizer::attempt_string(found, code, state);
+                    let quote = test.unwrap();
+                    found.push(quote);
+                    return Tokenizer::attempt_string(quote, found, code, state);
                 }
                 _ => {}
             }
@@ -668,31 +735,6 @@ impl Tokenizer {
                 }
             }
 
-            //Capture single line triple quoted string
-            else if let Some((new_pos, found)) = code.return_match(CAPTURE_TRIPLE_STRING.to_owned()) {
-                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
-            //Capture multi-line string start here
-            else if let Some((_new_pos, found)) = code.return_match(TRIPLE_QUOTE_START.to_owned()) {
-                //Assume this consumed the entire line!
-                state.string_continues = true;
-                state.string_start = Some(Position::m(col_pos, lineno));
-                state.string_buffer = found;
-                state.string_type = Some(StringType::TripleQuote);
-            }
-            //Look for "string"
-            else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
-                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            } else if let Some((_, found)) = code.return_match(TRIPLE_SINGLE_START.to_owned()) {
-                state.string_continues = true;
-                state.string_start = Some(Position::m(col_pos, lineno));
-                state.string_buffer = found;
-                state.string_type = Some(StringType::TripleSingleQuote);
-            }
-            //Look for 'string'
-            else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
-                product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
             //Look for identifier/Name tokens
             else if Tokenizer::is_potential_identifier_start(code.peek_char()) == true {
                  match self.attempt_identifiers(&mut code, state) {
@@ -732,34 +774,18 @@ impl Tokenizer {
 
                      }
                      _ => {
-                         println!("Failed to match @ {}:{}", lineno, col_pos);
+
+                         //Check to see if we have a continuing string
+                         if state.string_continues == true {
+                             state.string_start = Some(Position::t2((lineno, col_pos)));
+                         } else {
+                             println!("Failed to match @ {}:{}", lineno, col_pos);
+                         }
+
                      }
                  }
             }
 
-            // else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
-            //
-            //
-            //     //Check for async and await operators
-            //     if found == "async" {
-            //         product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
-            //     } else if found == "await" {
-            //         product.push(Token::quick(TType::Await, lineno, col_pos, new_pos, found));
-            //     } else {
-            //         product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-            //     }
-            //     is_statement = true;
-            // }
-            //Look for single char identifiers
-            // else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
-            //     product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
-            //     is_statement = true;
-            // }
-            // //Attempt to capture floats - TODO test if still needed
-            // else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
-            //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-            //     is_statement = true;
-            // }
             //Fetch numbers
             else if let Some('0'..='9') = code.peek_char() {
                 match self.attempt_number(&mut code, &state) {
