@@ -1,4 +1,6 @@
-use std::process::id;
+
+use ntest::timeout;
+
 use crate::lexer::tokenizer::{TConfig, Tokenizer};
 use crate::tokens::{TType, Position};
 
@@ -624,6 +626,7 @@ fn test_basic_operators() {
 }
 
 #[test]
+#[timeout(200)]
 fn test_valid_literals() {
     let ValidUnderscoreLiterals: Vec<&str> = vec![
         "0_0_0",
@@ -657,11 +660,20 @@ fn test_valid_literals() {
             continue;
         }
 
+        println!("Testing {:?}", value);
         let result = tokenizer.process_single_line(value.to_string()).expect("tokens");
         assert_eq!(result[0].r#type, TType::Number, "Got the wrong type when processing {:?}.  Got {:?}", value, result[0]);
     }
 }
 
+#[test]
+#[timeout(100)]
+fn test_troublesome_literal() {
+    let mut tokenizer = Tokenizer::new(TConfig{skip_endmarker: true, skip_encoding: true});
+    let result = tokenizer.process_single_line("1_00_00e5_1".to_string()).expect("tokens");
+    println!("Processed {:#?}", result);
+
+}
 
 #[test]
 fn test_multiline_strings() {
@@ -797,7 +809,7 @@ fn test_basic_indent() {
     test_token_w_position!(tokens[6], TType::Indent, (2, 0), (2, 0), "" );
     test_token_w_position!(tokens[7], TType::Name, (2, 4), (2, 9), "print" );
     test_token_w_position!(tokens[8], TType::Op, (2, 9), (2, 10), "(" );
-    test_token_w_position!(tokens[9], TType::String, (2, 10), (2, 23), "Hello world" );
+    test_token_w_position!(tokens[9], TType::String, (2, 10), (2, 23), "\"Hello world\"" );
     test_token_w_position!(tokens[10], TType::Op, (2, 23), (2, 24), ")" );
     test_token_w_position!(tokens[11], TType::NL, (2, 24), (2, 24), "" );
     test_token_w_position!(tokens[12], TType::Dedent, (4, 0), (4, 0), "" );
@@ -810,7 +822,7 @@ fn test_basic_indent() {
     test_token_w_position!(tokens[19], TType::Indent, (5, 0), (5, 0), "" );
     test_token_w_position!(tokens[20], TType::Name, (5, 4), (5, 9), "print" );
     test_token_w_position!(tokens[21], TType::Op, (5, 9), (5, 10), "(" );
-    test_token_w_position!(tokens[22], TType::String, (5, 10), (5, 19), "block 2" );
+    test_token_w_position!(tokens[22], TType::String, (5, 10), (5, 19), "\"block 2\"" );
     test_token_w_position!(tokens[23], TType::Op, (5, 19), (5, 20), ")" );
     test_token_w_position!(tokens[24], TType::NL, (5, 20), (5, 20), "" );
     test_token_w_position!(tokens[25], TType::Dedent, (5, 0), (5, 0), "" );
