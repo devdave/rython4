@@ -708,16 +708,20 @@ impl Tokenizer {
                     },
                     _=> {
                         //Assume didn't match
-                        //This is definitely a hack but we need to shift the code index forward
-                        //and if this isn't a float it's a . operator
-                        let dot = code.get().unwrap().to_string();
-                        product.push(
-                            Token::quick(
-                                TType::Op,
-                                    lineno, col_pos, col_pos+1,
-                                    dot
-                            )
-                        );
+                        //but we have a problem, this could be `.` or `...` operator tokens
+                        if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
+                            product.push(
+                                Token::quick(TType::Op,
+                                    lineno, col_pos, new_pos,
+                                    found
+                                )
+                            );
+                        } else {
+                            panic!("Syntax error (too many or too little .) on {}", lineno);
+                        }
+
+
+
 
                     }
                 }
