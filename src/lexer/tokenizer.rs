@@ -1,6 +1,8 @@
+
 use std::cmp::Ordering;
 
 use std::io::Read;
+
 
 use regex::Regex;
 
@@ -28,8 +30,6 @@ use crate::tokens::patterns::{
                           CAPTURE_TRIPLE_STRING,
                           ANY_NAME
 };
-
-
 
 
 
@@ -97,27 +97,26 @@ pub struct Tokenizer {
 }
 
 impl Tokenizer {
-
     pub fn new(config: TConfig) -> Self {
         Self {
             config,
         }
     }
 
-    pub fn tokenize_file<P>(filename:P, config: TConfig) -> Result<Vec<Token>, TokError>
+    pub fn tokenize_file<P>(filename: P, config: TConfig) -> Result<Vec<Token>, TokError>
         where P: AsRef<std::path::Path>, {
         let mut tokenizer = Tokenizer::new(config);
         return tokenizer.process_file(filename);
     }
 
     pub fn process_file<P>(&mut self, filename: P) -> Result<Vec<Token>, TokError>
-        where P: AsRef<std::path::Path>,  {
-
+        where P: AsRef<std::path::Path>, {
         let display = filename.as_ref().display();
         let mut buffer: String = String::new();
 
         let mut file = std::fs::File::open(&filename).expect("Failed to open file");
 
+        println!("File opened, reading to string");
 
         let read_res = file.read_to_string(&mut buffer);
         if let Ok(read_len) = read_res {
@@ -125,29 +124,26 @@ impl Tokenizer {
                 panic!("{:?} is empty or failed to read!", display);
             }
         } else if let Err(read_err) = read_res {
-            panic!("Failed to read {:?} - reason {:?}", display, read_err );
+            panic!("Failed to read {:?} - reason {:?}", display, read_err);
         }
 
+        println!("File loaded, cleaning now");
         let lines: Vec<String> = cleaner(buffer);
 
+        println!("Tokenizing now");
         return self.generate(lines);
-
     }
 
     pub fn process_single_line(&mut self, raw_line: String) -> Result<Vec<Token>, TokError> {
-
         let lines: Vec<String> = cleaner(raw_line);
 
         return self.generate(lines);
     }
 
-    pub fn process_interactive(&mut self, _input: String, _state: &State) {
-
-    }
+    pub fn process_interactive(&mut self, _input: String, _state: &State) {}
 
 
     pub fn generate(&mut self, source: Vec<String>) -> Result<Vec<Token>, TokError> {
-
         let mut product: Vec<Token> = Vec::new();
         let mut state = State::new();
 
@@ -156,8 +152,7 @@ impl Tokenizer {
         }
 
 
-        for (lineno, line,) in source.clone().into_iter().enumerate() {
-
+        for (lineno, line, ) in source.clone().into_iter().enumerate() {
             match self.process_line(&mut state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => {
@@ -165,14 +160,13 @@ impl Tokenizer {
                     return Err(issue)
                 },
             }
-
         }
 
         //Check for indents and push matching dedents
         if state.indent_stack.len() > 0 {
             while state.indent_stack.len() > 0 {
                 let _last_size = state.indent_stack.pop().unwrap();
-                product.push(Token::quick(TType::Dedent, source.len()+1, 0, 0, "".to_string()));
+                product.push(Token::quick(TType::Dedent, source.len() + 1, 0, 0, "".to_string()));
             }
         }
 
@@ -186,13 +180,297 @@ impl Tokenizer {
 
         if self.config.skip_endmarker == false {
             // product.push(Token::quick(TType::NL, source.len()+1, 0, 1, "\n".to_string()));
-            product.push(Token::quick(TType::EndMarker, source.len()+1, 0, 0, "".to_string()));
+            product.push(Token::quick(TType::EndMarker, source.len() + 1, 0, 0, "".to_string()));
         }
 
         return Ok(product);
     }
 
-    fn process_line(&self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
+    fn fetch_hexidecimal(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    {
+        let mut found: String = String::from("0x");
+
+
+        while code.remaining() > 0 {
+            match code.peek_char() {
+                Some('0'..='9') => {
+                    let sym = code.get_char().expect("symbol");
+                    found.push(sym);
+                },
+                Some('a'..='f') | Some('A'..='F') => {
+                    let sym = code.get_char().expect("sym");
+                    found.push(sym);
+                },
+                Some('_') => {
+                    //Do nothing/ignore
+                    code.get_char();
+                },
+                Some(' ') | Some('\n') | Some('#') | Some('\\') => {
+                    //Finished the hexidecimal
+                    return Ok(Some(found));
+                },
+                _ => {
+                    //Err how did we get here?
+                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                }
+            }
+        }
+        return Ok(Some(found));
+    }
+
+    fn fetch_binary(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    {
+        let mut found: String = String::from("0b");
+
+
+        while code.remaining() > 0 {
+            match code.peek_char() {
+                Some('0') | Some('1') => {
+                    let sym = code.get_char().expect("symbol");
+                    found.push(sym);
+                },
+                Some(' ') | Some('\n') | Some('#') | Some('\\') => {
+                    //Finished the hexidecimal
+                    return Ok(Some(found));
+                },
+                Some('_') => {
+                    //Do nothing/ignore
+                    code.get_char();
+                },
+                _ => {
+                    //Err how did we get here?
+                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                }
+            }
+        }
+        return Ok(Some(found));
+    }
+
+    fn fetch_octal(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    {
+        let mut found: String = String::from("0o");
+
+
+        while code.remaining() > 0 {
+            match code.peek_char() {
+                Some('0'..='7') => {
+                    let sym = code.get_char().expect("symbol");
+                    found.push(sym);
+                },
+                Some(' ') | Some('\n') | Some('#') | Some('\\') => {
+                    //Finished the hexidecimal
+                    return Ok(Some(found));
+                },
+                Some('_') => {
+                    //Do nothing/ignore
+                    code.get_char();
+                },
+                _ => {
+                    //Err how did we get here?
+                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                }
+            }
+        }
+        if found.len() > 0 {
+            return Ok(Some(found));
+        }
+
+        return Ok(None);
+    }
+
+
+
+    fn attempt_string(found: String, code: &mut CodeLine, state: &mut State) -> Result<Option<(TType, String)>, TokError>
+    {
+
+        return Ok(None);
+    }
+
+    fn is_potential_identifier_start(test: Option<char>) -> bool {
+        match test {
+            Some('a'..='z') | Some('A'..='Z') | Some('_') => {
+                true
+            }
+            _ => {
+                //This is not a valid start to a name
+                false
+            }
+        }
+    }
+
+    fn is_potential_identifier_char(c: char) -> bool {
+        return (c >= 'a' && c <= 'z')
+            || (c >= 'A' && c <= 'Z')
+            || (c >= '0' && c <= '9')
+            || c == '_'
+
+    }
+
+    fn attempt_identifiers(&mut self, code: &mut CodeLine, state: &mut State) -> Result<Option<(TType, String)>, TokError>
+    {
+        let mut is_name = false;
+        let mut found: String = String::new();
+
+        let mut saw_b = false;
+        let mut saw_r = false;
+        let mut saw_u = false;
+        let mut saw_f = false;
+
+
+        if Tokenizer::is_potential_identifier_start(code.peek_char()) {
+            while (code.remaining() > 0) {
+                let c = code.get_char().unwrap();
+
+                if (!(saw_b || saw_u || saw_f)) && (c == 'b' || c == 'B') {
+                    saw_b = true;
+                } else if (!(saw_b || saw_u || saw_r || saw_f) && (c == 'u' || c == 'U')) {
+                    saw_u = true;
+                } else if (!(saw_r || saw_u) && (c == 'r' || c == 'R')) {
+                    saw_r = true;
+                } else if (!(saw_f || saw_b || saw_u) && (c == 'f' || c == 'F')) {
+                    saw_f = true;
+                } else {
+                    break;
+                }
+                found.push(c);
+            }
+
+            let c = code.get_char().unwrap();
+
+            if (c == '"' || c == '\'') {
+                return Tokenizer::attempt_string(found, code, state);
+            }
+
+            let mut nonasci = false;
+
+            while (Tokenizer::is_potential_identifier_char(c)) {
+                //TODO fix me
+                // if (c >= 128) {
+                //     nonasci = true;
+                // }
+                found.push(c);
+                let c = code.get_char().unwrap();
+            }
+
+            if nonasci == true {
+                return Err(TokError::BadCharacter(c));
+            }
+
+
+            code.rewind()
+        }
+
+        return Ok(None);
+    }
+
+    fn attempt_number(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    {
+        //The number regex is way too big so let's simplify things.
+
+        let mut found: String = String::new();
+        let hint = code.get_char();
+
+        if let Some(starting_digit) = hint {
+            if starting_digit == '0' {
+                match code.peek_char() {
+                    Some('x') | Some('x') => {
+                        code.get_char();
+                        return self.fetch_hexidecimal(code, state);
+                    },
+                    Some('b') | Some('B') => {
+                        code.get_char();
+                        return self.fetch_binary(code, state);
+                    },
+                    Some('o') | Some('O') => {
+                        code.get_char();
+                        return self.fetch_octal(code, state);
+                    }
+                    Some('0'..='9') => {
+                        found.push(starting_digit);
+                    }
+                    Some('e') | Some('E') => {
+                        found.push('0');
+                        found.push(code.get_char().unwrap());
+                        return self.fetch_float_body(found, code, state );
+                    }
+                    _ => {
+                        //got something non numeric
+                        found.push(starting_digit);
+                        //lets break out.
+                        return Ok(Some(found));
+                    }
+                }
+            } else {
+                found.push(starting_digit);
+            }
+
+            while code.remaining() > 0 {
+                match code.peek_char() {
+                    None => {
+                        break;
+                    }
+                    Some('0'..='9') => {
+                        let sym = code.get_char().unwrap();
+                        found.push(sym);
+                    },
+                    Some('e') | Some('E') | Some('.') => {
+                        let sym = code.get_char().unwrap();
+                        found.push(sym);
+                        return self.fetch_float_body(found, code, state);
+                    }
+                    Some('_') => {
+                        //skip over
+                        let sym = code.get_char().unwrap();
+                    },
+                    _ => {
+                        //unexpected char!
+                        return Ok(Some(found));
+                    }
+                }
+            }
+        }
+
+
+        return Ok(None);
+    }
+
+    fn fetch_float_body(&mut self, mut found: String, code: &mut CodeLine, state: &State ) -> Result<Option<String>, TokError> {
+        let mut seen_e = true;
+        let mut seen_op = false;
+
+        while code.remaining() > 0 {
+            match code.peek_char() {
+                Some('0'..='9') => {
+                    let sym = code.get_char().unwrap();
+                    found.push(sym);
+                }
+                Some('+') | Some('-') if seen_op == false => {
+                    let sym = code.get_char().unwrap();
+                    seen_op = true;
+                    found.push(sym);
+                },
+                Some('+') | Some('-') => {
+                    let sym = code.get_char().unwrap();
+                    return Err(TokError::BadCharacter(sym));
+                }
+                Some('.') => {
+                    let sym = code.get_char().unwrap();
+                    found.push(sym);
+                }
+                Some('_') => {
+                    //nop
+                }
+                _ => {
+                    return Ok(Some(found));
+                }
+            }
+
+        }
+
+        return Ok(Some(found));
+    }
+
+    fn process_line(&mut self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
 
 
@@ -200,11 +478,8 @@ impl Tokenizer {
 
         //Deal with blank lines
         if line.len() == 1 && line == "\n" {
-
             return Ok(product);
         }
-
-
 
 
         if state.string_continues == false {
@@ -220,9 +495,7 @@ impl Tokenizer {
             if state.paren_depth.len() == 0 && state.line_continues == false {
 
                 //Ignore blank lines with comments
-                if let Some(test) = BL_COMMENT.find(&line) {
-
-                }
+                if let Some(test) = BL_COMMENT.find(&line) {}
                 //Handle indent/dedent here if there is a statement
 
                 else if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
@@ -280,7 +553,6 @@ impl Tokenizer {
         state.line_continues = false;
 
 
-
         let mut code = CodeLine::new(line);
 
         while code.remaining() > 0 {
@@ -301,9 +573,7 @@ impl Tokenizer {
                     state.string_start = None;
                     state.string_continues = false;
                     state.string_type = None;
-
-                }
-                else if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
+                } else if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
                     state.string_buffer = format!("{}{}", state.string_buffer, found);
                     let start = state.string_start.as_ref().unwrap().clone();
 
@@ -318,20 +588,16 @@ impl Tokenizer {
                     state.string_start = None;
                     state.string_continues = false;
                     state.string_type = None;
-                }
-                else {
+                } else {
                     //Consume the whole line
-                    if let Some((_new_pos, found )) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
+                    if let Some((_new_pos, found)) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
-
                 }
-
-
             }
 
             //Capture single line triple quoted string
-            else if let Some((new_pos, found )) = code.return_match(CAPTURE_TRIPLE_STRING.to_owned()) {
+            else if let Some((new_pos, found)) = code.return_match(CAPTURE_TRIPLE_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
             }
             //Capture multi-line string start here
@@ -344,10 +610,8 @@ impl Tokenizer {
             }
             //Look for "string"
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_QUOTE_STRING.to_owned()) {
-
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
-            else if let Some((_, found)) = code.return_match(TRIPLE_SINGLE_START.to_owned()) {
+            } else if let Some((_, found)) = code.return_match(TRIPLE_SINGLE_START.to_owned()) {
                 state.string_continues = true;
                 state.string_start = Some(Position::m(col_pos, lineno));
                 state.string_buffer = found;
@@ -356,29 +620,21 @@ impl Tokenizer {
             //Look for 'string'
             else if let Some((new_pos, found)) = code.return_match(CAPTURE_APOS_STRING.to_owned()) {
                 product.push(Token::quick(TType::String, lineno, col_pos, new_pos, found));
-            }
-
-
-            else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
-
+            } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_NAME.to_owned()) {
 
 
                 //Check for async and await operators
                 if found == "async" {
                     product.push(Token::quick(TType::Async, lineno, col_pos, new_pos, found));
-                }
-                else if found == "await" {
+                } else if found == "await" {
                     product.push(Token::quick(TType::Await, lineno, col_pos, new_pos, found));
-                }
-                else {
+                } else {
                     product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 }
                 is_statement = true;
-
             } else if let Some((new_pos, found)) = code.return_match(POSSIBLE_ONE_CHAR_NAME.to_owned()) {
                 product.push(Token::quick(TType::Name, lineno, col_pos, new_pos, found));
                 is_statement = true;
-
             }
             //Attempt to capture floats - TODO test if still needed
             else if let Some((new_pos, found)) = code.return_match(FLOATING_POINT.to_owned()) {
@@ -386,18 +642,28 @@ impl Tokenizer {
                 is_statement = true;
             }
             //The "SUPER" Number regex
-            else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
-                product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-                is_statement = true;
+            else if let Some('0'..='9') = code.peek_char() {
+                match self.attempt_number(&mut code, &state) {
+                    Ok(Some(found)) => {
+                        product.push(Token::quick(TType::Number, lineno, col_pos, col_pos + found.len(), found));
+                    }
+                    Err(err_token) => {
+                        return Err(err_token);
+                    }
+                    _ => {
+                        //Assume failed or didn't match which will be problematic
+                    }
+                }
             }
+            // else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
+            //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
+            //     is_statement = true;
+            // }
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
-
-
-
                 if found == "(" || found == "[" || found == "{" {
                     state.paren_depth.push(
                         (found.chars().nth(0).expect("expected char"),
-                            Position::t2((lineno, col_pos))
+                         Position::t2((lineno, col_pos))
                         )
                     );
                 } else if found == ")" || found == "]" || found == "}" {
@@ -409,8 +675,8 @@ impl Tokenizer {
                     if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
                         if (
                             (last_paren == '(' && current != ')')
-                            || (last_paren == '[' && current != ']')
-                            || (last_paren == '{' && current != '}')
+                                || (last_paren == '[' && current != ']')
+                                || (last_paren == '{' && current != '}')
                         ) {
                             return Err(TokError::MismatchedClosingParenOnLine(current, last_paren, lineno));
                         }
@@ -428,7 +694,6 @@ impl Tokenizer {
                 if state.string_continues == true {
                     state.string_buffer = format!("{}{}", state.string_buffer, found);
                 }
-
             }
             //Look for comments
             else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
@@ -446,9 +711,7 @@ impl Tokenizer {
             else if let Some((_, found)) = code.return_match(ANY_NAME.to_owned()) {
                 //TODO remove once I've caught the bugs that lead to this
                 println!("Captured any name: {:?} @ {}:{}", found, lineno, col_pos);
-
-            }
-            else {
+            } else {
                 if let Some(sym) = code.get() {
                     if sym == " " {
                         //skipping white space
@@ -456,19 +719,15 @@ impl Tokenizer {
                         if state.string_continues == true {
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
-                    }
-                    else if sym == "\\" {
+                    } else if sym == "\\" {
                         //Don't do anything, TODO how to signal a line continuation?
                         state.line_continues = true;
                         //abort processing for now, nothing matters after a \
                         return Ok(product);
-                    }
-                     else if sym == "\n" {
-
+                    } else if sym == "\n" {
                         if state.paren_depth.len() > 0 {
                             continue
-                        }
-                        else if state.string_continues == true {
+                        } else if state.string_continues == true {
                             // TODO is this really the fastest/"best" way to append to a String?
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
@@ -485,15 +744,9 @@ impl Tokenizer {
                         return Err(TokError::BadCharacter(sym.chars().nth(0).expect("char")));
                     }
                 }
-
             }
-
         }
 
-
-
         return Ok(product);
-
     }
-
 }
