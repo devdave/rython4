@@ -1,3 +1,4 @@
+
 use std::cmp::Ordering;
 
 use std::io::Read;
@@ -371,6 +372,7 @@ impl Tokenizer {
 
         match hint {
                 Some('0') => {
+                    found.push('0');
                     match code.peek_char() {
                         Some('x') | Some('x') => {
                             code.get_char();
@@ -386,18 +388,14 @@ impl Tokenizer {
                         }
                         Some('0'..='9') => {
                             let sym = code.get_char().unwrap();
-                            found.push('0');
                             found.push(sym);
                         }
                         Some('e') | Some('E') => {
-                            found.push('0');
                             found.push(code.get_char().unwrap());
                             return self.fetch_float_body(found, code, state);
                         }
                         _ => {
-                            println!("I am confused @ {:?} - {}", code.line, code.remaining());
                             //got something non numeric
-                            // found.push(starting_digit);
                             //lets break out.
                             return Ok(Some(found));
                         }
