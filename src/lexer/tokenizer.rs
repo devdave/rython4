@@ -496,7 +496,8 @@ impl Tokenizer {
                 }
 
                 Some('_') => {
-                    //nop
+                    //nop - skip ahead
+                    code.get_char();
                 }
                 _ => {
                     return Ok(Some(found));
