@@ -608,7 +608,7 @@ fn test_unary() {
 #[test]
 fn test_basic_operators() {
 
-    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: false, skip_endmarker: false});
+    let mut tokenizer = Tokenizer::new(TConfig{skip_encoding: true, skip_endmarker: false});
     let tokens = tokenizer.process_file("test_fixtures/test_basic_operators.py").expect("tokens");
 
     test_token_w_position!(tokens[0], TType::Number, (1, 0), (1, 1), "1" );
