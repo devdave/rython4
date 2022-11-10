@@ -8,7 +8,7 @@ use regex::Regex;
 
 
 use crate::cleaner;
-use crate::lexer::tokenizer::StringType::TripleQuote;
+// use crate::lexer::tokenizer::StringType::TripleQuote;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
@@ -16,19 +16,19 @@ use crate::tokens::patterns::{
                             // NAME_RE,
                             COMMENT,
                             BL_COMMENT,
-                            FLOATING_POINT,
-                            POSSIBLE_NAME,
-                            POSSIBLE_ONE_CHAR_NAME,
+                            // FLOATING_POINT,
+                            // POSSIBLE_NAME,
+                            // POSSIBLE_ONE_CHAR_NAME,
                             SPACE_TAB_FORMFEED_RE,
-                          NUMBER,
-                          CAPTURE_QUOTE_STRING,
-                          CAPTURE_APOS_STRING,
-                          TRIPLE_QUOTE_START,
+                          // NUMBER,
+                          // CAPTURE_QUOTE_STRING,
+                          // CAPTURE_APOS_STRING,
+                          // TRIPLE_QUOTE_START,
                           TRIPLE_QUOTE_CLOSE,
-                          TRIPLE_SINGLE_START,
+                          // TRIPLE_SINGLE_START,
                           TRIPLE_SINGLE_CLOSE,
-                          CAPTURE_TRIPLE_STRING,
-                          ANY_NAME,
+                          // CAPTURE_TRIPLE_STRING,
+                          // ANY_NAME,
                         SINGLE_APOS_CLOSE,
                         SINGLE_QUOTE_CLOSE,
 };
@@ -184,7 +184,7 @@ impl Tokenizer {
 
         if state.paren_depth.len() > 0 {
             println!("State: {:#?}", state);
-            let (last_paren, pos) = state.paren_depth.pop().expect("paren");
+            let (last_paren, _pos) = state.paren_depth.pop().expect("paren");
             println!("tokenizer failure: {:#?}", product);
 
             return Err(TokError::UnmatchedClosingParen(last_paren));
@@ -198,7 +198,7 @@ impl Tokenizer {
         return Ok(product);
     }
 
-    fn fetch_hexidecimal(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    fn fetch_hexidecimal(&mut self, code: &mut CodeLine, _state: &State) -> Result<Option<String>, TokError>
     {
         let mut found: String = String::from("0x");
 
@@ -231,7 +231,7 @@ impl Tokenizer {
         return Ok(Some(found));
     }
 
-    fn fetch_binary(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    fn fetch_binary(&mut self, code: &mut CodeLine, _state: &State) -> Result<Option<String>, TokError>
     {
         let mut found: String = String::from("0b");
 
@@ -260,7 +260,7 @@ impl Tokenizer {
         return Ok(Some(found));
     }
 
-    fn fetch_octal(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError>
+    fn fetch_octal(&mut self, code: &mut CodeLine, _state: &State) -> Result<Option<String>, TokError>
     {
         let mut found: String = String::from("0o");
 
@@ -380,7 +380,6 @@ impl Tokenizer {
         }
 
 
-        return Ok(None);
     }
 
     fn is_potential_identifier_start(test: Option<char>) -> bool {
@@ -435,7 +434,7 @@ impl Tokenizer {
 
 
         if Tokenizer::is_potential_identifier_start(code.peek_char()) {
-            while (code.remaining() > 0) {
+            while code.remaining() > 0 {
                 let test = code.peek_char();
 
                 match test {
@@ -988,11 +987,9 @@ impl Tokenizer {
                         return Err(TokError::UnmatchedClosingParen(current));
                     }
                     if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
-                        if (
-                            (last_paren == '(' && current != ')')
-                                || (last_paren == '[' && current != ']')
-                                || (last_paren == '{' && current != '}')
-                        ) {
+                        if (last_paren == '(' && current != ')')
+                            || (last_paren == '[' && current != ']')
+                            || (last_paren == '{' && current != '}') {
                             return Err(TokError::MismatchedClosingParenOnLine(current, last_paren, lineno));
                         }
                     } else {
