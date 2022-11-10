@@ -1011,9 +1011,9 @@ impl Tokenizer {
             else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
                 //Don't add comments into product
                 //Try to consume the newline
-                match code.peek() {
-                    Some("\n") => {
-                        code.get();
+                match code.peek_char() {
+                    Some('\n') => {
+                        code.get_char();
                         if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
                             product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
                         }
@@ -1023,19 +1023,19 @@ impl Tokenizer {
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
             else {
-                if let Some(sym) = code.get() {
-                    if sym == " " {
+                if let Some(sym) = code.get_char() {
+                    if sym == ' ' {
                         //skipping white space
                         //Except if we're inside a triple quoted/multiline string!
                         if state.string_continues == true {
                             state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
-                    } else if sym == "\\" {
+                    } else if sym == '\\' {
                         //Don't do anything, TODO how to signal a line continuation?
                         state.line_continues = true;
                         //abort processing for now, nothing matters after a \
                         return Ok(product);
-                    } else if sym == "\n" {
+                    } else if sym == '\n' {
                         if state.paren_depth.len() > 0 {
                             continue
                         } else if state.string_continues == true {
@@ -1052,7 +1052,7 @@ impl Tokenizer {
                     } else {
                         println!("Bad character @ {}:{}", lineno, col_pos);
                         println!("State; {:#?}", state);
-                        return Err(TokError::BadCharacter(sym.chars().nth(0).expect("char")));
+                        return Err(TokError::BadCharacter(sym));
                     }
                 }
             }
