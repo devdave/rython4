@@ -1,18 +1,20 @@
 
-use std::fs;
-use std::fs::DirEntry;
+
+
 use std::path::PathBuf;
 
-
-use crate::parser::grammar::{python, TokenRef, TokVec};
-
-use crate::tokens::TType::{Op, Number};
+use std::fs;
 use std::rc::Rc;
+
+use crate::parser::grammar::{python, TokVec};
+
+//use crate::tokens::TType::{Op, Number};
+
 use crate::lexer::{Tokenizer, TConfig};
 // use super::{python, TokVec};
-use crate::ast::Module;
+//use crate::ast::Module;
 
-use crate::ast::printer::print_module;
+// use crate::ast::printer::print_module;
 // use crate::cleaner;
 // use crate::tokens::TType::String;
 
@@ -54,7 +56,7 @@ fn parse_operators() {
 
 
     if let Ok(module) = magic {
-        print_module(module);
+        println!("{:#?}", module);
     } else {
         println!("{:?}", magic);
         assert!(false == true, "Parse error");
@@ -70,11 +72,12 @@ fn parse_hello_world() {
     let vec = TokVec(rctokens);
 
     let magic = python::file(&vec, "hello_world");
-    let module: Module = magic.unwrap();
+    let module = magic.unwrap();
 
     assert_eq!(module.body.len(), 1);
 
-    print_module(module);
+    // print_module(module);
+    println!("{:#?}", module);
 
 }
 
