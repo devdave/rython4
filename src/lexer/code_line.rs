@@ -16,12 +16,16 @@ pub struct CodeLine {
 
 impl CodeLine {
     pub fn new(input: String) -> Self {
-        Self {
-            len: input.len(),
+        let temp = Self {
+            len: input.clone().chars().collect::<Vec<_>>().len(),
             text: input.clone().chars().collect::<Vec<_>>(),
             line: input,
             pos: 0,
-        }
+        };
+
+
+        //assert_eq!(temp.text.len(), temp.line.len());
+        return temp;
     }
 
     pub fn return_match(&mut self, pattern: Regex) -> Option<(usize, String)> {
@@ -29,7 +33,8 @@ impl CodeLine {
 
         //TODO is there a faster/more efficient way to do this?
         if self.pos <= self.text.len() {
-            let remaining: String = self.text[self.pos..].iter().collect();
+            let remaining: String = self.text.iter().skip(self.pos).collect();
+
             if let Some(result) = pattern.find(remaining.as_str()) {
                let retstr = result.as_str().to_string();
                 self.pos += retstr.len();
@@ -54,6 +59,8 @@ impl CodeLine {
     pub fn remaining(&self) -> usize {
         self.len.saturating_sub(self.pos)
     }
+
+    pub fn remaining_char(&self) -> usize { self.text.len() }
 
     // pub fn get_line(&self) -> String {
     //     self.line.clone()
@@ -88,6 +95,7 @@ impl CodeLine {
     }
 
     pub fn get(&mut self) -> Option<&str> {
+        panic!("codeline.get() is deprecated");
         let retval = self.line.graphemes(true).nth(self.pos);
         self.pos = self.pos + 1;
         return retval;
