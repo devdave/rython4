@@ -1010,12 +1010,15 @@ impl Tokenizer {
             //Look for comments
             else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
                 //Don't add comments into product
-                //Consume the newline
-                if code.peek().unwrap() == "\n" {
-                    code.get();
-                    if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
-                        product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
-                    }
+                //Try to consume the newline
+                match code.peek() {
+                    Some("\n") => {
+                        code.get();
+                        if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
+                            product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
+                        }
+                    },
+                    _ => {}
                 }
                 //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
