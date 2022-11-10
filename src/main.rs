@@ -33,7 +33,7 @@ fn py_check_code(filepath: PathBuf) {
         for entry in filepath.read_dir().expect("directory") {
             if let Ok(test_path) = entry {
                 if test_path.path().is_dir() {
-                    return py_check_code(test_path.path());
+                    py_check_code(test_path.path());
                 } else {
                     py_run_file(test_path.path(), false, true);
                 }
