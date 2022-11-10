@@ -52,17 +52,20 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
     //Wow I need to find a better way to do this
     let display = filename.file_name().unwrap().to_str().unwrap().to_string();
 
-    // if display.ends_with(".py") == false {
-    //     println!("Will not parse {} as it doesn't end with .py", display);
-    //     return;
-    // }
+    if compile_only == true && display.ends_with(".py") == false {
+         println!("Will not compile/parse {} as it doesn't end with .py", display);
+         return;
+    }
 
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
     let mut buffer = String::new();
 
     println!("File opened, reading to string");
     match file.read_to_string(&mut buffer) {
-        Err(why) => panic!("Couldn't read: {} because `{}`", display, why),
+        Err(why) => {
+            println!("Couldn't read: {} because `{}`", display, why);
+            return;
+        },
         Ok(len) => println!("{} is {} bytes long", display, len),
     }
 
@@ -72,7 +75,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
     println!("Tokenizing");
     let outcome = tokenizer.generate(&lines);
-    println!("Tokenized!");
+    println!("Tokenized!\n");
 
     if let Ok(tokens) = outcome {
         if show_tokens == true {
