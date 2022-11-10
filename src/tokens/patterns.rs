@@ -72,3 +72,7 @@ pub static TRIPLE_SINGLE_START:Lazy<Regex> =
     ).expect("regex"));
 
 pub static TRIPLE_SINGLE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*'''"#).expect("regex") );
+
+pub static SINGLE_APOS_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*'"#).expect("regex"));
+
+pub static SINGLE_QUOTE_CLOSE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\A.*""#).expect("regex"));
