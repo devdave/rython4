@@ -18,12 +18,6 @@ mod test {
     }
 }
 
-    macro_rules! test_token {
-    ($token:expr, $ttype:expr, $content:expr)=>{
-        assert_eq!($token.r#type, $ttype);
-        assert_eq!($token.text, $content);
-    }
-}
 
     #[test]
     fn test_float() {
@@ -1229,4 +1223,5 @@ r#""This is a multiline string with a continuation here, \
         test_token_w_position!(tokens[4], TType::NL, (2, 41), (2, 41), "" );
 
     }
+
 }
