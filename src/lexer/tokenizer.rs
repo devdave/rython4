@@ -773,6 +773,47 @@ impl Tokenizer {
                             state.string_buffer = String::new();
                         }
                     },
+                    Some(StringType::SingleApos) => {
+                        if let Some((new_pos, found)) = code.return_match(SINGLE_APOS_CLOSE.to_owned()) {
+                            state.string_buffer = format!("{}{}", state.string_buffer, found);
+                            let start = state.string_start.as_ref().unwrap().clone();
+
+                            product.push(
+                                Token::Make(
+                                    TType::String,
+                                    start,
+                                    Position::m(new_pos, lineno),
+                                    state.string_buffer.clone(),
+                                )
+                            );
+                            state.string_start = None;
+                            state.string_continues = false;
+                            state.string_type = None;
+                            state.string_buffer = String::new();
+                        }
+                    },
+                    Some(StringType::SingleQuote) => {
+
+                        if let Some((new_pos, found)) = code.return_match(SINGLE_QUOTE_CLOSE.to_owned()) {
+
+                            state.string_buffer = format!("{}{}", state.string_buffer, found);
+                            let start = state.string_start.as_ref().unwrap().clone();
+
+                            product.push(
+                                Token::Make(
+                                    TType::String,
+                                    start,
+                                    Position::m(new_pos, lineno),
+                                    state.string_buffer.clone(),
+                                )
+                            );
+                            state.string_start = None;
+                            state.string_continues = false;
+                            state.string_type = None;
+                            state.string_buffer = String::new();
+                        }
+
+                    },
                     _ => {
                         println!("String continues under unexpected type: {:?}", state.string_type);
                     }
