@@ -87,7 +87,8 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
             println!("Failed to parse: {:#?}", parse_err);
             println!("Line error @ {:#?}:{:#?}", parse_err.location.start_pos.line, parse_err.location.start_pos.column);
             let lineno = parse_err.location.start_pos.line;
-            let line = lines.get(lineno).unwrap();
+
+            let line = lines.get(lineno-1).unwrap();
             println!("{:#?}", line);
             for token_ref in tvector.0 {
                 if token_ref.start.line >= lineno-1 || token_ref.start.line == lineno {
