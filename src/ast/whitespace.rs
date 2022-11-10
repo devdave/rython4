@@ -62,21 +62,21 @@ impl<'a> Default for EmptyLine<'a> {
     }
 }
 
-impl<'a> EmptyLine<'a> {
-    pub fn new(
-        indent: bool,
-        whitespace: SimpleWhitespace<'a>,
-        comment: Option<Comment<'a>>,
-        newline: Newline<'a>,
-    ) -> Self {
-        Self {
-            indent,
-            whitespace,
-            comment,
-            newline,
-        }
-    }
-}
+// impl<'a> EmptyLine<'a> {
+//     pub fn new(
+//         indent: bool,
+//         whitespace: SimpleWhitespace<'a>,
+//         comment: Option<Comment<'a>>,
+//         newline: Newline<'a>,
+//     ) -> Self {
+//         Self {
+//             indent,
+//             whitespace,
+//             comment,
+//             newline,
+//         }
+//     }
+// }
 
 #[derive(Debug, Eq, PartialEq, Default, Clone)]
 #[cfg_attr(feature = "py", derive(TryIntoPy))]
@@ -92,7 +92,7 @@ pub struct ParenthesizedWhitespace<'a> {
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum ParenthesizableWhitespace<'a> {
     SimpleWhitespace(SimpleWhitespace<'a>),
-    ParenthesizedWhitespace(ParenthesizedWhitespace<'a>),
+    // ParenthesizedWhitespace(ParenthesizedWhitespace<'a>),
 }
 
 
