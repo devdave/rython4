@@ -28,13 +28,21 @@ impl CodeLine {
         //Return the new cursor position
 
         //TODO is there a faster/more efficient way to do this?
-        let remaining: String = self.line.graphemes(true).skip(self.pos).collect();
+        if self.pos <= self.text.len() {
+            let remaining: String = self.text[self.pos..].iter().collect();
+            if let Some(result) = pattern.find(remaining.as_str()) {
+               let retstr = result.as_str().to_string();
+                self.pos += retstr.len();
+                return Some((self.pos, retstr));
+            }
 
-        if let Some(result) = pattern.find(remaining.as_str()) {
-           let retstr = result.as_str().to_string();
-            self.pos += retstr.len();
-            return Some((self.pos, retstr));
+        } else {
+            return None;
         }
+
+        // let remaining: String = self.line.graphemes(true).skip(self.pos).collect();
+
+
         None
 
     }
