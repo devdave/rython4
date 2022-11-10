@@ -82,10 +82,14 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
             }
         }
 
+        if compile_only == true {
+            return;
+        }
+
 
         let tvector = TokVec::from(tokens);
         let result = python::file(&tvector, &display.to_string().as_str());
-        if let Ok(ptree) = result {
+        if let Ok(_ptree) = result {
             println!("Parsing succeeded! \n");
         }
         else if let Err(parse_err) = result {
@@ -108,7 +112,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
 
 
     } else if let Err(issue) = outcome {
-        panic!("Failed to process {:?} - token error", issue);
+        println!("Failed to process {:?} - token error", issue);
     }
 
 
