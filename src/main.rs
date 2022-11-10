@@ -104,12 +104,11 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
         else {
             println!("Failed to parse: {:#?}", result);
 
-
         }
 
 
     } else if let Err(issue) = outcome {
-        panic!("Failed to process {:?} - token eror", issue);
+        panic!("Failed to process {:?} - token error", issue);
     }
 
 
