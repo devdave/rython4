@@ -1,3 +1,4 @@
+
 use regex::Regex;
 use std::string::String;
 
@@ -8,6 +9,7 @@ use unicode_segmentation::UnicodeSegmentation;
 #[derive(Clone)]
 pub struct CodeLine {
     pub line: String,
+    pub text: Vec<char>,
     len: usize,
     pos: usize,
 }
@@ -16,6 +18,7 @@ impl CodeLine {
     pub fn new(input: String) -> Self {
         Self {
             len: input.len(),
+            text: input.clone().chars().collect::<Vec<_>>(),
             line: input,
             pos: 0,
         }
@@ -57,7 +60,13 @@ impl CodeLine {
     }
 
     pub fn peek_char(&mut self) -> Option<char> {
-        return self.line[self.pos..].chars().nth(0);
+        if self.text.len() > self.pos {
+            return Some(self.text[self.pos]);
+        } else {
+            return None;
+        }
+
+        // return self.line[self.pos..].chars().nth(0);
     }
 
     pub fn peek_ahead_char(&mut self, skip: usize) -> Option<char> {
