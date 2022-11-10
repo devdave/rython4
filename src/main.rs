@@ -52,6 +52,11 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
     //Wow I need to find a better way to do this
     let display = filename.file_name().unwrap().to_str().unwrap().to_string();
 
+    // if display.ends_with(".py") == false {
+    //     println!("Will not parse {} as it doesn't end with .py", display);
+    //     return;
+    // }
+
     let mut file = std::fs::File::open(&filename).expect("Failed to open file");
     let mut buffer = String::new();
 
