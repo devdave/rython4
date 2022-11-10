@@ -960,7 +960,7 @@ impl Tokenizer {
                                 )
                             );
                         } else {
-                            panic!("Syntax error (too many or too little .) on {}", lineno);
+                            panic!("Syntax error (too many or too little .) on {} - \n\t{:?} - \n\t{:?} - \n\t{:?}\n", lineno, code.line, product, code.position());
                         }
 
 
