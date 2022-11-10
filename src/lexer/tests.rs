@@ -1194,4 +1194,22 @@ to see if it works""""#.to_string();
             assert_eq!(tokens[0].text, valid_name.to_string());
         }
     }
+
+    #[test]
+    fn test_issue_difflib_raw_string_block() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/test_issue_difflib_raw_string_block.py", TConfig::default()).expect("tokens");
+
+        for (idx, token) in tokens.iter().enumerate(){
+            println!("{}:{:?}", idx, token.r#type);
+        }
+
+        test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 5), "class" );
+        test_token_w_position!(tokens[1], TType::Name, (1, 6), (1, 12), "Differ" );
+        test_token_w_position!(tokens[2], TType::Op, (1, 12), (1, 13), ":" );
+        test_token_w_position!(tokens[3], TType::NL, (1, 13), (1, 13), "" );
+        test_token_w_position!(tokens[4], TType::Indent, (2, 0), (2, 0), "" );
+        assert_eq!(tokens[5].r#type, TType::String);
+        test_token_w_position!(tokens[6], TType::NL, (85, 7), (85, 7), "" );
+        test_token_w_position!(tokens[7], TType::Dedent, (85, 0), (85, 0), "" );
+    }
 }
