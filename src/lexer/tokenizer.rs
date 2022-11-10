@@ -339,7 +339,10 @@ impl Tokenizer {
                 end_quote_size = 0;
                 if sym == '\\' {
                     escaped = true;
+                    //Is this a line continuation?
                     body.push(sym);
+
+
                     if code.remaining() > 0 {
                         let escaped = code.get_char().unwrap();
                         body.push(escaped);
@@ -355,16 +358,23 @@ impl Tokenizer {
         }
 
         if end_quote_size != quote_size {
+            state.string_continues = true;
+            state.string_buffer = body;
             if quote_size == 3 {
-                state.string_continues = true;
-                state.string_buffer = body;
                 if quote ==  '"' {
                     state.string_type = Some(StringType::TripleQuote);
                 } else {
                     state.string_type = Some(StringType::TripleApos);
                 }
-                return Ok(None);
+            } else {
+                if quote == '"' {
+                    state.string_type = Some(StringType::SingleQuote);
+                } else {
+                    state.string_type = Some(StringType::SingleApos);
+                }
             }
+            return Ok(None);
+
         } else {
             return Ok(Some((TType::String, body)));
         }
