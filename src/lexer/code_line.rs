@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::string::String;
-use regex::internal::Char;
+
 use unicode_segmentation;
 use unicode_segmentation::UnicodeSegmentation;
 
