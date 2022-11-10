@@ -302,6 +302,7 @@ impl Tokenizer {
 
         let test = code.get_char();
 
+        //Check if this is a triple quoted string
         if test != None && test.unwrap() == quote {
 
             body.push(test.unwrap());
@@ -317,6 +318,8 @@ impl Tokenizer {
         } else {
             code.rewind();
         }
+
+
 
 
         while (end_quote_size != quote_size) && code.remaining() > 0 {
@@ -644,7 +647,6 @@ impl Tokenizer {
 
         if state.string_continues == false {
 
-
             //Handle blank lines
             if line.trim().len() == 0 {
                 //We are done!
@@ -720,40 +722,56 @@ impl Tokenizer {
 
             if state.string_continues == true {
                 //TODO check for string continuation type/state.type to use the correct regex
-                if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_CLOSE.to_owned()) {
-                    state.string_buffer = format!("{}{}", state.string_buffer, found);
-                    let start = state.string_start.as_ref().unwrap().clone();
 
-                    product.push(Token::Make(
-                        TType::String,
-                        start,
-                        Position::m(new_pos, lineno),
-                        state.string_buffer.clone())
-                    );
-                    state.string_start = None;
-                    state.string_continues = false;
-                    state.string_type = None;
-                } else if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
-                    state.string_buffer = format!("{}{}", state.string_buffer, found);
-                    let start = state.string_start.as_ref().unwrap().clone();
+                match state.string_type {
+                    Some(StringType::TripleQuote) => {
+                        if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_CLOSE.to_owned())
+                        {
+                            state.string_buffer = format!("{}{}", state.string_buffer, found);
+                            let start = state.string_start.as_ref().unwrap().clone();
 
-                    product.push(
-                        Token::Make(
-                            TType::String,
-                            start,
-                            Position::m(new_pos, lineno),
-                            state.string_buffer.clone(),
-                        )
-                    );
-                    state.string_start = None;
-                    state.string_continues = false;
-                    state.string_type = None;
-                } else {
-                    //Consume the whole line
+                            product.push(Token::Make(
+                                TType::String,
+                                start,
+                                Position::m(new_pos, lineno),
+                                state.string_buffer.clone())
+                            );
+                            state.string_start = None;
+                            state.string_continues = false;
+                            state.string_type = None;
+                            state.string_buffer = String::new();
+                        }
+                    },
+                    Some(StringType::TripleApos) => {
+                        if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
+                            state.string_buffer = format!("{}{}", state.string_buffer, found);
+                            let start = state.string_start.as_ref().unwrap().clone();
+
+                            product.push(
+                                Token::Make(
+                                    TType::String,
+                                    start,
+                                    Position::m(new_pos, lineno),
+                                    state.string_buffer.clone(),
+                                )
+                            );
+                            state.string_start = None;
+                            state.string_continues = false;
+                            state.string_type = None;
+                            state.string_buffer = String::new();
+                        }
+                    },
+                    _ => {
+                        println!("String continues under unexpected type: {:?}", state.string_type);
+                    }
+                }
+
+                if state.string_continues == true {
                     if let Some((_new_pos, found)) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
                         state.string_buffer = format!("{}{}", state.string_buffer, found);
                     }
                 }
+
             }
             else if let Some('"') = code.peek_char() {
                 let sym = code.get_char().unwrap();
