@@ -28,7 +28,9 @@ use crate::tokens::patterns::{
                           TRIPLE_SINGLE_START,
                           TRIPLE_SINGLE_CLOSE,
                           CAPTURE_TRIPLE_STRING,
-                          ANY_NAME
+                          ANY_NAME,
+                        SINGLE_APOS_CLOSE,
+                        SINGLE_QUOTE_CLOSE,
 };
 
 
