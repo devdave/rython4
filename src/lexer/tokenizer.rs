@@ -249,8 +249,9 @@ impl Tokenizer {
                     code.get_char();
                 },
                 _ => {
+                    return Ok(Some(found));
                     //Err how did we get here?
-                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                    // panic!("How did we get here? {:?} @ {:#?}", code.line, state);
                 }
             }
         }
@@ -278,7 +279,8 @@ impl Tokenizer {
                 },
                 _ => {
                     //Err how did we get here?
-                    panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                    // panic!("How did we get here? {:?} @ {:#?}", code.line, state);
+                    return Ok(Some(found));
                 }
             }
         }
