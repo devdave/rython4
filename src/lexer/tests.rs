@@ -1212,4 +1212,21 @@ to see if it works""""#.to_string();
         test_token_w_position!(tokens[6], TType::NL, (85, 7), (85, 7), "" );
         test_token_w_position!(tokens[7], TType::Dedent, (85, 0), (85, 0), "" );
     }
+
+    #[test]
+    fn test_issue_multiline_single_quote_string() {
+
+        let tokens = Tokenizer::tokenize_file("test_fixtures/test_issue_multiline_single_quote_string.py", TConfig::default()).expect("tokens");
+
+        let str1 =
+r#""This is a multiline string with a continuation here, \
+    which really fucks things up for me""#;
+
+        test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 3), "foo" );
+        test_token_w_position!(tokens[1], TType::Op, (1, 3), (1, 4), "(" );
+        test_token_w_position!(tokens[2], TType::String, (1, 4), (2, 40), str1 );
+        test_token_w_position!(tokens[3], TType::Op, (2, 40), (2, 41), ")" );
+        test_token_w_position!(tokens[4], TType::NL, (2, 41), (2, 41), "" );
+
+    }
 }
