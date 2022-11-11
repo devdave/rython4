@@ -841,17 +841,11 @@ impl Tokenizer {
             //only do indent and dedent if we're not inside brackets
             if state.paren_depth.len() == 0 && state.line_continues == false {
                 match Tokenizer::attempt_indentation(state, lineno, &line) {
-                    Ok(indent_product) => {
-                        match indent_product {
-                            None => {
-                                //do nothing
-                            },
-                            Some(detentation_tokens) => {
-                                product.extend(detentation_tokens);
-                            }
-                        }
+                    Ok(Some(indent_product)) => {
+                        product.extend(detentation_tokens);
                     },
                     Err(err_token) => { return Err(err_token); },
+                    _ => {}
                 }
 
             }
@@ -870,18 +864,13 @@ impl Tokenizer {
             if state.string_continues == true {
                 //TODO check for string continuation type/state.type to use the correct regex
                 match Tokenizer::attempt_close_multiline_string(state, &mut code) {
-                    Ok(multiline_option) => {
-                        match multiline_option {
-                            None => {},
-                            Some(multiline_content) => {
-                                product.extend(multiline_content);
-                            }
-                        }
-
+                    Ok(Some(multiline_option)) => {
+                        product.extend(multiline_content);
                     }
                     Err(err_token) => {
                         return Err(err_token);
                     }
+                    _ => {}
                 }
 
             }
