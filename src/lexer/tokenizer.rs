@@ -647,6 +647,73 @@ impl Tokenizer {
         return Ok(Some(found));
     }
 
+    fn attempt_indentation(state: &mut State, lineno: usize, line: &String)
+        -> Result<Option<Vec<Token>>, TokError>
+    {
+        let mut product: Vec<Token> = Vec::new();
+
+        //Ignore blank lines with comments
+            if let Some(test) = BL_COMMENT.find(&line) {}
+            //Handle indent/dedent here if there is a statement
+
+            else if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
+
+                //TODO make sure there is no mixing of tabs, spaces, and form feed.
+                //TODO drop support for form feed?
+                let current_size: usize = ws_match.end() - ws_match.start();
+                let last_size = state.indent_stack.last().unwrap_or(&0);
+
+                match current_size.cmp(last_size) {
+                    Ordering::Greater => {
+                        //push on a new indent
+                        if state.indent_stack.len() + 1 > MAXINDENT {
+                            return Err(TokError::TooDeep);
+                        }
+                        state.indent_stack.push(current_size);
+                        product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
+                        state.indent = current_size;
+                    },
+                    Ordering::Less => {
+
+                        //Pop that indent!
+                        //TODO this is flawed and needs to pop only to the correct/new indentation
+
+                        while state.indent_stack.len() > 0 {
+                            let last_size = state.indent_stack.pop().unwrap();
+                            if last_size != current_size {
+                                product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                                state.indent = current_size;
+                            } else {
+                                state.indent_stack.push(last_size);
+                                break;
+                            }
+                        }
+                    },
+                    Ordering::Equal => {
+                        //Do nothing
+                    }
+                }
+            } else if state.indent_stack.len() > 0 && line.trim().chars().nth(0).unwrap_or('N') != '#' {
+                //Pop all indents
+
+                while state.indent_stack.len() > 0 {
+                    let last_size = state.indent_stack.pop().unwrap();
+
+                    product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
+                }
+
+                state.indent = 0;
+            }
+
+        if product.len() > 0 {
+            return Ok(Some(product));
+        }
+
+        return Ok(None);
+
+
+    }
+
     fn process_line(&mut self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
         let mut product: Vec<Token> = Vec::new();
 
@@ -669,59 +736,20 @@ impl Tokenizer {
 
             //only do indent and dedent if we're not inside brackets
             if state.paren_depth.len() == 0 && state.line_continues == false {
-
-                //Ignore blank lines with comments
-                if let Some(test) = BL_COMMENT.find(&line) {}
-                //Handle indent/dedent here if there is a statement
-
-                else if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
-
-                    //TODO make sure there is no mixing of tabs, spaces, and form feed.
-                    //TODO drop support for form feed?
-                    let current_size: usize = ws_match.end() - ws_match.start();
-                    let last_size = state.indent_stack.last().unwrap_or(&0);
-
-                    match current_size.cmp(last_size) {
-                        Ordering::Greater => {
-                            //push on a new indent
-                            if state.indent_stack.len() + 1 > MAXINDENT {
-                                return Err(TokError::TooDeep);
+                match Tokenizer::attempt_indentation(state, lineno, &line) {
+                    Ok(indent_product) => {
+                        match indent_product {
+                            None => {
+                                //do nothing
+                            },
+                            Some(detentation_tokens) => {
+                                product.extend(detentation_tokens);
                             }
-                            state.indent_stack.push(current_size);
-                            product.push(Token::quick(TType::Indent, lineno, 0, 0, "".to_string()));
-                            state.indent = current_size;
-                        },
-                        Ordering::Less => {
-
-                            //Pop that indent!
-                            //TODO this is flawed and needs to pop only to the correct/new indentation
-
-                            while state.indent_stack.len() > 0 {
-                                let last_size = state.indent_stack.pop().unwrap();
-                                if last_size != current_size {
-                                    product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-                                    state.indent = current_size;
-                                } else {
-                                    state.indent_stack.push(last_size);
-                                    break;
-                                }
-                            }
-                        },
-                        Ordering::Equal => {
-                            //Do nothing
                         }
-                    }
-                } else if state.indent_stack.len() > 0 && line.trim().chars().nth(0).unwrap_or('N') != '#' {
-                    //Pop all indents
-
-                    while state.indent_stack.len() > 0 {
-                        let last_size = state.indent_stack.pop().unwrap();
-
-                        product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
-                    }
-
-                    state.indent = 0;
+                    },
+                    Err(err_token) => { return Err(err_token); },
                 }
+
             }
         }
 
