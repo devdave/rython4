@@ -843,7 +843,16 @@ impl Tokenizer {
 
 
         let mut code = CodeLine::new(line);
-        //todo, string off the beginning whitespace if it exists for a minor speed boost
+
+
+        //strip off any whitespace
+        while code.remaining() > 0 && state.string_continues == false {
+            if let Some(' ') | Some('\t') = code.peek_char() {
+                code.get_char();
+            } else {
+                break;
+            }
+        }
 
 
         while code.remaining() > 0 {
