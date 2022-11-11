@@ -718,107 +718,90 @@ impl Tokenizer {
 
     }
 
+
     fn attempt_close_multiline_string(lineno: usize, state: &mut State, code: &mut CodeLine )
-    -> Result<Option<Vec<Token>>, TokError>
+    -> Result<Option<String>, TokError>
     {
         let mut product: Vec<Token> = Vec::new();
 
+        let mut quote = '"';
+        let mut quote_size = 1;
+        let mut end_quote_size = 0;
+        let mut buffer = String::new();
+
+
         match state.string_type {
-                    Some(StringType::TripleQuote) => {
-                        if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_CLOSE.to_owned())
-                        {
-                            state.string_buffer = format!("{}{}", state.string_buffer, found);
-                            let start = state.string_start.as_ref().unwrap().clone();
+            Some(StringType::TripleQuote) => {
+                quote = '"';
+                quote_size = 3;
+            },
+            Some(StringType::TripleApos) => {
+                quote = '\'';
+                quote_size = 3
+            },
+            Some(StringType::SingleApos) => {
+                quote = '\'';
+                quote_size = 1;
+            },
+            Some(StringType::SingleQuote) => {
+                quote = '"';
+                quote_size = 1;
+            }
 
-                            product.push(Token::Make(
-                                TType::String,
-                                start,
-                                Position::m(new_pos, lineno),
-                                state.string_buffer.clone())
-                            );
-                            state.string_start = None;
-                            state.string_continues = false;
-                            state.string_type = None;
-                            state.string_buffer = String::new();
-                        }
-                    },
-                    Some(StringType::TripleApos) => {
-                        if let Some((new_pos, found)) = code.return_match(TRIPLE_SINGLE_CLOSE.to_owned()) {
-                            state.string_buffer = format!("{}{}", state.string_buffer, found);
-                            let start = state.string_start.as_ref().unwrap().clone();
-
-                            product.push(
-                                Token::Make(
-                                    TType::String,
-                                    start,
-                                    Position::m(new_pos, lineno),
-                                    state.string_buffer.clone(),
-                                )
-                            );
-                            state.string_start = None;
-                            state.string_continues = false;
-                            state.string_type = None;
-                            state.string_buffer = String::new();
-                        }
-                    },
-                    Some(StringType::SingleApos) => {
-                        if let Some((new_pos, found)) = code.return_match(SINGLE_APOS_CLOSE.to_owned()) {
-                            state.string_buffer = format!("{}{}", state.string_buffer, found);
-                            let start = state.string_start.as_ref().unwrap().clone();
-
-                            product.push(
-                                Token::Make(
-                                    TType::String,
-                                    start,
-                                    Position::m(new_pos, lineno),
-                                    state.string_buffer.clone(),
-                                )
-                            );
-                            state.string_start = None;
-                            state.string_continues = false;
-                            state.string_type = None;
-                            state.string_buffer = String::new();
-                        }
-                    },
-                    Some(StringType::SingleQuote) => {
-
-                        if let Some((new_pos, found)) = code.return_match(SINGLE_QUOTE_CLOSE.to_owned()) {
-
-                            state.string_buffer = format!("{}{}", state.string_buffer, found);
-                            let start = state.string_start.as_ref().unwrap().clone();
-
-                            product.push(
-                                Token::Make(
-                                    TType::String,
-                                    start,
-                                    Position::m(new_pos, lineno),
-                                    state.string_buffer.clone(),
-                                )
-                            );
-                            state.string_start = None;
-                            state.string_continues = false;
-                            state.string_type = None;
-                            state.string_buffer = String::new();
-                        }
-
-                    },
-                    _ => {
-                        println!("String continues under unexpected type: {:?}", state.string_type);
-                    }
-                }
-
-        if state.string_continues == true {
-            if let Some((_new_pos, found)) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
-                state.string_buffer = format!("{}{}", state.string_buffer, found);
+            _ => {
+                panic!("State StringType is not handled {:#?}", state);
             }
         }
 
-        if product.len() > 0 {
-            return Ok(Some(product));
+        while (end_quote_size != quote_size) && code.remaining() > 0 {
+            let next =  code.get_char();
+            //reached the end of the line
+            if next == None {
+                if buffer.len() > 0 {
+                    return Ok(Some(buffer));
+                }
+                return Ok(None);
+            }
+
+
+            let sym = next.unwrap();
+            //Should only have with ' and " continued lines
+            let mut escaped = false;
+
+            if sym == quote {
+                end_quote_size += 1;
+            } else {
+                end_quote_size = 0;
+                if sym == '\\' && (quote_size != 3) {
+                    escaped = true;
+                    //todo Double check this is correct and i add the continuation symbol to the buffer
+                    buffer.push(sym);
+
+                    if code.remaining() == 1 {
+                        let nl = code.get_char().unwrap();
+                        buffer.push(nl);
+                        return Ok(Some(buffer));
+                    } else {
+                        //todo add an undefined behavior?
+                        return Err(TokError::UnterminatedString);
+                    }
+
+                }
+            }
+            if escaped != true {
+                buffer.push(sym);
+            }
+
         }
 
-        return Ok(None);
+        if end_quote_size != quote_size {
+            state.string_continues = true;
+            return Ok(Some(buffer));
+        } else {
 
+            state.string_continues = false;
+            return Ok(Some(buffer));
+        }
 
     }
 
@@ -868,10 +851,29 @@ impl Tokenizer {
             //TODO should this be outside of the loop?
             if state.string_continues == true {
                 //TODO check for string continuation type/state.type to use the correct regex
+                //todo alright this line is really goofy, check this is sane
+                let sstart = state.string_start.as_ref().unwrap().clone();
                 match Tokenizer::attempt_close_multiline_string(lineno, state, &mut code) {
-                    Ok(Some(multiline_option)) => {
-                        product.extend(multiline_option);
-                    }
+                    Ok(Some(string_body)) if state.string_continues == false => {
+
+                        state.string_buffer = format!("{}{}", state.string_buffer, string_body);
+                        product.push(
+                            Token::Make(
+                                TType::String,
+                                Position::m(
+                                    sstart.col,
+                                    sstart.line
+                                ),
+                                Position::t2((lineno, col_pos+string_body.len())),
+                                state.string_buffer.clone()
+                            )
+                        );
+
+                        state.string_buffer = String::new();
+                    },
+                    Ok(Some(string_body)) if state.string_continues == true => {
+                        state.string_buffer = format!("{}{}", state.string_buffer, string_body);
+                    },
                     Err(err_token) => {
                         return Err(err_token);
                     }
@@ -919,7 +921,7 @@ impl Tokenizer {
                         if state.string_continues == true {
                              state.string_start = Some(Position::t2((lineno, col_pos)));
                          } else {
-                             println!("Failed to match @ {}:{}", lineno, col_pos);
+                             println!("Failed to match string @ {}:{}", lineno, col_pos);
                          }
                     }
                 }
@@ -1093,33 +1095,6 @@ impl Tokenizer {
 
             }
 
-            // else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
-            //     if found == "(" || found == "[" || found == "{" {
-            //         state.paren_depth.push(
-            //             (found.chars().nth(0).expect("expected char"),
-            //              Position::t2((lineno, col_pos))
-            //             )
-            //         );
-            //     } else if found == ")" || found == "]" || found == "}" {
-            //         let current = found.chars().nth(0).expect("char");
-            //
-            //         if state.paren_depth.len() == 0 {
-            //             return Err(TokError::UnmatchedClosingParen(current));
-            //         }
-            //         if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
-            //             if (last_paren == '(' && current != ')')
-            //                 || (last_paren == '[' && current != ']')
-            //                 || (last_paren == '{' && current != '}') {
-            //                 return Err(TokError::MismatchedClosingParenOnLine(current, last_paren, lineno));
-            //             }
-            //         } else {
-            //             panic!("Expected element in paren stack but got nothing: {:#?}", state);
-            //         }
-            //     }
-            //
-            //     product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
-            //     is_statement = true;
-            // }
             //Look for WS
             else if let Some((_, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
                 //and ignore it
@@ -1148,7 +1123,8 @@ impl Tokenizer {
                         //skipping white space
                         //Except if we're inside a triple quoted/multiline string!
                         if state.string_continues == true {
-                            state.string_buffer = format!("{}{}", state.string_buffer, sym);
+                            state.string_buffer.push(sym);
+                            //state.string_buffer = format!("{}{}", state.string_buffer, sym);
                         }
                     } else if sym == '\\' {
                         //Don't do anything, TODO how to signal a line continuation?
