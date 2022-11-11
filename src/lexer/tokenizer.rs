@@ -1092,20 +1092,30 @@ impl Tokenizer {
                 }
             }
             //Look for comments
-            else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
-                //Don't add comments into product
-                //Try to consume the newline
-                match code.peek_char() {
-                    Some('\n') => {
-                        code.get_char();
-                        if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
-                            product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
-                        }
-                    },
-                    _ => {}
+            else if let Some('#') = code.peek_char() {
+                while code.remaining() > 0 {
+                    let sym = code.get_char().unwrap();
+                    if sym == '\n' {
+                        code.rewind();
+                        break;
+                    }
                 }
-                //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
             }
+            //Look for comments
+            // else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
+            //     //Don't add comments into product
+            //     //Try to consume the newline
+            //     match code.peek_char() {
+            //         Some('\n') => {
+            //             code.get_char();
+            //             if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
+            //                 product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
+            //             }
+            //         },
+            //         _ => {}
+            //     }
+            //     //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
+            // }
             else {
                 if let Some(sym) = code.get_char() {
                     if sym == ' ' {
