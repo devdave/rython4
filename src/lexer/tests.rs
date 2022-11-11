@@ -1281,12 +1281,12 @@ r#""This is a multiline string with a continuation here, \
         let tokens = Tokenizer::tokenize_file("test_fixtures/test_multiline_concurrent_strings.py", TConfig::default()).expect("tokens");
 
         let str1 =
-r#"""""Hello world this is  the firs
-            multiline string"""""#;
+r#""""Hello world this is  the first
+    multiline string""""#;
 
         let str2 =
 r#""""
-        This is the second multiline""""#;
+    This is the second multiline""""#;
 
         test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 3), "def" );
         test_token_w_position!(tokens[1], TType::Name, (1, 4), (1, 7), "foo" );
