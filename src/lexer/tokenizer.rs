@@ -845,6 +845,7 @@ impl Tokenizer {
         let mut code = CodeLine::new(line);
         //todo, string off the beginning whitespace if it exists for a minor speed boost
 
+
         while code.remaining() > 0 {
             let col_pos = code.position();
 
@@ -881,50 +882,30 @@ impl Tokenizer {
                 }
 
             }
-            else if let Some('"') = code.peek_char() {
+            else if let Some('"') | Some('\'') = code.peek_char()
+            {
                 let sym = code.get_char().unwrap();
-                match Tokenizer::attempt_string('"',
-                                                       "\"".to_string(),
-                                                       &mut code, state
-                ) {
+                match Tokenizer::attempt_string(sym, sym.to_string(), &mut code, state) {
                     Ok(Some((token_type, found_str))) => {
                         assert_eq!(token_type, TType::String);
-                        product.push(Token::quick(
-                            token_type,
-                            lineno, col_pos, col_pos+found_str.len(),
-                            found_str
-                        ));
+                        product.push(
+                            Token::quick(
+                                token_type,
+                                lineno, col_pos, col_pos+found_str.len(),
+                                found_str
+                            )
+                        );
                     },
                     _ => {
                         if state.string_continues == true {
-                             state.string_start = Some(Position::t2((lineno, col_pos)));
-                         } else {
-                             println!("Failed to match string @ {}:{}", lineno, col_pos);
-                         }
+                            state.string_start = Some(Position::t2((lineno, col_pos)));
+                        } else {
+                            println!("Failed to close {} string @ {}:{}", sym, lineno, col_pos);
+                            return Err(TokError::UnterminatedString);
+                        }
                     }
                 }
 
-            }
-            else if let Some('\'') = code.peek_char() {
-                let sym = code.get_char().unwrap();
-                match Tokenizer::attempt_string('\'', "'".to_string(),
-                &mut code, state) {
-                    Ok(Some((token_type, found_str))) => {
-                        assert_eq!(token_type, TType::String);
-                        product.push(Token::quick(
-                            token_type,
-                            lineno, col_pos, col_pos+found_str.len(),
-                            found_str
-                        ));
-                    },
-                    _ => {
-                        if state.string_continues == true {
-                             state.string_start = Some(Position::t2((lineno, col_pos)));
-                         } else {
-                             println!("Failed to match string @ {}:{}", lineno, col_pos);
-                         }
-                    }
-                }
             }
 
             //Look for identifier/Name tokens
