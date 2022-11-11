@@ -888,7 +888,6 @@ impl Tokenizer {
             }
 
 
-
         while code.remaining() > 0 {
             let col_pos = code.position();
 
@@ -1128,7 +1127,8 @@ impl Tokenizer {
                             continue
                         } else if state.string_continues == true {
                             // TODO is this really the fastest/"best" way to append to a String?
-                            state.string_buffer = format!("{}{}", state.string_buffer, sym);
+                            state.string_buffer.push(sym);
+                            
                         }
                         //TODO FIX the parsing grammar mixup between Newline and NL - this is a hack until then
                         else if true {
