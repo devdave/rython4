@@ -1091,7 +1091,6 @@ impl Tokenizer {
                     state.string_buffer = format!("{}{}", state.string_buffer, found);
                 }
             }
-            //Look for comments
             else if let Some('#') = code.peek_char() {
                 while code.remaining() > 0 {
                     let sym = code.get_char().unwrap();
@@ -1131,7 +1130,7 @@ impl Tokenizer {
                         //abort processing for now, nothing matters after a \
                         return Ok(product);
                     } else if sym == '\n' {
-                        if state.paren_depth.len() > 0 {
+                        if state.paren_depth.len() > 0 || product.len() == 0 {
                             continue
                         } else if state.string_continues == true {
                             // TODO is this really the fastest/"best" way to append to a String?
