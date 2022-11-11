@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
 
 mod lexer;
 mod tokens;
@@ -10,6 +12,8 @@ use clap::Parser;
 
 use crate::lexer::{ Tokenizer, TConfig, cleaner};
 use crate::parser::grammar::{python, TokVec};
+
+
 
 
 
@@ -75,7 +79,7 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
     let mut tokenizer = Tokenizer::new(TConfig{ skip_encoding: true, skip_endmarker: false } );
     println!("Tokenizing");
     let outcome = tokenizer.generate(&lines);
-    println!("Tokenized!\n");
+    println!("Tokenizer finished!\n");
 
     if let Ok(tokens) = outcome {
         if show_tokens == true {
@@ -114,8 +118,9 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
         }
 
 
-    } else if let Err(issue) = outcome {
-        println!("Failed to process {:?} - token error", issue);
+    }
+    else if let Err(issue) = outcome {
+        println!("Failed to tokenize {:?} - token error", issue);
     }
 
 
@@ -133,11 +138,14 @@ fn py_intrepret_string(line: String, _show_tokens: bool) {
 
 
 fn main() {
-    let args = Args::parse();
-    println!("Hello, world! {:?}", args);
-    //TODO - Check if file is being pushed in via stdin
-    //Check for filename argument
+    pretty_env_logger::init();
 
+    let args = Args::parse();
+
+    debug!("Got args: {:?}", args);
+    //TODO - Check if file is being pushed in via stdin
+
+    //Check for filename argument
     if let Some(filename) = args.filename {
         if args.check_code == true {
             py_check_code(filename);
