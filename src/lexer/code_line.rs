@@ -142,12 +142,12 @@ mod test {
 
         assert_eq!(outcome, Some((5 as usize, "12345".to_string())));
 
-        assert_eq!(line.peek(), Some("a"));
-        assert_eq!(line.get(), Some("a"));
-        assert_eq!(line.get(), Some("b"));
-        assert_eq!(line.get(), Some("c"));
-        assert_eq!(line.get(), Some("\n"));
-        assert_eq!(line.get(), None);
+        assert_eq!(line.peek_char(), Some('a'));
+        assert_eq!(line.get_char(), Some('a'));
+        assert_eq!(line.get_char(), Some('b'));
+        assert_eq!(line.get_char(), Some('c'));
+        assert_eq!(line.get_char(), Some('\n'));
+        assert_eq!(line.get_char(), None);
         assert_eq!(line.remaining(), 0);
 
 
