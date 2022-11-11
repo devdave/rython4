@@ -1276,4 +1276,53 @@ r#""This is a multiline string with a continuation here, \
 
     }
 
+    #[test]
+    fn test_multiline_concurrent_strings() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/test_multiline_concurrent_strings.py", TConfig::default()).expect("tokens");
+
+        let str1 =
+r#"""""Hello world this is  the firs
+            multiline string"""""#;
+
+        let str2 =
+r#""""
+        This is the second multiline""""#;
+
+        test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 3), "def" );
+        test_token_w_position!(tokens[1], TType::Name, (1, 4), (1, 7), "foo" );
+        test_token_w_position!(tokens[2], TType::Op, (1, 7), (1, 8), "(" );
+        test_token_w_position!(tokens[3], TType::Name, (1, 8), (1, 13), "first" );
+        test_token_w_position!(tokens[4], TType::Op, (1, 13), (1, 14), "," );
+        test_token_w_position!(tokens[5], TType::Name, (1, 15), (1, 21), "second" );
+        test_token_w_position!(tokens[6], TType::Op, (1, 21), (1, 22), ")" );
+        test_token_w_position!(tokens[7], TType::Op, (1, 22), (1, 23), ":" );
+        test_token_w_position!(tokens[8], TType::NL, (1, 23), (1, 23), "" );
+        test_token_w_position!(tokens[9], TType::Indent, (2, 0), (2, 0), "" );
+        test_token_w_position!(tokens[10], TType::Name, (2, 4), (2, 9), "print" );
+        test_token_w_position!(tokens[11], TType::Op, (2, 9), (2, 10), "(" );
+        test_token_w_position!(tokens[12], TType::Name, (2, 10), (2, 13), "len" );
+        test_token_w_position!(tokens[13], TType::Op, (2, 13), (2, 14), "(" );
+        test_token_w_position!(tokens[14], TType::Name, (2, 14), (2, 19), "first" );
+        test_token_w_position!(tokens[15], TType::Op, (2, 19), (2, 20), ")" );
+        test_token_w_position!(tokens[16], TType::Op, (2, 20), (2, 21), ")" );
+        test_token_w_position!(tokens[17], TType::NL, (2, 21), (2, 21), "" );
+        test_token_w_position!(tokens[18], TType::Name, (3, 4), (3, 9), "print" );
+        test_token_w_position!(tokens[19], TType::Op, (3, 9), (3, 10), "(" );
+        test_token_w_position!(tokens[20], TType::Name, (3, 10), (3, 13), "len" );
+        test_token_w_position!(tokens[21], TType::Op, (3, 13), (3, 14), "(" );
+        test_token_w_position!(tokens[22], TType::Name, (3, 14), (3, 20), "second" );
+        test_token_w_position!(tokens[23], TType::Op, (3, 20), (3, 21), ")" );
+        test_token_w_position!(tokens[24], TType::Op, (3, 21), (3, 22), ")" );
+        test_token_w_position!(tokens[25], TType::NL, (3, 22), (3, 22), "" );
+        test_token_w_position!(tokens[26], TType::Dedent, (6, 0), (6, 0), "" );
+        test_token_w_position!(tokens[27], TType::Name, (6, 0), (6, 3), "foo" );
+        test_token_w_position!(tokens[28], TType::Op, (6, 3), (6, 4), "(" );
+        test_token_w_position!(tokens[29], TType::String, (7, 4), (8, 23), str1  );
+        test_token_w_position!(tokens[30], TType::Op, (8, 23), (8, 24), "," );
+        test_token_w_position!(tokens[31], TType::String, (8, 25), (9, 35), str2 );
+        test_token_w_position!(tokens[32], TType::Op, (10, 0), (10, 1), ")" );
+        test_token_w_position!(tokens[33], TType::NL, (10, 1), (10, 1), "" );
+
+    }
+
 }
