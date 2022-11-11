@@ -714,58 +714,12 @@ impl Tokenizer {
 
     }
 
-    fn process_line(&mut self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
+    fn attempt_close_multiline_string(state: &mut State, code: &mut CodeLine )
+    -> Result<Option<Vec<Token>>, TokError>
+    {
         let mut product: Vec<Token> = Vec::new();
 
-
-        let mut is_statement = false;
-
-        //Deal with blank lines
-        if line.len() == 1 && line == "\n" {
-            return Ok(product);
-        }
-
-
-        if state.string_continues == false {
-
-            //Handle blank lines
-            if line.trim().len() == 0 {
-                //We are done!
-                return Ok(product);
-            }
-
-            //only do indent and dedent if we're not inside brackets
-            if state.paren_depth.len() == 0 && state.line_continues == false {
-                match Tokenizer::attempt_indentation(state, lineno, &line) {
-                    Ok(indent_product) => {
-                        match indent_product {
-                            None => {
-                                //do nothing
-                            },
-                            Some(detentation_tokens) => {
-                                product.extend(detentation_tokens);
-                            }
-                        }
-                    },
-                    Err(err_token) => { return Err(err_token); },
-                }
-
-            }
-        }
-
-        //reset this flag as its served its purpose
-        state.line_continues = false;
-
-
-        let mut code = CodeLine::new(line);
-
-        while code.remaining() > 0 {
-            let col_pos = code.position();
-
-            if state.string_continues == true {
-                //TODO check for string continuation type/state.type to use the correct regex
-
-                match state.string_type {
+        match state.string_type {
                     Some(StringType::TripleQuote) => {
                         if let Some((new_pos, found)) = code.return_match(TRIPLE_QUOTE_CLOSE.to_owned())
                         {
@@ -849,9 +803,84 @@ impl Tokenizer {
                     }
                 }
 
-                if state.string_continues == true {
-                    if let Some((_new_pos, found)) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
-                        state.string_buffer = format!("{}{}", state.string_buffer, found);
+        if state.string_continues == true {
+            if let Some((_new_pos, found)) = code.return_match(Regex::new(r#"\A((\n|.)*)"#).expect("regex")) {
+                state.string_buffer = format!("{}{}", state.string_buffer, found);
+            }
+        }
+
+        if product.len() > 0 {
+            return Ok(Some(product));
+        }
+
+        return Ok(None);
+
+
+    }
+
+    fn process_line(&mut self, state: &mut State, lineno: usize, line: String) -> Result<Vec<Token>, TokError> {
+        let mut product: Vec<Token> = Vec::new();
+
+
+        let mut is_statement = false;
+
+        //Deal with blank lines
+        if line.len() == 1 && line == "\n" {
+            return Ok(product);
+        }
+
+
+        if state.string_continues == false {
+
+            //Handle blank lines
+            if line.trim().len() == 0 {
+                //We are done!
+                return Ok(product);
+            }
+
+            //only do indent and dedent if we're not inside brackets
+            if state.paren_depth.len() == 0 && state.line_continues == false {
+                match Tokenizer::attempt_indentation(state, lineno, &line) {
+                    Ok(indent_product) => {
+                        match indent_product {
+                            None => {
+                                //do nothing
+                            },
+                            Some(detentation_tokens) => {
+                                product.extend(detentation_tokens);
+                            }
+                        }
+                    },
+                    Err(err_token) => { return Err(err_token); },
+                }
+
+            }
+        }
+
+        //reset this flag as its served its purpose
+        state.line_continues = false;
+
+
+        let mut code = CodeLine::new(line);
+
+        while code.remaining() > 0 {
+            let col_pos = code.position();
+
+            //TODO should this be outside of the loop?
+            if state.string_continues == true {
+                //TODO check for string continuation type/state.type to use the correct regex
+                match Tokenizer::attempt_close_multiline_string(state, &mut code) {
+                    Ok(multiline_option) => {
+                        match multiline_option {
+                            None => {},
+                            Some(multiline_content) => {
+                                product.extend(multiline_content);
+                            }
+                        }
+
+                    }
+                    Err(err_token) => {
+                        return Err(err_token);
                     }
                 }
 
