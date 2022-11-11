@@ -168,7 +168,7 @@ impl Tokenizer {
             match self.process_line(&mut state, lineno.saturating_add(1), line) {
                 Ok(mut tokens) => product.append(&mut tokens),
                 Err(issue) => {
-                    println!("tokenizer failure: {:?}", product);
+                    println!("tokenizer failure: {:#?}", product);
                     return Err(issue)
                 },
             }
@@ -185,7 +185,7 @@ impl Tokenizer {
         if state.paren_depth.len() > 0 {
             println!("State: {:#?}", state);
             let (last_paren, _pos) = state.paren_depth.pop().expect("paren");
-            println!("tokenizer failure: {:#?}", product);
+
 
             return Err(TokError::UnmatchedClosingParen(last_paren));
         }
