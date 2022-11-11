@@ -85,7 +85,11 @@ impl CodeLine {
     }
 
     pub fn peek_ahead_char(&mut self, skip: usize) -> Option<char> {
-        return self.line[(self.pos+skip)..].chars().nth(0);
+        if self.pos + skip < self.len {
+            return self.line[(self.pos+skip)..].chars().nth(0);
+        }
+
+        None
     }
 
     pub fn get_char(&mut self) -> Option<char> {
