@@ -166,7 +166,11 @@ impl Tokenizer {
 
         for (lineno, line, ) in source.clone().into_iter().enumerate() {
             match self.process_line(&mut state, lineno.saturating_add(1), line) {
-                Ok(mut tokens) => product.append(&mut tokens),
+                Ok(mut tokens) => {
+                    println!("Processed {:?}", source.get(lineno));
+                    println!("Got {:#?}", tokens);
+                    product.append(&mut tokens)
+                },
                 Err(issue) => {
                     println!("tokenizer failure: {:#?}", product);
                     return Err(issue)
