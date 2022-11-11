@@ -714,7 +714,7 @@ impl Tokenizer {
 
     }
 
-    fn attempt_close_multiline_string(state: &mut State, code: &mut CodeLine )
+    fn attempt_close_multiline_string(lineno: usize, state: &mut State, code: &mut CodeLine )
     -> Result<Option<Vec<Token>>, TokError>
     {
         let mut product: Vec<Token> = Vec::new();
@@ -842,7 +842,7 @@ impl Tokenizer {
             if state.paren_depth.len() == 0 && state.line_continues == false {
                 match Tokenizer::attempt_indentation(state, lineno, &line) {
                     Ok(Some(indent_product)) => {
-                        product.extend(detentation_tokens);
+                        product.extend(indent_product);
                     },
                     Err(err_token) => { return Err(err_token); },
                     _ => {}
@@ -864,9 +864,9 @@ impl Tokenizer {
             //TODO should this be outside of the loop?
             if state.string_continues == true {
                 //TODO check for string continuation type/state.type to use the correct regex
-                match Tokenizer::attempt_close_multiline_string(state, &mut code) {
+                match Tokenizer::attempt_close_multiline_string(lineno, state, &mut code) {
                     Ok(Some(multiline_option)) => {
-                        product.extend(multiline_content);
+                        product.extend(multiline_option);
                     }
                     Err(err_token) => {
                         return Err(err_token);
