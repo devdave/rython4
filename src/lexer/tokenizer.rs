@@ -156,6 +156,7 @@ impl Tokenizer {
 
 
     pub fn generate(&mut self, source: &Vec<String>) -> Result<Vec<Token>, TokError> {
+        //TODO break this down into subfunctions as it has gotten too long
         let mut product: Vec<Token> = Vec::new();
         let mut state = State::new();
 
