@@ -854,12 +854,7 @@ impl Tokenizer {
             }
         }
 
-
-        while code.remaining() > 0 {
-            let col_pos = code.position();
-
-            //TODO should this be outside of the loop?
-            if state.string_continues == true {
+        if state.string_continues == true {
                 //TODO check for string continuation type/state.type to use the correct regex
                 //todo alright this line is really goofy, check this is sane
                 let sstart = state.string_start.as_ref().unwrap().clone();
@@ -874,7 +869,7 @@ impl Tokenizer {
                                     sstart.col,
                                     sstart.line
                                 ),
-                                Position::t2((lineno, col_pos+string_body.len())),
+                                Position::t2((lineno, string_body.len())),
                                 state.string_buffer.clone()
                             )
                         );
@@ -891,7 +886,14 @@ impl Tokenizer {
                 }
 
             }
-            else if let Some('"') | Some('\'') = code.peek_char()
+
+
+
+        while code.remaining() > 0 {
+            let col_pos = code.position();
+
+
+            if let Some('"') | Some('\'') = code.peek_char()
             {
                 let sym = code.get_char().unwrap();
                 match Tokenizer::attempt_string(sym, sym.to_string(), &mut code, state) {
