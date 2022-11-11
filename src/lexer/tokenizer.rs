@@ -967,10 +967,7 @@ impl Tokenizer {
                     }
                 }
             }
-            // else if let Some((new_pos, found)) = code.return_match(NUMBER.to_owned()) {
-            //     product.push(Token::quick(TType::Number, lineno, col_pos, new_pos, found));
-            //     is_statement = true;
-            // }
+
             else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
                 if found == "(" || found == "[" || found == "{" {
                     state.paren_depth.push(
