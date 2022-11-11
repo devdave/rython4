@@ -856,6 +856,7 @@ impl Tokenizer {
 
 
         let mut code = CodeLine::new(line);
+        //todo, string off the beginning whitespace if it exists for a minor speed boost
 
         while code.remaining() > 0 {
             let col_pos = code.position();
