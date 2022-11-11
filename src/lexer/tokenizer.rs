@@ -2,6 +2,7 @@
 use std::cmp::Ordering;
 
 use std::io::Read;
+use peg::ParseSlice;
 
 
 use regex::Regex;
@@ -32,6 +33,9 @@ use crate::tokens::patterns::{
                         SINGLE_APOS_CLOSE,
                         SINGLE_QUOTE_CLOSE,
 };
+
+
+use super::operators::{is_onechar_opcode, is_twochar_op, is_threechar_op};
 
 
 
@@ -1021,7 +1025,37 @@ impl Tokenizer {
                 }
             }
 
-            else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
+                //look for 3 char operators
+            else if is_threechar_op(code.peek_char(), code.peek_ahead_char(1), code.peek_ahead_char(2)) == true {
+                let mut found_op = String::new();
+                found_op.push(code.get_char().expect("symbol"));
+                found_op.push(code.get_char().expect("symbol"));
+                found_op.push(code.get_char().expect("symbol"));
+
+                product.push(Token::quick(
+                    TType::Op,
+                    lineno, col_pos, col_pos+3,
+                    found_op,
+                ));
+            }
+            else if is_twochar_op(code.peek_char(), code.peek_ahead_char(1)) == true {
+                let mut found_op = String::new();
+
+                found_op.push(code.get_char().expect("token"));
+                found_op.push(code.get_char().expect("token"));
+
+                product.push(Token::quick(
+                    TType::Op,
+                    lineno, col_pos, col_pos+2,
+                    found_op,
+                ));
+            }
+            else if is_onechar_opcode(code.peek_char()) == true {
+                let mut found = String::new();
+                let current = code.get_char().expect("symbol");
+
+                found.push(current);
+
                 if found == "(" || found == "[" || found == "{" {
                     state.paren_depth.push(
                         (found.chars().nth(0).expect("expected char"),
@@ -1029,7 +1063,6 @@ impl Tokenizer {
                         )
                     );
                 } else if found == ")" || found == "]" || found == "}" {
-                    let current = found.chars().nth(0).expect("char");
 
                     if state.paren_depth.len() == 0 {
                         return Err(TokError::UnmatchedClosingParen(current));
@@ -1045,9 +1078,48 @@ impl Tokenizer {
                     }
                 }
 
-                product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
                 is_statement = true;
+
+
+                product.push(
+                    Token::quick(
+                        TType::Op,
+                        lineno, col_pos, col_pos+1,
+                        found
+                    )
+                );
+
+
+
             }
+
+            // else if let Some((new_pos, found)) = code.return_match(OPERATOR_RE.to_owned()) {
+            //     if found == "(" || found == "[" || found == "{" {
+            //         state.paren_depth.push(
+            //             (found.chars().nth(0).expect("expected char"),
+            //              Position::t2((lineno, col_pos))
+            //             )
+            //         );
+            //     } else if found == ")" || found == "]" || found == "}" {
+            //         let current = found.chars().nth(0).expect("char");
+            //
+            //         if state.paren_depth.len() == 0 {
+            //             return Err(TokError::UnmatchedClosingParen(current));
+            //         }
+            //         if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
+            //             if (last_paren == '(' && current != ')')
+            //                 || (last_paren == '[' && current != ']')
+            //                 || (last_paren == '{' && current != '}') {
+            //                 return Err(TokError::MismatchedClosingParenOnLine(current, last_paren, lineno));
+            //             }
+            //         } else {
+            //             panic!("Expected element in paren stack but got nothing: {:#?}", state);
+            //         }
+            //     }
+            //
+            //     product.push(Token::quick(TType::Op, lineno, col_pos, new_pos, found));
+            //     is_statement = true;
+            // }
             //Look for WS
             else if let Some((_, found)) = code.return_match(SPACE_TAB_FORMFEED_RE.to_owned()) {
                 //and ignore it
