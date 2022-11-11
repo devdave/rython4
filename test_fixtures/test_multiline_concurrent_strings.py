@@ -4,7 +4,7 @@ def foo(first, second):
 
 
 foo(
-    """Hello world this is  the firs
+    """Hello world this is  the first
     multiline string""", """
     This is the second multiline"""
 )
