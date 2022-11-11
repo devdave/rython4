@@ -903,7 +903,7 @@ impl Tokenizer {
                         if state.string_continues == true {
                              state.string_start = Some(Position::t2((lineno, col_pos)));
                          } else {
-                             println!("Failed to match @ {}:{}", lineno, col_pos);
+                             println!("Failed to match string @ {}:{}", lineno, col_pos);
                          }
                     }
                 }
@@ -952,6 +952,7 @@ impl Tokenizer {
                                  )
                              );
                          }
+
                          else if token_type == TType::Name || token_type == TType::String {
                              product.push(
                                  Token::quick(token_type,
