@@ -156,6 +156,7 @@ impl Tokenizer {
         return self.generate(&lines);
     }
 
+    #[allow(dead_code)]
     pub fn process_interactive(&mut self, _input: String, _state: &State) {}
 
 
