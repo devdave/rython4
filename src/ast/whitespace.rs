@@ -21,7 +21,7 @@ pub struct Newline<'a>(pub Option<&'a str>, pub Fakeness);
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Fakeness {
-    Fake,
+    // Fake,
     Real,
 }
 

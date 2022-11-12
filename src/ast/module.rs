@@ -7,7 +7,6 @@ use crate::tokens::Token;
 
 use super::statement::Statement;
 
-type TokenRef = Rc<Token>;
 
 #[derive(Debug)]
 pub struct Module {
