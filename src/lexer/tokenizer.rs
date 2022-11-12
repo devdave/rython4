@@ -580,7 +580,7 @@ impl Tokenizer {
         return Ok(None);
     }
 
-    fn attempt_floating_point(&mut self, code: &mut CodeLine, state: &State) -> Result<Option<String>, TokError> {
+    fn attempt_floating_point(&mut self, code: &mut CodeLine) -> Result<Option<String>, TokError> {
         let mut found: String = String::new();
         let point_sym = code.get_char().unwrap();
         assert_eq!(point_sym, '.', "How did we get here?");
@@ -985,7 +985,7 @@ impl Tokenizer {
                 }
             }
             else if let Some('.') = code.peek_char() {
-                match self.attempt_floating_point(&mut code, &state){
+                match self.attempt_floating_point(&mut code){
                     Ok(Some(found)) => {
                         product.push(Token::quick(
                             TType::Number,
