@@ -1,7 +1,8 @@
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum TType {
     Encoding,
-    Comment, //TODO decide if i want to cull this as parser doesn't want/need this
+    #[allow(dead_code)]
+    Comment, 
     String,
     Name,
     Number,
