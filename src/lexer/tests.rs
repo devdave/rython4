@@ -1226,18 +1226,6 @@ to see if it works""""#.to_string();
 
 
     #[test]
-    #[ignore]
-    fn test_and_profile_tokenizing_stdlib_astpy() {
-
-        let tokens = Tokenizer::tokenize_file("PyLib/ast.py",
-                                              TConfig {
-                                                  skip_encoding: true,
-                                                  skip_endmarker: false
-                                              })
-            .expect("tokens");
-    }
-
-    #[test]
     fn test_attempt_identifiers() {
         let valid_names = vec![
             "hello_world",
