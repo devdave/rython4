@@ -336,6 +336,7 @@ impl Tokenizer {
 
 
 
+
         while (end_quote_size != quote_size) && code.remaining() > 0 {
             let next = code.get_char();
             if next == None || (next.unwrap() == '\n' && quote_size == 1)  {
@@ -345,8 +346,10 @@ impl Tokenizer {
             let sym = next.unwrap();
             let mut escaped = false;
 
+
             if sym == quote {
                 end_quote_size += 1;
+                body.push(sym);
             } else {
                 end_quote_size = 0;
                 if sym == '\\' {
@@ -359,17 +362,19 @@ impl Tokenizer {
                     body.push(sym);
 
 
-                    if code.remaining() > 0 {
+                    if code.remaining() > 1 {
                         let escaped = code.get_char().unwrap();
                         body.push(escaped);
                     } else if quote_size != 3 {
-                        return Err(TokError::UnterminatedString);
+                        return Err(TokError::LineContinuation);
                     }
                 }
+                if escaped == false {
+                    body.push(sym);
+                }
+
             }
-            if escaped != true {
-                body.push(sym);
-            }
+
 
         }
 
