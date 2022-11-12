@@ -819,7 +819,7 @@ impl Tokenizer {
         let mut product: Vec<Token> = Vec::new();
 
 
-        let mut is_statement = false;
+
 
         //Deal with blank lines
         if line.len() == 1 && line == "\n" {
@@ -977,7 +977,7 @@ impl Tokenizer {
                          }
                      }
                  }
-                is_statement = true;
+
             }
 
             //Fetch numbers
