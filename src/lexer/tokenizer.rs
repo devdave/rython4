@@ -759,7 +759,7 @@ impl Tokenizer {
             }
 
             _ => {
-                panic!("State StringType is not handled {:#?}", state);
+                panic!("State.StringType is not handled {:#?}", state);
             }
         }
 
