@@ -478,7 +478,7 @@ impl Tokenizer {
 
             while (Tokenizer::is_potential_identifier_char(test)) && code.remaining() > 0  {
 
-                if (test.unwrap() as usize >= 128) {
+                if test.unwrap() as usize >= 128 {
                     nonasci = true;
                 }
                 found.push(test.unwrap());
@@ -530,11 +530,11 @@ impl Tokenizer {
                         }
                         Some('e') | Some('E') => {
                             found.push(code.get_char().unwrap());
-                            return self.fetch_float_body(found, code, state);
+                            return self.fetch_float_body(found, code);
                         }
                         Some('.') => {
 
-                            return self.fetch_float_body(found, code, state);
+                            return self.fetch_float_body(found, code);
                         }
                         _ => {
                             //got something non numeric
@@ -563,11 +563,11 @@ impl Tokenizer {
                 Some('e') | Some('E') | Some('.') => {
                     let sym = code.get_char().unwrap();
                     found.push(sym);
-                    return self.fetch_float_body(found, code, state);
+                    return self.fetch_float_body(found, code);
                 }
                 Some('_') => {
                     //skip over
-                    let sym = code.get_char().unwrap();
+                    code.get_char();
                 },
                 _ => {
                     //unexpected char!
@@ -599,12 +599,12 @@ impl Tokenizer {
             }
         }
 
-        return self.fetch_float_body(found, code, state);
+        return self.fetch_float_body(found, code);
 
     }
 
-    fn fetch_float_body(&mut self, mut found: String, code: &mut CodeLine, state: &State ) -> Result<Option<String>, TokError> {
-        let mut seen_e = found.contains('e') || found.contains('E');
+    fn fetch_float_body(&mut self, mut found: String, code: &mut CodeLine) -> Result<Option<String>, TokError> {
+        let seen_e = found.contains('e') || found.contains('E');
 
         let mut seen_op = false;
 
@@ -632,7 +632,7 @@ impl Tokenizer {
                     found.push(sym);
 
                 },
-                Some('e') | Some('E') if seen_e == false => {
+                Some('e') | Some('E') if seen_e == true => {
                     let sym = code.get_char().unwrap();
                     return Err(TokError::BadCharacter(sym));
                 }
@@ -656,10 +656,10 @@ impl Tokenizer {
     {
         let mut product: Vec<Token> = Vec::new();
 
-        //Ignore blank lines with comments
-            if let Some(test) = BL_COMMENT.find(&line) {}
-            //Handle indent/dedent here if there is a statement
+            //Ignore blank lines with comments
+            if let Some(_test) = BL_COMMENT.find(&line) {}
 
+            //Handle indent/dedent here if there is a statement
             else if let Some(ws_match) = SPACE_TAB_FORMFEED_RE.find(&line) {
 
                 //TODO make sure there is no mixing of tabs, spaces, and form feed.
@@ -701,7 +701,7 @@ impl Tokenizer {
                 //Pop all indents
 
                 while state.indent_stack.len() > 0 {
-                    let last_size = state.indent_stack.pop().unwrap();
+                    state.indent_stack.pop().unwrap();
 
                     product.push(Token::quick(TType::Dedent, lineno, 0, 0, "".to_string()));
                 }
@@ -719,10 +719,10 @@ impl Tokenizer {
     }
 
 
-    fn attempt_close_multiline_string(lineno: usize, state: &mut State, code: &mut CodeLine )
+    fn attempt_close_multiline_string(state: &mut State, code: &mut CodeLine )
     -> Result<Option<String>, TokError>
     {
-        let mut product: Vec<Token> = Vec::new();
+
 
         let mut quote = '"';
         let mut quote_size = 1;
@@ -858,7 +858,7 @@ impl Tokenizer {
                 //TODO check for string continuation type/state.type to use the correct regex
                 //todo alright this line is really goofy, check this is sane
                 let sstart = state.string_start.as_ref().unwrap().clone();
-                match Tokenizer::attempt_close_multiline_string(lineno, state, &mut code) {
+                match Tokenizer::attempt_close_multiline_string(state, &mut code) {
                     Ok(Some(string_body)) if state.string_continues == false => {
 
                         state.string_buffer = format!("{}{}", state.string_buffer, string_body);
@@ -1060,7 +1060,7 @@ impl Tokenizer {
                     if state.paren_depth.len() == 0 {
                         return Err(TokError::UnmatchedClosingParen(current));
                     }
-                    if let Some((last_paren, start_pos)) = state.paren_depth.pop() {
+                    if let Some((last_paren, _start_pos)) = state.paren_depth.pop() {
                         if (last_paren == '(' && current != ')')
                             || (last_paren == '[' && current != ']')
                             || (last_paren == '{' && current != '}') {
@@ -1071,7 +1071,7 @@ impl Tokenizer {
                     }
                 }
 
-                is_statement = true;
+
 
 
                 product.push(

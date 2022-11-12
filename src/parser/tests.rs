@@ -97,7 +97,7 @@ where P: AsRef<std::path::Path>
 
     let magic = python::file(&vec, &display_str.as_str());
 
-    if let Ok(module) = magic {
+    if let Ok(_) = magic {
         //Quiet this down
         //print_module(module);
         println!("Successfully parsed {}", display_str);

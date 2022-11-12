@@ -60,19 +60,11 @@ impl CodeLine {
         self.len.saturating_sub(self.pos)
     }
 
-    pub fn remaining_char(&self) -> usize { self.text.len() }
-
-    // pub fn get_line(&self) -> String {
-    //     self.line.clone()
-    // }
 
     pub fn rewind(&mut self) {
         self.pos = self.pos.saturating_sub(1);
     }
 
-    pub fn peek(&self) -> Option<&str> {
-        return self.line.graphemes(true).nth(self.pos);
-    }
 
     pub fn peek_char(&mut self) -> Option<char> {
         if self.text.len() > self.pos {
@@ -96,13 +88,6 @@ impl CodeLine {
         let result = self.peek_char();
         self.pos = self.pos.saturating_add(1);
         return result;
-    }
-
-    pub fn get(&mut self) -> Option<&str> {
-        panic!("codeline.get() is deprecated");
-        let retval = self.line.graphemes(true).nth(self.pos);
-        self.pos = self.pos + 1;
-        return retval;
     }
 
 
