@@ -822,7 +822,7 @@ mod test {
     #[test]
     #[timeout(200)]
     fn test_valid_literals() {
-        let ValidUnderscoreLiterals: Vec<&str> = vec![
+        let valid_underscore_literals: Vec<&str> = vec![
             "0_0_0",
             "4_2",
             "1_0000_0000",
@@ -849,7 +849,7 @@ mod test {
         let mut tokenizer = Tokenizer::new(TConfig { skip_endmarker: true, skip_encoding: true });
 
 
-        for value in ValidUnderscoreLiterals {
+        for value in valid_underscore_literals {
             if value.starts_with("(") {
                 continue;
             }
