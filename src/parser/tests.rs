@@ -198,27 +198,3 @@ fn parse_directory(scandir: PathBuf)
     }
 
 }
-
-#[test]
-fn parse_the_entire_stdlib() {
-
-    return; //Takes too long
-
-    let paths = fs::read_dir("PyLib/").expect("paths");
-
-
-
-    for test in paths {
-        let path = test.expect("path").path();
-        let display = path.display();
-
-        if path.is_dir() {
-            parse_directory(path);
-        } else {
-            println!("Attempting {}", display);
-            attempt_parse_file(path);
-        }
-    }
-
-
-}
