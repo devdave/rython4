@@ -723,9 +723,8 @@ impl Tokenizer {
     -> Result<Option<String>, TokError>
     {
 
-
-        let mut quote = '"';
-        let mut quote_size = 1;
+        let mut quote:char;
+        let mut quote_size:usize;
         let mut end_quote_size = 0;
         let mut buffer = String::new();
 
