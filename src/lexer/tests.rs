@@ -976,6 +976,72 @@ to see if it works""""#.to_string();
             "test_fixtures/basic_class.py",
             TConfig { skip_encoding: true, skip_endmarker: false }
         ).expect("tokens");
+
+        test_token_w_position!(tokens[0], TType::Name, (1, 0), (1, 5), "class" );
+        test_token_w_position!(tokens[1], TType::Name, (1, 6), (1, 11), "Basic" );
+        test_token_w_position!(tokens[2], TType::Op, (1, 11), (1, 12), ":" );
+        test_token_w_position!(tokens[3], TType::NL, (1, 12), (1, 12), "" );
+        test_token_w_position!(tokens[4], TType::Indent, (2, 0), (2, 0), "" );
+        // test_token_w_position!(tokens[5], TType::String, (2, 4), (4, 7), """"
+        //     A basic class definition
+        //     """" );
+        test_token_w_position!(tokens[6], TType::NL, (4, 7), (4, 7), "" );
+        test_token_w_position!(tokens[7], TType::Name, (5, 4), (5, 7), "def" );
+        test_token_w_position!(tokens[8], TType::Name, (5, 8), (5, 16), "__init__" );
+        test_token_w_position!(tokens[9], TType::Op, (5, 16), (5, 17), "(" );
+        test_token_w_position!(tokens[10], TType::Name, (5, 17), (5, 21), "self" );
+        test_token_w_position!(tokens[11], TType::Op, (5, 21), (5, 22), ")" );
+        test_token_w_position!(tokens[12], TType::Op, (5, 22), (5, 23), ":" );
+        test_token_w_position!(tokens[13], TType::NL, (5, 23), (5, 23), "" );
+        test_token_w_position!(tokens[14], TType::Indent, (6, 0), (6, 0), "" );
+        // test_token_w_position!(tokens[15], TType::String, (6, 8), (8, 11), """"
+        //         A basic init
+        //         """" );
+        test_token_w_position!(tokens[16], TType::NL, (8, 11), (8, 11), "" );
+        test_token_w_position!(tokens[17], TType::Name, (9, 8), (9, 12), "self" );
+        test_token_w_position!(tokens[18], TType::Op, (9, 12), (9, 13), "." );
+        test_token_w_position!(tokens[19], TType::Name, (9, 13), (9, 14), "c" );
+        test_token_w_position!(tokens[20], TType::Op, (9, 15), (9, 16), "=" );
+        test_token_w_position!(tokens[21], TType::Number, (9, 17), (9, 18), "0" );
+        test_token_w_position!(tokens[22], TType::NL, (9, 18), (9, 18), "" );
+        test_token_w_position!(tokens[23], TType::Dedent, (11, 0), (11, 0), "" );
+        test_token_w_position!(tokens[24], TType::Name, (11, 4), (11, 7), "def" );
+        test_token_w_position!(tokens[25], TType::Name, (11, 8), (11, 11), "add" );
+        test_token_w_position!(tokens[26], TType::Op, (11, 11), (11, 12), "(" );
+        test_token_w_position!(tokens[27], TType::Name, (11, 12), (11, 16), "self" );
+        test_token_w_position!(tokens[28], TType::Op, (11, 16), (11, 17), "," );
+        test_token_w_position!(tokens[29], TType::Name, (11, 18), (11, 19), "a" );
+        test_token_w_position!(tokens[30], TType::Op, (11, 19), (11, 20), "," );
+        test_token_w_position!(tokens[31], TType::Name, (11, 21), (11, 22), "b" );
+        test_token_w_position!(tokens[32], TType::Op, (11, 22), (11, 23), ")" );
+        test_token_w_position!(tokens[33], TType::Op, (11, 23), (11, 24), ":" );
+        test_token_w_position!(tokens[34], TType::NL, (11, 24), (11, 24), "" );
+        test_token_w_position!(tokens[35], TType::Indent, (12, 0), (12, 0), "" );
+        test_token_w_position!(tokens[36], TType::Name, (12, 8), (12, 12), "self" );
+        test_token_w_position!(tokens[37], TType::Op, (12, 12), (12, 13), "." );
+        test_token_w_position!(tokens[38], TType::Name, (12, 13), (12, 14), "c" );
+        test_token_w_position!(tokens[39], TType::Op, (12, 15), (12, 16), "=" );
+        test_token_w_position!(tokens[40], TType::Name, (12, 17), (12, 18), "a" );
+        test_token_w_position!(tokens[41], TType::Op, (12, 19), (12, 20), "+" );
+        test_token_w_position!(tokens[42], TType::Name, (12, 21), (12, 22), "b" );
+        test_token_w_position!(tokens[43], TType::NL, (12, 22), (12, 22), "" );
+        test_token_w_position!(tokens[44], TType::Dedent, (14, 0), (14, 0), "" );
+        test_token_w_position!(tokens[45], TType::Name, (14, 4), (14, 7), "def" );
+        test_token_w_position!(tokens[46], TType::Name, (14, 8), (14, 11), "get" );
+        test_token_w_position!(tokens[47], TType::Op, (14, 11), (14, 12), "(" );
+        test_token_w_position!(tokens[48], TType::Name, (14, 12), (14, 16), "self" );
+        test_token_w_position!(tokens[49], TType::Op, (14, 16), (14, 17), ")" );
+        test_token_w_position!(tokens[50], TType::Op, (14, 17), (14, 18), ":" );
+        test_token_w_position!(tokens[51], TType::NL, (14, 18), (14, 18), "" );
+        test_token_w_position!(tokens[52], TType::Indent, (15, 0), (15, 0), "" );
+        test_token_w_position!(tokens[53], TType::Name, (15, 8), (15, 14), "return" );
+        test_token_w_position!(tokens[54], TType::Name, (15, 15), (15, 19), "self" );
+        test_token_w_position!(tokens[55], TType::Op, (15, 19), (15, 20), "." );
+        test_token_w_position!(tokens[56], TType::Name, (15, 20), (15, 21), "c" );
+        test_token_w_position!(tokens[57], TType::NL, (15, 21), (15, 21), "" );
+        test_token_w_position!(tokens[58], TType::Dedent, (15, 0), (15, 0), "" );
+        test_token_w_position!(tokens[59], TType::Dedent, (15, 0), (15, 0), "" );
+
     }
 
     #[test]
@@ -1160,8 +1226,9 @@ to see if it works""""#.to_string();
 
 
     #[test]
+    #[ignore]
     fn test_and_profile_tokenizing_stdlib_astpy() {
-        return; //Disable for now!
+
         let tokens = Tokenizer::tokenize_file("PyLib/ast.py",
                                               TConfig {
                                                   skip_encoding: true,
