@@ -2,7 +2,7 @@
 pub enum TType {
     Encoding,
     #[allow(dead_code)]
-    Comment, 
+    Comment,
     String,
     Name,
     Number,
