@@ -365,7 +365,15 @@ impl Tokenizer {
                     if code.remaining() > 1 {
                         let escaped = code.get_char().unwrap();
                         body.push(escaped);
-                    } else if quote_size != 3 {
+                    }
+                    else if code.remaining() == 1 {
+                        let escaped = code.get_char().unwrap();
+                        assert_eq!(escaped, '\n');
+                        body.push(escaped);
+                        break;
+
+                    }
+                    else if quote_size != 3 {
                         return Err(TokError::LineContinuation);
                     }
                 }
