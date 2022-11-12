@@ -5,7 +5,7 @@ mod test {
     use ntest::timeout;
 
     use crate::lexer::tokenizer::{TConfig, Tokenizer};
-    use crate::tokens::{TType, Position};
+    use crate::tokens::{TType, Position, TokError};
 
     macro_rules! test_token_w_position {
     ($token:expr, $ttype:expr, $start:expr, $end:expr, $content:expr)=>{
@@ -1383,4 +1383,24 @@ r#""""
 
     }
 
+
+    #[test]
+    fn test_escaped_chars_in_string() {
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let escaped1 = r#""Hello World\" that's an escaped quote!""#;
+
+        let tokens = tokenizer.process_single_line(escaped1.to_string()).expect("tokens");
+        assert_eq!(tokens[0].r#type, TType::String);
+        assert_eq!(tokens[0].text, escaped1);
+    }
+
+    #[test]
+    fn test_unterminated_string() {
+        let mut tokenizer = Tokenizer::new(TConfig::default());
+        let escaped1 = r#""It's important to"#;
+
+        let err = tokenizer.process_single_line(escaped1.to_string()).unwrap_err();
+        assert_eq!(err, TokError::UnterminatedString);
+
+    }
 }
