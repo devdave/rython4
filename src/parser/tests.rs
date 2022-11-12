@@ -1,7 +1,6 @@
 
 
 
-use std::path::PathBuf;
 
 use std::fs;
 use std::rc::Rc;
@@ -181,20 +180,3 @@ fn match_is_a_structure_and_soft_keyword() {
     attempt_parse_file("test_fixtures/test_match.py");
 }
 
-fn parse_directory(scandir: PathBuf)
-{
-    let contents = scandir.read_dir().expect("directory");
-
-    for test in contents {
-        let path = test.expect("directory").path();
-        let display = path.display();
-
-        if path.is_dir() {
-            parse_directory(path);
-        } else {
-            println!("Attempting {}", display);
-            attempt_parse_file(path);
-        }
-    }
-
-}

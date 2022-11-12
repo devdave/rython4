@@ -161,7 +161,7 @@ parser! {
                 first_tok,
                 first_statement: stmts.0,
                 rest: stmts.1,
-                last_semi: stmts.2,
+                // last_semi: stmts.2,
             }
         }
 
@@ -1953,7 +1953,7 @@ struct SimpleStatementParts {
     first_tok: TokenRef, // The first token of the first statement. Used for its whitespace
     first_statement: SmallStatement,
     rest: Vec<(TokenRef, SmallStatement)>, // semicolon, statement pairs
-    last_semi: Option<TokenRef>,
+    //last_semi: Option<TokenRef>,
 }
 
 // fn make_semicolon(tok: TokenRef) -> Semicolon {
@@ -1973,13 +1973,13 @@ fn make_simple_statement_suite(parts: SimpleStatementParts) -> Suite {
     })
 }
 
-fn make_simple_statement_line(parts: SimpleStatementParts) -> SimpleStatementLine {
-    let (_first_tok, body) = _make_simple_statement(parts);
-    SimpleStatementLine {
-        body,
-
-    }
-}
+// fn make_simple_statement_line(parts: SimpleStatementParts) -> SimpleStatementLine {
+//     let (_first_tok, body) = _make_simple_statement(parts);
+//     SimpleStatementLine {
+//         body,
+//
+//     }
+// }
 
 fn make_if(
     _if_tok: TokenRef,
@@ -3209,7 +3209,8 @@ fn make_match_star(_star_tok: TokenRef, name: Option<Name>) -> MatchStar {
 
 fn make_match_mapping(
     _lbrace: LeftCurlyBrace,
-    mut elements: Vec<MatchMappingElement>,
+    //note this was mut
+    elements: Vec<MatchMappingElement>,
     el_comma: Option<Comma>,
     _star_tok: Option<TokenRef>,
     rest: Option<Name>,

@@ -2,8 +2,7 @@
 use regex::Regex;
 use std::string::String;
 
-use unicode_segmentation;
-use unicode_segmentation::UnicodeSegmentation;
+// use unicode_segmentation;
 
 
 #[derive(Clone)]

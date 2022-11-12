@@ -1,6 +1,9 @@
 
+#[allow(unused)]
 use crate::tokens::TokError;
+#[allow(unused)]
 use crate::parser::TokVec;
+#[allow(unused)]
 use peg::Parse;
 use thiserror::Error;
 

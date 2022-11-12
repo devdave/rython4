@@ -118,7 +118,9 @@ pub enum Expression {
     Ellipsis,
     Integer(Box<Integer>),
     Float(Box<Float>),
+    #[allow(dead_code)]
     Binary(Box<Binary>),  //TODO compiler says this is never used!
+    #[allow(dead_code)]
     Hexidecimal(Box<Hexidecimal>), //TODO compiler says this is never used!
     Imaginary(Box<Imaginary>),
     Comparison(Box<Comparison>),
@@ -317,6 +319,8 @@ pub struct Parameters {
 }
 
 impl Parameters {
+
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.params.is_empty()
             && self.star_arg.is_none()
