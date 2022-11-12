@@ -12,8 +12,8 @@ mod test {
 
         assert_eq!($token.text, $content, "Testing for text/content with {:?} != {:?} for a/{:?} e/{:?}", $token.text, $content, $token.r#type, $ttype);
         assert_eq!($token.r#type, $ttype, "Testing for type with {:?} {:?} != {:?}", $token.text, $token.r#type, $ttype);
-        //assert_eq!($token.start, Position::t2($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
-        //assert_eq!($token.end, Position::t2($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
+        assert_eq!($token.start, Position::t2($start), "Testing for start with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.start, $start);
+        assert_eq!($token.end, Position::t2($end), "Testing for end with {:?} % {:?} : {:?} != {:?}", $token.text, $token.r#type, $token.end, $end);
 
     }
 }
