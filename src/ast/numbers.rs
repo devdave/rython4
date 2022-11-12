@@ -45,6 +45,7 @@ static IMAGINARY_RE: Lazy<Regex> = Lazy::new(|| {
 });
 
 pub(crate) fn parse_number(raw: String) -> Expression {
+    //TODO cull these regexs!
     let test = raw.as_str();
     if INTEGER_RE.is_match(test) {
         Expression::Integer(Box::new(Integer {
