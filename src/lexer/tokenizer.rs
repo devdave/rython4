@@ -34,7 +34,6 @@ use crate::tokens::patterns::{
                         // SINGLE_QUOTE_CLOSE,
 };
 
-
 use super::operators::{is_onechar_opcode, is_twochar_op, is_threechar_op};
 
 
@@ -49,7 +48,6 @@ enum StringType {
     SingleApos,
     TripleApos,
     SingleQuote,
-    TripleSingleQuote,
     TripleQuote,
 }
 
@@ -70,7 +68,7 @@ impl TConfig {
 }
 
 #[derive(Debug)]
-struct State {
+pub struct State {
     // Parenthesis symbol ([{ and starting position
     paren_depth: Vec<(char, Position)>,
     //For now accept/allow only spaces
@@ -82,7 +80,9 @@ struct State {
     string_buffer: String,
     //Indentation logic
     indent: usize,
+    #[allow(dead_code)]
     tabsize: usize,
+    #[allow(dead_code)]
     altindentstack: Vec<usize>,
     line_continues: bool,
 }
@@ -221,6 +221,9 @@ impl Tokenizer {
                     let sym = code.get_char().expect("sym");
                     found.push(sym);
                 },
+                Some('g'..='z') | Some('G'..='Z') => {
+                    return Err(TokError::BadHexadecimal);
+                }
                 Some('_') => {
                     //Do nothing/ignore
                     code.get_char();
@@ -248,6 +251,9 @@ impl Tokenizer {
                     let sym = code.get_char().expect("symbol");
                     found.push(sym);
                 },
+                Some('2'..='9') => {
+                    return Err(TokError::BadBinary);
+                }
                 Some(' ') | Some('\n') | Some('#') | Some('\\') => {
                     //Finished the hexidecimal
                     return Ok(Some(found));
@@ -346,6 +352,10 @@ impl Tokenizer {
                 if sym == '\\' {
                     escaped = true;
                     //Is this a line continuation?
+                    if let Some('\n') = code.peek_char() {
+                        state.line_continues = true;
+                    }
+
                     body.push(sym);
 
 
