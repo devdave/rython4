@@ -2,10 +2,10 @@
 use std::cmp::Ordering;
 
 use std::io::Read;
-use peg::ParseSlice;
 
 
-use regex::Regex;
+
+
 
 
 use crate::cleaner;
@@ -15,7 +15,7 @@ use super::code_line::CodeLine;
 
 use crate::tokens::patterns::{
                             // NAME_RE,
-                            COMMENT,
+                            // COMMENT,
                             BL_COMMENT,
                             // FLOATING_POINT,
                             // POSSIBLE_NAME,
@@ -25,13 +25,13 @@ use crate::tokens::patterns::{
                           // CAPTURE_QUOTE_STRING,
                           // CAPTURE_APOS_STRING,
                           // TRIPLE_QUOTE_START,
-                          TRIPLE_QUOTE_CLOSE,
+                          // TRIPLE_QUOTE_CLOSE,
                           // TRIPLE_SINGLE_START,
-                          TRIPLE_SINGLE_CLOSE,
+                          // TRIPLE_SINGLE_CLOSE,
                           // CAPTURE_TRIPLE_STRING,
                           // ANY_NAME,
-                        SINGLE_APOS_CLOSE,
-                        SINGLE_QUOTE_CLOSE,
+                        // SINGLE_APOS_CLOSE,
+                        // SINGLE_QUOTE_CLOSE,
 };
 
 
@@ -429,7 +429,7 @@ impl Tokenizer {
 
     fn attempt_identifiers(&mut self, code: &mut CodeLine, state: &mut State) -> Result<Option<(TType, String)>, TokError>
     {
-        let mut is_name = false;
+        // let mut is_name = false;
         let mut found: String = String::new();
 
         let mut saw_b = false;
@@ -477,21 +477,23 @@ impl Tokenizer {
             let mut nonasci = false;
 
             while (Tokenizer::is_potential_identifier_char(test)) && code.remaining() > 0  {
-                //TODO fix me
-                // if (c >= 128) {
-                //     nonasci = true;
-                // }
+
+                if (test.unwrap() as usize >= 128) {
+                    nonasci = true;
+                }
                 found.push(test.unwrap());
 
                 test = code.get_char();
             }
 
-            //c is not a potential identifier char!
+            //c is not a potential identifier char or it maybe \n
             code.rewind();
 
-            // if nonasci == true {
-            //     return Err(TokError::BadCharacter(test));
-            // }
+            //TODO add pep 3131 support
+            if nonasci == true {
+                // return Err(TokError::BadCharacter(test.unwrap()));
+                println!("Detected a non-asci char in identifer {}", found);
+            }
             return Ok(Some( (TType::Name, found)));
 
         }
