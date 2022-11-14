@@ -1402,5 +1402,15 @@ r#""""
         let err = tokenizer.process_single_line(escaped1.to_string()).unwrap_err();
         assert_eq!(err, TokError::UnterminatedString);
 
+        let escaped2 = r#"'Hello world this should crash"#;
+
+        let err = tokenizer.process_single_line(escaped2.to_string()).unwrap_err();
+        assert_eq!(err, TokError::UnterminatedString);
+
+        let escaped3 = r#"'This is
+        broken'"#;
+        let err = tokenizer.process_single_line(escaped3.to_string()).unwrap_err();
+        assert_eq!(err, TokError::UnterminatedString);
+
     }
 }
