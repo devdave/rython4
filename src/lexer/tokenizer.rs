@@ -335,8 +335,6 @@ impl Tokenizer {
 
 
 
-
-
         while (end_quote_size != quote_size) && code.remaining() > 0 {
             let next = code.get_char();
             if next == None || (next.unwrap() == '\n' && quote_size == 1)  {
@@ -346,11 +344,11 @@ impl Tokenizer {
             let sym = next.unwrap();
             let mut escaped = false;
 
-
             if sym == quote {
                 end_quote_size += 1;
                 body.push(sym);
-            } else {
+            }
+            else {
                 end_quote_size = 0;
                 if sym == '\\' {
                     escaped = true;
@@ -803,6 +801,7 @@ impl Tokenizer {
                     if code.remaining() == 1 {
                         let nl = code.get_char().unwrap();
                         buffer.push(nl);
+                        assert_eq!(nl, '\n');
                         return Ok(Some(buffer));
                     } else {
                         //todo add an undefined behavior?
@@ -817,6 +816,7 @@ impl Tokenizer {
 
         }
 
+        //TODO deal with scenarious where String is a ' or " quoted string that isn't closed correctly
         if end_quote_size != quote_size {
             state.string_continues = true;
             return Ok(Some(buffer));
@@ -933,7 +933,7 @@ impl Tokenizer {
                         if state.string_continues == true {
                             state.string_start = Some(Position::t2((lineno, col_pos)));
                         } else {
-                            println!("Failed to close {} string @ {}:{}", sym, lineno, col_pos);
+                            println!("Failed to close {} string @ {}:{}", sym, lineno, code.position());
                             return Err(TokError::UnterminatedString);
                         }
                     }
