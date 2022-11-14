@@ -5,6 +5,7 @@ mod lexer;
 mod tokens;
 mod parser;
 mod ast;
+mod walker;
 
 use std::io::Read;
 use std::path::PathBuf;
