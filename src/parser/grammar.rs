@@ -358,7 +358,6 @@ parser! {
                 make_simple_statement_suite(s)
             }
         //TODO should I add back in invalid_block?
-        //TODO should I add back in invalid_block?
 
         rule decorators() -> Vec<Decorator>
             = (at:lit("@") e:named_expression() nl:tok(NL, "NEWLINE") {
@@ -1498,10 +1497,17 @@ parser! {
         rule _() -> TokenRef
             = [t] { t }
 
-        //Invalid rules
+        //@Invalid rules
 
         rule invalid_import_from_targets()
             = import_from_as_names() c:comma() NEWLINE() {? Err("trailing comma not allowed without surrounding parentheses") }
+
+
+        rule invalid_arguments()
+            = args() lit(",") lit("*") {? Err("Iterable argument uunpacking follows keyword argument unpacking") }
+            / expression() for_if_clauses() lit(",") {? Err("Generator expression must be parenthesized") }
+            / name() lit("=") expression() for_if_clauses() {? Err("invalid syntax. Maybe you meant '==' or ':=' instead of '='?")}
+        
 
 
         //Utility rules
