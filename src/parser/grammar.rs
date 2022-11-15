@@ -1507,7 +1507,7 @@ parser! {
             = args() lit(",") lit("*") {? Err("Iterable argument uunpacking follows keyword argument unpacking") }
             / expression() for_if_clauses() lit(",") {? Err("Generator expression must be parenthesized") }
             / name() lit("=") expression() for_if_clauses() {? Err("invalid syntax. Maybe you meant '==' or ':=' instead of '='?")}
-        
+
 
 
         //Utility rules
@@ -2081,7 +2081,7 @@ fn make_name_or_attr(
 ) -> NameOrAttribute {
 
     if let Some((dot, name)) = tail.pop() {
-        let _dot = make_dot(dot);
+
         return NameOrAttribute::A(Box::new(Attribute {
             attr: name,
             value: Box::new(make_name_or_attr(first_tok, tail).into()),
