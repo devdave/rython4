@@ -491,6 +491,11 @@ impl Tokenizer {
                 Some('"') | Some('\'') => {
                     let quote = test.unwrap();
                     found.push(quote);
+
+                    if saw_f == true {
+                        //This could be a "cheap" place to catch this as a fString
+                    }
+
                     return Tokenizer::attempt_string(quote, found, code, state);
                 }
                 _ => {}

@@ -1413,4 +1413,15 @@ r#""""
         assert_eq!(err, TokError::UnterminatedString);
 
     }
+
+    fn test_fstring_basic() {
+        let tokens = Tokenizer::tokenize_file("test_fixtures/fstring_simple.py", TConfig::default()).expect("tokens");
+
+        assert_eq!(tokens[0].r#type, TType::FStringStart);
+        assert_eq!(tokens[1].r#type, TType::FStringString);
+        assert_eq!(tokens[2].r#type, TType::FStringEnd);
+
+
+
+    }
 }
