@@ -184,6 +184,7 @@ parser! {
             / &t_nonlocal() s:nonlocal_stmt() {SmallStatement::Nonlocal(s)}
 
 
+        //TODO fix so I know `for` and `with` are prefixed with async
 
         rule compound_stmt() -> CompoundStatement
             = &(t_def() / lit("@") / tok(Async, "ASYNC")) f:function_def() {
@@ -206,6 +207,8 @@ parser! {
 
         //         / single_subscript_attribute_target) ':' b=expression c=['=' d=annotated_rhs { d }] {
         // CHECK_VERSION(stmt_ty, 6, "Variable annotations syntax is", _PyAST_AnnAssign(a, b, c, 0, EXTRA)) }
+
+        //TODO cull whitespace/noop tokens
 
         rule assignment() -> SmallStatement
             = a:name() col:lit(":") ann:expression()
@@ -279,6 +282,7 @@ parser! {
 
         rule yield_stmt() -> Expression
             = yield_expr()
+
 
         rule assert_stmt() -> Assert
             = kw:t_assert() test:expression() rest:(c:comma() msg:expression() {(c, msg)})? {
@@ -1436,6 +1440,7 @@ parser! {
 
         rule _f_string() -> FormattedStringContent
             = t:tok(FStringString, "f-string contents") {
+                //TODO simplify this
                 FormattedStringContent::Text(FormattedStringText { value: t.text.clone() })
             }
 
