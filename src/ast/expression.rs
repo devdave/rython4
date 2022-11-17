@@ -390,12 +390,12 @@ pub struct SimpleString {
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ConcatenatedString {
-    pub left: Box<String>,
-    pub right: Box<String>,
+    pub left: Box<AST_String>,
+    pub right: Box<AST_String>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum String {
+pub enum AST_String {
     Simple(SimpleString),
     Concatenated(ConcatenatedString),
     Formatted(Box<FormattedString>),
@@ -489,12 +489,12 @@ impl std::convert::From<NameOrAttribute> for Expression {
     }
 }
 
-impl std::convert::From<String> for Expression {
-    fn from(s: String) -> Self {
+impl std::convert::From<AST_String> for Expression {
+    fn from(s: AST_String) -> Self {
         match s {
-            String::Simple(s) => Self::SimpleString(Box::new(s)),
-            String::Concatenated(s) => Self::ConcatenatedString(Box::new(s)),
-            String::Formatted(s) => Self::FormattedString(Box::new(*s)),
+            AST_String::Simple(s) => Self::SimpleString(Box::new(s)),
+            AST_String::Concatenated(s) => Self::ConcatenatedString(Box::new(s)),
+            AST_String::Formatted(s) => Self::FormattedString(Box::new(*s)),
         }
     }
 }
