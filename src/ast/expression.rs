@@ -49,8 +49,6 @@ pub struct BinaryOperation {
     pub left: Box<Expression>,
     pub operator: BinaryOp,
     pub right: Box<Expression>,
-    pub lpar: Vec<LeftParen>,
-    pub rpar: Vec<RightParen>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -59,8 +57,6 @@ pub struct BooleanOperation {
     pub left: Box<Expression>,
     pub operator: BooleanOp,
     pub right: Box<Expression>,
-    pub lpar: Vec<LeftParen>,
-    pub rpar: Vec<RightParen>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
