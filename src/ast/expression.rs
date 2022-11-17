@@ -151,7 +151,7 @@ pub struct Arg {
     pub value: Expression,
     pub keyword: Option<Name>,
     pub equal: Option<AssignEqual>,
-    pub comma: Option<Comma>,
+
     pub star: std::string::String,
 }
 
@@ -502,7 +502,6 @@ impl std::convert::From<String> for Expression {
 impl WithComma for Arg {
     fn with_comma(self, c: Comma) -> Self {
         Self {
-            comma: Some(c),
             ..self
         }
     }
