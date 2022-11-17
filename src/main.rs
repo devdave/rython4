@@ -13,11 +13,7 @@ use clap::Parser;
 
 use crate::lexer::{ Tokenizer, TConfig, cleaner};
 use crate::parser::grammar::{python, TokVec};
-
-
-
-
-
+use crate::walker::parse_module;
 
 
 #[derive(Parser, Debug)]
@@ -97,8 +93,9 @@ fn py_run_file(filename: PathBuf, show_tokens: bool, compile_only: bool)  {
 
         let tvector = TokVec::from(tokens);
         let result = python::file(&tvector, &display.to_string().as_str());
-        if let Ok(_ptree) = result {
+        if let Ok(ptree) = result {
             println!("Parsing succeeded! \n");
+            parse_module(ptree);
         }
         else if let Err(parse_err) = result {
             println!("Failed to parse: {:#?}", parse_err);
