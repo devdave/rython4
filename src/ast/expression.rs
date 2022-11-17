@@ -381,11 +381,6 @@ pub struct Await {
     pub expression: Box<Expression>,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Asynchronous {
-
-}
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct SimpleString {
     /// The texual representation of the string, including quotes, prefix
