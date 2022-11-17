@@ -1021,8 +1021,8 @@ parser! {
             / a:primary() b:genexp() {
                 Expression::Call(Box::new(make_genexp_call(a, b)))
             }
-            / f:primary() lpar:lit("(") arg:arguments()? rpar:lit(")") {
-                Expression::Call(Box::new(make_call(f, lpar, arg.unwrap_or_default(), rpar)))
+            / f:primary() lit("(") arg:arguments()? lit(")") {
+                Expression::Call(Box::new(make_call(f, arg.unwrap_or_default())))
             }
             / v:primary() lbrak:lbrak() s:slices() rbrak:rbrak() {
                 Expression::Subscript(Box::new(make_subscript(v, lbrak, s, rbrak)))
@@ -1391,8 +1391,9 @@ parser! {
             / f:t_primary() gen:genexp() &t_lookahead() {
                 Expression::Call(Box::new(make_genexp_call(f, gen)))
             }
-            / f:t_primary() lpar:lit("(") arg:arguments()? rpar:lit(")") &t_lookahead() {
-                Expression::Call(Box::new(make_call(f, lpar, arg.unwrap_or_default(), rpar)))
+            / f:t_primary() lit("(") arg:arguments()? lit(")") &t_lookahead() {
+            / f:t_primary() lit("(") arg:arguments()? lit(")") &t_lookahead() {
+                Expression::Call(Box::new(make_call(f, arg.unwrap_or_default())))
             }
             / a:atom() &t_lookahead() {a}
 
@@ -1839,8 +1840,6 @@ fn make_boolean_op(
             left: Box::new(expr),
             operator: make_boolean_operator(tok)?,
             right: Box::new(right),
-            lpar: vec![],
-            rpar: vec![],
         }))
     }
     Ok(expr)
@@ -1869,8 +1868,6 @@ fn make_binary_op(
         left: Box::new(left),
         operator,
         right: Box::new(right),
-        lpar: vec![],
-        rpar: vec![],
     })))
 }
 
@@ -2285,9 +2282,7 @@ fn make_star_arg(star: TokenRef, expr: Expression) -> Arg {
 
 fn make_call(
     func: Expression,
-    _lpar_tok: TokenRef,
     args: Vec<Arg>,
-    _rpar_tok: TokenRef,
 ) -> Call {
 
     let func = Box::new(func);
