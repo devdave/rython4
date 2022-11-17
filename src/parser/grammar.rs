@@ -1152,9 +1152,9 @@ parser! {
         // Literals
 
         // todo deal with + infinite loop here
-        rule strings() -> String
+        rule strings() -> AST_String
             = s:(str:tok(STRING, "STRING") t:&_ {( make_string(str), t) }
-                / str:fstring() t:&_ {(String::Formatted(Box::new(str)), t)})+ {
+                / str:fstring() t:&_ {(AST_String::Formatted(Box::new(str)), t)})+ {
                 make_strings(s)
             }
 
@@ -2019,6 +2019,7 @@ fn make_parameters(
     params: Vec<Param>,
     star_etc: Option<StarEtc>,
 ) -> Parameters {
+    // WTF is going on in here?
     let (posonly_params, posonly_ind) = match posonly {
         Some((a, b)) => (a, Some(b)),
         None => (vec![], None),
@@ -2824,21 +2825,20 @@ fn make_class_def(
     })
 }
 
-fn make_string(tok: TokenRef) -> String {
-    String::Simple(SimpleString {
+fn make_string(tok: TokenRef) -> AST_String {
+    AST_String::Simple(SimpleString {
         value: Box::new(tok.text.clone()),
 
     })
 }
 
-fn make_strings(s: Vec<(String, TokenRef)>) -> String {
+fn make_strings(s: Vec<(AST_String, TokenRef)>) -> AST_String {
     let mut strings = s.into_iter().rev();
     let (first, _) = strings.next().expect("no strings to make a string of");
     strings.fold(first, |acc, (str, _tok)| {
-        let ret: String = String::Concatenated(ConcatenatedString {
+        let ret: AST_String = AST_String::Concatenated(ConcatenatedString {
             left: Box::new(str),
             right: Box::new(acc),
-
         });
         ret
     })
