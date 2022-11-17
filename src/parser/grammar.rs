@@ -1392,7 +1392,6 @@ parser! {
                 Expression::Call(Box::new(make_genexp_call(f, gen)))
             }
             / f:t_primary() lit("(") arg:arguments()? lit(")") &t_lookahead() {
-            / f:t_primary() lit("(") arg:arguments()? lit(")") &t_lookahead() {
                 Expression::Call(Box::new(make_call(f, arg.unwrap_or_default())))
             }
             / a:atom() &t_lookahead() {a}
@@ -1754,14 +1753,15 @@ fn make_function_def(
     _colon_tok: TokenRef,
     body: Suite,
 ) -> FunctionDef {
-    let asynchronous = async_tok.as_ref().map(|_| Asynchronous {});
+
+    let is_async = async_tok != None;
     FunctionDef {
         name,
         params: params.unwrap_or_default(),
         body,
         decorators: Default::default(),
         returns,
-        asynchronous,
+        asynchronous: is_async,
     }
 }
 
@@ -2264,7 +2264,7 @@ fn make_kwarg(name: Name, eq: TokenRef, value: Expression) -> Arg {
         value,
         keyword,
         equal,
-        comma: None,
+
         star: "".to_string(),
     }
 }
@@ -2275,7 +2275,7 @@ fn make_star_arg(star: TokenRef, expr: Expression) -> Arg {
         value: expr,
         keyword: None,
         equal: None,
-        comma: None,
+
         star: star.text.clone(),
     }
 }
@@ -2311,7 +2311,6 @@ fn make_genexp_call(func: Expression, genexp: GeneratorExp) -> Call {
             value: Expression::GeneratorExp(Box::new(genexp)),
             keyword: None,
             equal: None,
-            comma: None,
             star: "".to_string(),
         }],
     }
@@ -2322,7 +2321,6 @@ fn make_arg(expr: Expression) -> Arg {
         value: expr,
         keyword: Default::default(),
         equal: Default::default(),
-        comma: Default::default(),
         star: Default::default(),
     }
 }
@@ -2343,16 +2341,16 @@ fn make_for_if(
     ifs: Vec<CompIf>,
 ) -> CompFor {
     let inner_for_in = None;
-    let asynchronous = async_tok.as_ref().map(|_| Asynchronous {
-    });
+
+    let is_async = async_tok != None;
+
 
     CompFor {
         target,
         iter,
         ifs,
         inner_for_in,
-        asynchronous,
-
+        asynchronous: is_async,
     }
 }
 
@@ -2750,15 +2748,15 @@ fn make_for(
     body: Suite,
     orelse: Option<Else>,
 ) -> For {
-    let asynchronous = async_tok.as_ref().map(|_| Asynchronous {
-    });
+
+    let is_async = async_tok != None;
 
     For {
         target,
         iter,
         body,
         orelse,
-        asynchronous,
+        asynchronous: is_async,
     }
 }
 
@@ -3034,11 +3032,13 @@ fn make_with(
     _colon_tok: TokenRef,
     body: Suite,
 ) -> With {
-    let asynchronous = async_tok.as_ref().map(|_| Asynchronous {});
+
+    let is_async = async_tok != None;
+
     With {
         items,
         body,
-        asynchronous,
+        asynchronous: is_async,
 
     }
 }
