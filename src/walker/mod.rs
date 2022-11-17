@@ -2,7 +2,8 @@
 // Not intended to execute code but instead to look for symbols
 //  this is an experiment/toy to figure out how I am going to make a symbol table.
 
-use crate::ast::{Assert, AssignTargetExpression, AugAssign, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompOp, CompoundStatement, Element, Expression, Import, ImportFrom, NameOrAttribute, Return, SmallStatement, Statement, Subscript, UnaryOp};
+use crate::ast::{Assert, AssignTarget, AssignTargetExpression, AugAssign, AugOp, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompOp, CompoundStatement, Element, Else, Expression, For, If, Import, ImportFrom, NameOrAttribute, Parameters, Return, SimpleStatementSuite, SmallStatement, Statement, Subscript, Suite, UnaryOp};
+use crate::ast::Expression::BooleanOperation;
 use super::ast::Module;
 
 
@@ -34,32 +35,154 @@ fn parse_statement_enum(stm: Statement, depth: usize) {
         }
         Statement::Compound(stm_comp) => {
             println!("{}Compound statemet ->", prefix);
-            prefix = "\t".repeat(depth+1);
+            parse_compound_statement(stm_comp, depth+1);
 
-            match stm_comp {
+
+
+        }
+    }
+}
+
+fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
+
+    let prefix = "\t".repeat(depth);
+
+    match stm_compound {
                 CompoundStatement::FunctionDef(fdef) => {
-                    println!("{}Func. def -> ", depth);
-                    parse_funcdef(fdef, depth+2);
+                    println!("{}Func. def {} -> ", prefix, fdef.name.value);
+                    if fdef.returns != None {
+                        println!("{}\t returns", prefix);
+                        parse_expression(fdef.returns.unwrap().annotation, depth + 2 );
+                    }
+
+                    println!("{}\t is async? {} ", prefix, fdef.asynchronous != false);
+                    if fdef.decorators.len() > 0 {
+                        println!("{}\t has decorators ", prefix);
+                        for decorator in fdef.decorators {
+                            parse_expression(decorator.decorator, depth+2);
+                        }
+                    }
+
+                    println!("{}\t Parameters ->", prefix);
+
+                    parse_parameters(fdef.params, depth + 2);
+
+                    println!("{}\t Function body ->", prefix);
+                    match fdef.body {
+                        Suite::IndentedBlock(block) => {
+                            for piece in block.body {
+                                match piece{
+                                    Statement::Simple(simple) => {
+                                        for small in simple.body {
+                                            parse_smallstatement_enum(small, depth + 2);
+                                        }
+                                    }
+                                    Statement::Compound(compound) => {
+                                        parse_compound_statement(compound, depth+1);
+                                    }
+                                }
+                            }
+                        }
+                        Suite::SimpleStatementSuite(simple_suite) => {
+                            for suite in simple_suite.body {
+                                parse_smallstatement_enum(suite, depth + 2);
+                            }
+                        }
+                    }
+
                 }
                 CompoundStatement::If(if_expr) => {
-                    println!("{} If ->", depth);
-                    parse_if(if_expr, depth+2);
+
+                    match if_expr {
+                        If { test, body, orelse, is_elif } => {
+                            if is_elif == true {
+                                println!("{} else if -> ", prefix);
+                            }
+                            else {
+                                    println!("{} if -> ", prefix);
+                            }
+
+                            println!("{}\t Test is -> ", prefix);
+                            parse_expression(test, depth   + 2);
+
+                            println!("{}\tBody ->", prefix);
+                            parse_suite(body, depth + 2);
+
+                        }
+                    }
                 }
                 CompoundStatement::For(for_expr) => {
                     println!("{} For ->", depth);
-                    parse_for(for_expr, depth+2);
+
+                    match for_expr {
+                        For { target, iter, body, orelse, asynchronous } => {
+                            if asynchronous == true {
+                                println!("{}\t Is async ->", prefix);
+                            }
+
+                            parse_assign_target_expression(target, depth+1);
+
+                            println!("{}\t in -> ", prefix);
+                            parse_expression(iter, depth + 3);
+
+
+                            parse_suite(body, depth + 2);
+
+                            if orelse != None {
+                                match orelse {
+                                    None => {}
+                                    Some(else_body) => {
+                                        println!("{}\t\t or else ", prefix);
+                                        parse_suite(else_body.body, depth+3);
+                                    }
+                                }
+                            }
+
+
+
+                        }
+                    }
+
                 }
                 CompoundStatement::While(while_expr) => {
                     println!("{} While ->", prefix);
-                    parse_while(while_expr, depth+2);
+                    parse_expression(while_expr.test, depth + 1 );
+                    parse_suite(while_expr.body, depth + 2 );
+                    if while_expr.orelse != None {
+                        println!("{}\t or else -> ", prefix);
+                        parse_suite(while_expr.orelse.unwrap().body, depth + 2 );
+                    }
+
                 }
                 CompoundStatement::ClassDef(clsdef) => {
-                    println!("{}Class ->", prefix);
-                    parse_classdef(clsdef, depth+2);
+                    println!("{}Class {} ->", prefix, clsdef.name.value);
+                    if clsdef.decorators.len() > 0 {
+                        println!("{}\t Decorators -> ", prefix);
+                        for decorator in clsdef.decorators {
+                            parse_expression(decorator.decorator, depth + 2);
+                        }
+                    }
+                    if clsdef.bases.len() > 0 {
+                        println!("{}\t Bases -> ", prefix);
+                        parse_args(clsdef.bases, depth + 2);
+
+                    }
+                    if clsdef.keywords.len() > 0 {
+                        println!("{}\t Keywords ->", prefix);
+                        parse_args(clsdef.keywords, depth+ 2);
+                    }
+                    println!("{}\t body -> ", prefix);
+                    parse_suite(clsdef.body, depth + 2);
+
                 }
                 CompoundStatement::Try(try_expr) => {
                     println!("{}Try ->", prefix);
-                    parse_try(try_expr, depth+2);
+                    println!("{}\t body ->", prefix);
+                    parse_suite(try_expr.body, depth + 2);
+                    println!("{}\t handler/excepts -> ", prefix);
+                    for handler in try_expr.handlers {
+                        println!("{}\t\t TODO try handler", prefix);
+                    }
                 }
                 CompoundStatement::TryStar(try_star) => {
                     println!("{}Try catchall ->", prefix);
@@ -74,7 +197,21 @@ fn parse_statement_enum(stm: Statement, depth: usize) {
                     parse_match(match_expr, depth+2);
                 }
             }
+}
 
+fn parse_suite(body: Suite, depth: usize) {
+    let prefix = "\t".repeat(depth);
+    match body {
+        Suite::IndentedBlock(indent) => {
+            for elm in indent.body {
+                parse_statement_enum(elm, depth + 1);
+            }
+        }
+        Suite::SimpleStatementSuite(simple) => {
+            println!("{}\t\t Simple", prefix);
+            for small in simple.body {
+                parse_smallstatement_enum(small, depth + 1);
+            }
         }
     }
 }
@@ -91,7 +228,12 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
         SmallStatement::Break => println!("{}{}", prefix, "Break"),
         SmallStatement::Continue => println!("{}{}", prefix, "Continue"),
         SmallStatement::Return(ret_expr) => {
-            parse_return(expr, depth + 1);
+            if ret_expr.value != None {
+                println!("{}Returns -> ", prefix);
+                parse_expression(ret_expr.value.unwrap(), depth + 1);
+            } else {
+                println!("{} Returns None", prefix);
+            }
         }
         SmallStatement::Expr(expr) => {
             parse_expression(expr.value, depth+1);
@@ -111,21 +253,65 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
         }
         SmallStatement::Assign(assign) => {
             println!("{} Assign to -> ", prefix);
-            parse_assign(assign, depth+1);
+            println!("{}\t targets -> ", prefix);
+            for target in assign.targets{
+                match target {
+                    AssignTarget { target } => {
+                        match target {
+                            AssignTargetExpression::Name(name) => {
+                                println!("{}\t\t name: {}", prefix, name.value);
+                            }
+                            AssignTargetExpression::Attribute(attr) => {
+                                println!("{}\t\t Attr {}", prefix, attr.attr.value);
+                                parse_expression(*attr.value, depth+3);
+                            }
+                            AssignTargetExpression::StarredElement(starred) => {
+                                println!("{}\t\t Starred -> ", prefix);
+                                parse_expression(*starred.value, depth + 3);
+                            }
+                            AssignTargetExpression::Tuple(tpl) => {
+                                println!("{}\t\t Tuple -> ", prefix);
+                                for elm in tpl.elements {
+                                    parse_element(elm, depth + 3);
+                                }
+                            }
+                            AssignTargetExpression::List(list) => {
+                                println!("{}\t\t List[]", prefix);
+                                for elm in list.elements {
+                                    parse_element(elm, depth + 3);
+                                }
+                            }
+                            AssignTargetExpression::Subscript(subscript) => {
+                                parse_subscript(*subscript, depth + 3 );
+                            }
+                        }
+                    }
+                }
+            }
+
         }
         SmallStatement::AnnAssign(ann_assign) => {
             println!("{}Ann. Assign -> ", prefix);
-            parse_ann_assign(ann_assign, depth+1);
+            println!("{}\t Annotated assignment -> ", prefix);
+            parse_assign_target_expression(ann_assign.target, depth+1);
         }
         SmallStatement::Raise(raise) => {
             println!("{} Raise -> ", prefix);
-            parse_raise(raise, depth+1);
+            if raise.cause != None {
+                println!("{}\t Caused by -> ", prefix);
+                parse_expression(raise.cause.unwrap().item, depth+2);
+            }
+            if raise.exc != None {
+                println!("{}\t Exception -> ", prefix);
+                parse_expression(raise.exc.unwrap(), depth + 2);
+            }
         }
         SmallStatement::Global(global) => {
             println!("{} Global ->", prefix);
             for name in global.names {
                 println!("{}\t {}", prefix, name.name.value);
             }
+
         }
         SmallStatement::Nonlocal(nonlocal) => {
             println!("{} Nonlocal -> ", prefix);
@@ -145,9 +331,72 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
     }
 }
 
+fn parse_element(element: Element, depth: usize) {
+    let prefix = "\t".repeat(depth  );
+    match elm {
+        Element::Simple { value } => {
+            parse_expression(value, depth + 3);
+        }
+        Element::Starred(starred) => {
+            println!("{}\t\t\t Starred -> ", prefix);
+            parse_expression(*starred.value, depth + 4);
+        }
+    }
+}
+
 fn parse_augassign(augassign: AugAssign, depth: usize) {
     let prefix = "\t".repeat(depth);
-    match augassign.target {
+    parse_assign_target_expression(augassign.target, depth+1);
+
+    match augassign.operator {
+        AugOp::AddAssign => {
+            println!("{}\t\t +=", prefix);
+        }
+        AugOp::SubtractAssign => {
+            println!("{}\t\t -=", prefix);
+        }
+        AugOp::MultiplyAssign => {
+            println!("{}\t\t *=", prefix);
+        }
+        AugOp::MatrixMultiplyAssign => {
+            println!("{}\t\t @=", prefix);
+        }
+        AugOp::DivideAssign => {
+            println!("{}\t\t /=", prefix);
+        }
+        AugOp::ModuloAssign => {
+            println!("{}\t\t %=", prefix);
+        }
+        AugOp::BitAndAssign => {
+            println!("{}\t\t &=", prefix);
+        }
+        AugOp::BitOrAssign => {
+            println!("{}\t\t |=", prefix);
+        }
+        AugOp::BitXorAssign => {
+            println!("{}\t\t ^=", prefix);
+        }
+        AugOp::LeftShiftAssign => {
+            println!("{}\t\t <<=", prefix);
+        }
+        AugOp::RightShiftAssign => {
+            println!("{}\t\t >>=", prefix);
+        }
+        AugOp::PowerAssign => {
+            println!("{}\t\t **=", prefix);
+
+        }
+        AugOp::FloorDivideAssign => {
+            println!("{}\t\t //=", prefix);
+        }
+    }
+
+}
+
+fn parse_assign_target_expression(target: AssignTargetExpression, depth: usize) {
+    let prefix = "\t".repeat(depth);
+
+    match target {
         AssignTargetExpression::Name(name) => {
             println!("{} Name -> {}", prefix, name.value);
         }
@@ -218,7 +467,6 @@ fn parse_augassign(augassign: AugAssign, depth: usize) {
             }
         }
     }
-
 }
 
 fn parse_importfrom(import: ImportFrom, depth: usize) {
@@ -450,10 +698,7 @@ fn parse_expression(expr: Expression, depth: usize) {
             println!("{} Call to ->", prefix);
             parse_expression(*call.func, depth + 1);
             println!("{}\t Arguments", prefix);
-            for arg in call.args {
-
-                println!("{}\t positioned ")
-            }
+            parse_args(call.args);
 
         }
         Expression::GeneratorExp(genexp) => {
