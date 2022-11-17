@@ -186,7 +186,7 @@ pub struct CompFor {
     pub iter: Expression,
     pub ifs: Vec<CompIf>,
     pub inner_for_in: Option<Box<CompFor>>,
-    pub asynchronous: Option<Asynchronous>,
+    pub asynchronous: bool,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

@@ -7,7 +7,6 @@ use crate::tokens::Token;
 use super::expression::{
     Arg,
     AssignTargetExpression,
-    Asynchronous,
     Expression,
     From,
     Parameters,
@@ -86,7 +85,7 @@ pub struct FunctionDef {
     pub body: Suite,
     pub decorators: Vec<Decorator>,
     pub returns: Option<Annotation>,
-    pub asynchronous: Option<Asynchronous,>,
+    pub asynchronous: bool,
 
 }
 
@@ -102,7 +101,7 @@ pub struct For {
     pub iter: Expression,
     pub body: Suite,
     pub orelse: Option<Else>,
-    pub asynchronous: Option<Asynchronous,>,
+    pub asynchronous: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -466,7 +465,7 @@ pub struct While {
 pub struct With {
     pub items: Vec<WithItem>,
     pub body: Suite,
-    pub asynchronous: Option<Asynchronous,>,
+    pub asynchronous: bool,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone)]
