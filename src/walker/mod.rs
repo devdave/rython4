@@ -2,7 +2,7 @@
 // Not intended to execute code but instead to look for symbols
 //  this is an experiment/toy to figure out how I am going to make a symbol table.
 
-use crate::ast::{Assert, CompoundStatement, Expression, Import, Return, SmallStatement, Statement};
+use crate::ast::{Assert, AssignTargetExpression, AugAssign, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompOp, CompoundStatement, Element, Expression, Import, ImportFrom, NameOrAttribute, Return, SmallStatement, Statement, Subscript, UnaryOp};
 use super::ast::Module;
 
 
@@ -88,8 +88,8 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
         SmallStatement::Pass => {
             println!("{}{}", prefix, "Pass");
         }
-        SmallStatement::Break => println!("{}{}", prefix, "Break");
-        SmallStatement::Continue => println!("{}{}", prefix, "Continue");
+        SmallStatement::Break => println!("{}{}", prefix, "Break"),
+        SmallStatement::Continue => println!("{}{}", prefix, "Continue"),
         SmallStatement::Return(ret_expr) => {
             parse_return(expr, depth + 1);
         }
@@ -102,7 +102,7 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
             parse_assert(asr, depth+1);
         }
         SmallStatement::Import(names) => {
-            println!("{}Import->". prefix);
+            println!("{}Import->", prefix);
             parse_import(names, depth+1);
         }
         SmallStatement::ImportFrom(import_from) => {
@@ -123,11 +123,16 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
         }
         SmallStatement::Global(global) => {
             println!("{} Global ->", prefix);
-            parse_global(global, depth+1);
+            for name in global.names {
+                println!("{}\t {}", prefix, name.name.value);
+            }
         }
         SmallStatement::Nonlocal(nonlocal) => {
             println!("{} Nonlocal -> ", prefix);
-            parse_nonlocal(nonlocal, depth+1);
+            for name in nonlocal.names {
+                println!("{}\t {}", prefix, name.name.value);
+            }
+
         }
         SmallStatement::AugAssign(augassign) => {
             println!("{}Aug assign->", prefix);
@@ -138,6 +143,109 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
             parse_del(del_stm, depth+1);
         }
     }
+}
+
+fn parse_augassign(augassign: AugAssign, depth: usize) {
+    let prefix = "\t".repeat(depth);
+    match augassign.target {
+        AssignTargetExpression::Name(name) => {
+            println!("{} Name -> {}", prefix, name.value);
+        }
+        AssignTargetExpression::Attribute(attr) => {
+            println!("{} Attribute -> {}", prefix, attr.attr.value);
+            parse_expression(*attr.value, depth+1);
+        }
+        AssignTargetExpression::StarredElement(starred) => {
+            println!("{} Starred -> ", prefix);
+            parse_expression(*starred.value, depth + 1);
+        }
+        AssignTargetExpression::Tuple(tple) => {
+            println!("{} Tuple(,) -> ", prefix);
+            for elm in tple.elements {
+                match elm {
+                    Element::Simple { value } => {
+                        println!("{}\t Simple -> ", prefix);
+                        parse_expression(value, depth+2);
+                    }
+                    Element::Starred(starred) => {
+                        println!("{}\t Starred ->", prefix);
+                        parse_expression(*starred.value, depth+2);
+
+                    }
+                }
+            }
+        }
+        AssignTargetExpression::List(list) => {
+            println!("{} List[] ->", prefix);
+            for elm in list.elements {
+                match elm {
+                    Element::Simple { value } => {
+                        println!("{}\t Simple -> ", prefix);
+                        parse_expression(value, depth+2);
+                    }
+                    Element::Starred(starred) => {
+                        println!("{}\t Starred -> ", prefix);
+                        parse_expression(*starred.value, depth+2);
+                    }
+                }
+            }
+        }
+        AssignTargetExpression::Subscript(subscript) => {
+            println!("{}Subscript ->", prefix);
+            parse_expression(*subscript.value, depth+1);
+
+            println!("{}\t Slice ->", prefix);
+            for elm in subscript.slice {
+                match elm.slice {
+                    BaseSlice::Index(idx) => {
+                        parse_expression(*idx.value, depth+2);
+                    }
+                    BaseSlice::Slice(slice) => {
+                        if let Some(lower) = slice.lower {
+                            println!("{}\t\t Lower ->", prefix);
+                            parse_expression(lower, depth+3);
+                        }
+                        if let Some(step) = slice.step {
+                            println!("{}\t\t Step ->", prefix);
+                            parse_expression(step, depth+3);
+                        }
+                        if let Some(upper) = slice.upper {
+                            println!("{}\t\t Upper ->", prefix);
+                            parse_expression(upper, depth + 3);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+fn parse_importfrom(import: ImportFrom, depth: usize) {
+
+    let prefix = "\t".repeat();
+
+    if import.relative.len() > 0 {
+        println!("{}Relative ->", prefix);
+        for dots in import.relative {
+            println!("{}\tRelative -> .", prefix);
+        }
+    }
+
+    if let Some(name_or_attr) = import.module {
+        println!("{} from ->", prefix);
+        match name_or_attr {
+            NameOrAttribute::N(name) => {
+                println!("{}\t Name -> {}", prefix, name.value);
+            }
+            NameOrAttribute::A(attr) => {
+                println!("{}\t Attr {}. -> ", prefix, attr.attr.value);
+                parse_expression(*attr.value, depth+2);
+            }
+        }
+    }
+
+
 }
 
 fn parse_return(return_st: Return, depth: usize) {
@@ -179,62 +287,208 @@ fn parse_expression(expr: Expression, depth: usize) {
         Expression::Comparison(comp) => {
             println!("{} Comparison ->", prefix);
             println!("{}\t Left -> ", prefix);
-            parse_expression(*comp.left,depth+1);
+            parse_expression(*comp.left,depth+2);
+
             println!("{}\t Right -> ", prefix);
             for right in comp.comparisons {
-                parse_comparison(right, depth+1);
+                match right.operator {
+                    CompOp::LessThan => {
+                        println!("{}\t\t less than <", prefix);
+                    }
+                    CompOp::GreaterThan => {
+                        println!("{}\t\t greater than >", prefix);
+                    }
+                    CompOp::LessThanEqual => {
+                        println!("{}\t\t less than equal <=", prefix);
+                    }
+                    CompOp::GreaterThanEqual => {
+                        println!("{}\t\t greater than >=", prefix);
+                    }
+                    CompOp::Equal => {
+                        println!("{}\t\t equal = ", prefix);
+                    }
+                    CompOp::NotEqual => {
+                        println!("{}\t\t not !=", prefix);
+                    }
+                    CompOp::In => {
+                        println!("{}\t\t in", prefix);
+                    }
+                    CompOp::NotIn => {
+                        println!("{}\t\t not in", prefix);
+                    }
+                    CompOp::Is => {
+                        println!("{}\t\t is", prefix);
+                    }
+                    CompOp::IsNot => {
+                        println!("{}\t\t is not", prefix);
+                    }
+                }
+                parse_expression(right.comparator, depth+3);
             }
-
 
 
         }
         Expression::UnaryOperation(unary) => {
             println!("{} Unary op. ->", prefix);
-            parse_unary_op(unary, depth+1);
+            match unary.operator {
+                UnaryOp::Plus => {
+                    println!("{}\t + plus ->", prefix);
+                }
+                UnaryOp::Minus => {
+                    println!("{}\t - minus ->", prefix);
+                }
+                UnaryOp::BitInvert => {
+                    //TODO I don't remember this one
+                    println!("{}\t ^ bit invert? ->", prefix);
+                }
+                UnaryOp::Not => {
+                    println!("{}\t ! not ->", prefix);
+                }
+            }
+            parse_expression(*unary.expression, depth + 1);
+
         }
         Expression::BinaryOperation(binop) => {
             println!("{} Binary op. ->", prefix);
-            parse_bin_op(binop, depth+1);
+            println!("{}\t Left -> ", prefix);
+            parse_expression(*binop.left, depth + 1);
+
+            println!("{}\t Operator -> ", prefix);
+            match binop.operator {
+                BinaryOp::Add => {
+                    println!("{}\t\t Add + -> ", prefix);
+                }
+                BinaryOp::Subtract => {
+                    println!("{}\t\t Subtract - -> ", prefix);
+                }
+                BinaryOp::Multiply => {
+                    println!("{}\t\t Multiply * -> ", prefix);
+                }
+                BinaryOp::Divide => {
+                    println!("{}\t\t Divide (soft) / -> ", prefix);
+                }
+                BinaryOp::FloorDivide => {
+                    println!("{}\t\t Floor divide (hard) -> ", prefix);
+                }
+                BinaryOp::Modulo => {
+                    println!("{}\t\t Modulo % -> ", prefix);
+                }
+                BinaryOp::Power => {
+                    println!("{}\t\t Power ** -> ", prefix);
+                }
+                BinaryOp::LeftShift => {
+                    println!("{}\t\t Left shift << -> ", prefix);
+                }
+                BinaryOp::RightShift => {
+                    println!("{}\t\t Right shift >> -> ", prefix);
+                }
+                BinaryOp::BitOr => {
+                    println!("{}\t\t Bit or | -> ", prefix);
+                }
+                BinaryOp::BitAnd => {
+                    println!("{}\t\t Bit And & -> ", prefix);
+                }
+                BinaryOp::BitXor => {
+                    println!("{}\t\t Modulo ^ -> ", prefix);
+                }
+                BinaryOp::MatrixMultiply => {
+                    //Shit when did this get added to Python?
+                    println!("{}\t\t Matrix Multiply @ -> ", prefix);
+                }
+            }
+
+            println!("{}\t Right -> ", prefix);
+
+            parse_expression(*binop.right, depth+2);
+
+
         }
         Expression::BooleanOperation(boolop) => {
             println!("{} Bool op. ->", prefix);
-            parse_bool_op(boolop, depth+1)
+            println!("{}\t Left -> ", prefix);
+            parse_expression(*boolop.left, depth +2);
+
+            println!("{}\t Operator -> ", prefix);
+
+            match boolop.operator {
+                BooleanOp::And => {
+                    println!("{}\t\t And ",prefix);
+                }
+                BooleanOp::Or => {
+                    println!("{}\t\t Or ",prefix);
+                }
+            }
+
+            println!("{}\t Right -> ", prefix);
+            parse_expression(*boolop.right, depth+2);
+
+
+
+
+
         }
         Expression::Attribute(attr) => {
-            println!("{} Attribute access ->", prefix);
-            parse_attr(attr, depth+1);
+            println!("{} Attribute access {} ->", prefix, attr.attr.value);
+            println!("{}\t -> ", prefix);
+            parse_expression(* attr.value, depth+1);
         }
         Expression::Tuple(tpl) => {
             println!("{} Tuple ", prefix);
-            parse_tuple(tpl, depth+1)
+            println!("{}\t Elements -> ", prefix);
+            for elm in tpl.elements {
+                match elm {
+                    Element::Simple { value } => {
+                        parse_expression(value, depth+1);
+                    }
+                    Element::Starred(starred) => {
+                        parse_expression(*starred.value, depth+1);
+                    }
+                }
+            }
         }
         Expression::Call(call) => {
             println!("{} Call to ->", prefix);
-            parse_call(call, depth+1);
+            parse_expression(*call.func, depth + 1);
+            println!("{}\t Arguments", prefix);
+            for arg in call.args {
+
+                println!("{}\t positioned ")
+            }
+
         }
         Expression::GeneratorExp(genexp) => {
-            println!("{}", prefix);
+            println!("{}Generator Expression ->", prefix);
+            parse_genexp(genexp, depth+1);
         }
         Expression::ListComp(listcomp) => {
-            println!("{}", prefix);
+            println!("{}List comprehension ->", prefix);
+            parse_listcomp(listcomp, depth+1);
+
         }
         Expression::SetComp(setcomp) => {
-            println!("{}", prefix);
+            println!("{}Set comprehension ->", prefix);
+            parse_set_comp(setcomp, depth+1);
         }
         Expression::DictComp(dictcomp) => {
-            println!("{}", prefix);
+            println!("{}Dict. comprehension ->", prefix);
+            parse_dict_comp(dictcomp, depth+1);
         }
         Expression::List(list) => {
-            println!("{}", prefix);
+            println!("{}List ->", prefix);
+            parse_list(list, depth+1);
         }
         Expression::Set(set) => {
             println!("{}", prefix);
+            parse_set(set, depth+1);
         }
         Expression::Dict(dict) => {
             println!("{}", prefix);
+            parse_dict(dict, depth+1);
         }
         Expression::Subscript(subscript) => {
             println!("{}", prefix);
+            //[]
+            parse_subscript(*subscript, depth+1);
         }
         Expression::StarredElement(starred) => {
             println!("{}", prefix);
@@ -265,6 +519,10 @@ fn parse_expression(expr: Expression, depth: usize) {
         }
     }
 
+}
+
+fn parse_subscript(subscript: Subscript, depth: usize) {
+    todo!()
 }
 
 fn parse_assert(stm: Assert, depth: usize) {
