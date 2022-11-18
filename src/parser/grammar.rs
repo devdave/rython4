@@ -1152,9 +1152,9 @@ parser! {
         // Literals
 
         // todo deal with + infinite loop here
-        rule strings() -> AST_String
+        rule strings() -> AstString
             = s:(str:tok(STRING, "STRING") t:&_ {( make_string(str), t) }
-                / str:fstring() t:&_ {(AST_String::Formatted(Box::new(str)), t)})+ {
+                / str:fstring() t:&_ {(AstString::Formatted(Box::new(str)), t)})+ {
                 make_strings(s)
             }
 
@@ -2825,18 +2825,18 @@ fn make_class_def(
     })
 }
 
-fn make_string(tok: TokenRef) -> AST_String {
-    AST_String::Simple(SimpleString {
+fn make_string(tok: TokenRef) -> AstString {
+    AstString::Simple(SimpleString {
         value: Box::new(tok.text.clone()),
 
     })
 }
 
-fn make_strings(s: Vec<(AST_String, TokenRef)>) -> AST_String {
+fn make_strings(s: Vec<(AstString, TokenRef)>) -> AstString {
     let mut strings = s.into_iter().rev();
     let (first, _) = strings.next().expect("no strings to make a string of");
     strings.fold(first, |acc, (str, _tok)| {
-        let ret: AST_String = AST_String::Concatenated(ConcatenatedString {
+        let ret: AstString = AstString::Concatenated(ConcatenatedString {
             left: Box::new(str),
             right: Box::new(acc),
         });

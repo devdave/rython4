@@ -17,7 +17,7 @@ pub use expression::{
     AssignTargetExpression,
     Subscript, BaseSlice, Index, Slice, SubscriptElement, ListComp, SetComp, DictComp, List, Set, Dict, DictElement,
     StarredDictElement, IfExp, Lambda, Parameters, Param, ParamStar, ParamSlash, StarArg, Yield, From, Await,
-    SimpleString, ConcatenatedString, AST_String, FormattedString, FormattedStringContent, FormattedStringText,
+    SimpleString, ConcatenatedString, AstString, FormattedString, FormattedStringContent, FormattedStringText,
     FormattedStringExpression, NamedExpr,
     NameOrAttribute,
     Expression,
