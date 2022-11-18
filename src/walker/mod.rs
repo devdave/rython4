@@ -2,7 +2,7 @@
 //  this is an experiment/toy to figure out how I am going to make a symbol table.
 
 
-use crate::ast::{Arg, Assert, AssignTarget, AssignTargetExpression, AST_String, Attribute, AugAssign, AugOp, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompFor, CompOp, CompoundStatement, DelTargetExpression, DictElement, Element, Else, Expression, For, FunctionDef, If, Import, ImportFrom, Match, MatchCase, MatchPattern, MatchSequence, NameOrAttribute, Parameters, Return, SimpleStatementSuite, Slice, SmallStatement, Statement, Subscript, Suite, UnaryOp, With, YieldValue};
+use crate::ast::{Arg, Assert, AssignTarget, AssignTargetExpression, AstString, Attribute, AugAssign, AugOp, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompFor, CompOp, CompoundStatement, DelTargetExpression, DictElement, Element, Else, Expression, For, FunctionDef, If, Import, ImportFrom, Match, MatchCase, MatchPattern, MatchSequence, NameOrAttribute, Parameters, Return, SimpleStatementSuite, Slice, SmallStatement, Statement, Subscript, Suite, UnaryOp, With, YieldValue};
 use crate::ast::Expression::BooleanOperation;
 use super::ast::Module;
 
@@ -21,7 +21,7 @@ pub fn parse_module(start: Module) {
 fn parse_attribute(attr: Attribute, depth: usize) {
     let prefix = INDENT.repeat(depth);
     parse_expression(*attr.value, depth);
-    println!("{:indent$}.{}", attr.attr.value, indent=depth);
+    println!("{}.{}", prefix, attr.attr.value);
 }
 
 fn parse_statement_enum(stm: Statement, depth: usize) {
@@ -29,13 +29,13 @@ fn parse_statement_enum(stm: Statement, depth: usize) {
 
     match stm {
         Statement::Simple(stm_simple) => {
-            println!("{:indent$}Small statement ->", prefix, indent=depth);
+            println!("{}Small statement ->", prefix);
             for sub_statement in stm_simple.body {
                 parse_smallstatement_enum(sub_statement, depth + 1);
             }
         }
         Statement::Compound(stm_comp) => {
-            println!("{:indent$}Compound statement ->", prefix, indent=depth);
+            println!("{}Compound statement ->", prefix);
             parse_compound_statement(stm_comp, depth + 1);
         }
     }
@@ -52,31 +52,31 @@ fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
             match if_expr {
                 If { test, body, orelse, is_elif } => {
                     if is_elif == true {
-                        println!("{:indent$} else if -> ", indent=depth);
+                        println!("{} else if -> ", prefix);
                     } else {
-                        println!("{:indent$} if -> ", indent=depth);
+                        println!("{} if -> ", prefix);
                     }
 
-                    println!("{:indent$}\t Test is -> ", indent=depth);
+                    println!("{}\t Test is -> ", prefix);
                     parse_expression(test, depth + 2);
 
-                    println!("{:indent$}\tBody ->", indent=depth);
+                    println!("{}\tBody ->", prefix);
                     parse_suite(body, depth + 2);
                 }
             }
         }
         CompoundStatement::For(for_expr) => {
-            println!("{:indent$} For ->", indent=depth);
+            println!("{} For ->", prefix);
 
             match for_expr {
                 For { target, iter, body, orelse, asynchronous } => {
                     if asynchronous == true {
-                        println!("{:indent$}\t Is async ->", indent=depth);
+                        println!("{}\t Is async ->", prefix);
                     }
 
                     parse_assign_target_expression(target, depth + 1);
 
-                    println!("{:indent$}\t in -> ", indent=depth);
+                    println!("{}\t in -> ", prefix);
                     parse_expression(iter, depth + 3);
 
 
@@ -86,7 +86,7 @@ fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
                         match orelse {
                             None => {}
                             Some(else_body) => {
-                                println!("{:indent$} or else ", indent=depth+1);
+                                println!("{} or else ", prefix);
                                 parse_suite(else_body.body, depth + 3);
                             }
                         }
@@ -95,40 +95,40 @@ fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
             }
         }
         CompoundStatement::While(while_expr) => {
-            println!("{:indent$} While ->", indent=depth);
+            println!("{} While ->", prefix);
             parse_expression(while_expr.test, depth + 1);
             parse_suite(while_expr.body, depth + 2);
             if while_expr.orelse != None {
-                println!("{:indent$} or else -> ", indent=depth+1);
+                println!("{} or else -> ", prefix);
                 parse_suite(while_expr.orelse.unwrap().body, depth + 2);
             }
         }
         CompoundStatement::ClassDef(clsdef) => {
-            println!("{:indent$}Class {:?} ->", clsdef.name.value, indent=depth);
+            println!("{}Class {:?} ->", prefix, clsdef.name.value);
             if clsdef.decorators.len() > 0 {
-                println!("{:indent$} Decorators -> ", indent=depth+1);
+                println!("{} Decorators -> ", prefix);
                 for decorator in clsdef.decorators {
                     parse_expression(decorator.decorator, depth + 2);
                 }
             }
             if clsdef.bases.len() > 0 {
-                println!("{:indent$} Bases -> ", indent=depth+1);
+                println!("{} Bases -> ", prefix);
                 parse_args(clsdef.bases, depth + 2);
             }
             if clsdef.keywords.len() > 0 {
-                println!("{:indent$} Keywords ->", indent=depth+1);
+                println!("{} Keywords ->", prefix);
                 parse_args(clsdef.keywords, depth + 2);
             }
-            println!("{:indent$} body -> ", indent=depth+1);
+            println!("{} body -> ", prefix);
             parse_suite(clsdef.body, depth + 1);
         }
         CompoundStatement::Try(try_expr) => {
-            println!("{:indent$}Try ->", indent=depth);
-            println!("{:indent$} body ->", indent=depth+1);
+            println!("{}Try ->", prefix);
+            println!("{}body ->", prefix);
             parse_suite(try_expr.body, depth + 2);
-            println!("{:indent$} handler/excepts -> ", indent=depth+1);
+            println!("{} handler/excepts -> ", prefix);
             for handler in try_expr.handlers {
-                println!("{:indent$} TODO try handler", indent=depth+2);
+                println!("{} TODO try handler", prefix);
             }
         }
         CompoundStatement::TryStar(try_star) => {
@@ -421,10 +421,10 @@ fn parse_smallstatement_enum(small: SmallStatement, depth: usize) {
                     AssignTarget { target } => {
                         match target {
                             AssignTargetExpression::Name(name) => {
-                                println!("{}\t\t name: {}", prefix, name.value);
+                                println!("{}\t name: {}", prefix, name.value);
                             }
                             AssignTargetExpression::Attribute(attr) => {
-                                println!("{}\t\t Attribute ->", prefix);
+                                println!("{}\t Attribute ->", prefix);
                                 parse_attribute(*attr, depth + 1);
                             }
                             AssignTargetExpression::StarredElement(starred) => {
@@ -960,13 +960,13 @@ fn parse_expression(expr: Expression, depth: usize) {
     }
 }
 
-fn parse_ast_String(ast_string: AST_String, depth: usize) {
+fn parse_ast_String(ast_string: AstString, depth: usize) {
     let prefix = INDENT.repeat(depth);
     match ast_string {
-        AST_String::Simple(simple_str) => {
+        AstString::Simple(simple_str) => {
             println!("{} Simple -> ", *simple_str.value);
         }
-        AST_String::Concatenated(concat) => {
+        AstString::Concatenated(concat) => {
             println!("{} Concatenated -> ", prefix);
             println!("{}\t left -> ", prefix);
             parse_ast_String(*concat.left, depth + 2);
@@ -974,7 +974,7 @@ fn parse_ast_String(ast_string: AST_String, depth: usize) {
             println!("{}\t right -> ", prefix);
             parse_ast_String(*concat.right, depth + 2);
         }
-        AST_String::Formatted(fstring) => {
+        AstString::Formatted(fstring) => {
             println!("{} F-String -> ", prefix);
             println!("TODO");
             //TODO
