@@ -333,7 +333,10 @@ fn parse_parameters(params: Parameters, depth: usize) {
     }
 
     if params.star_arg.is_some() {
-        println!("{} * star catchall", prefix);
+        let star_param = params.star_arg.unwrap();
+        println!("{} * star catchall => {:#?}", prefix, star_param);
+
+
     }
 
     if params.star_kwarg.is_some() {
