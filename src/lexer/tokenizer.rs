@@ -282,6 +282,9 @@ impl Tokenizer {
                     let sym = code.get_char().expect("symbol");
                     found.push(sym);
                 },
+                Some('8'..='9') => {
+                    return Err(TokError::BadOctalDigit(code.peek_char().unwrap()))
+                }
                 Some(' ') | Some('\n') | Some('#') | Some('\\') => {
                     //Finished the hexidecimal
                     return Ok(Some(found));
