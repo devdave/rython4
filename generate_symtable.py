@@ -24,8 +24,6 @@ def walk_table(st: symtable.SymbolTable, depth=0):
 
 
 
-
-
 def describe_symbol(sym: symtable.Symbol, depth=0):
     def print_d(txt, *args):
         prefix = " " * depth
