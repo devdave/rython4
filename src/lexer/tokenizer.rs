@@ -9,7 +9,6 @@ use std::io::Read;
 
 
 use crate::cleaner;
-// use crate::lexer::tokenizer::StringType::TripleQuote;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
@@ -598,6 +597,7 @@ impl Tokenizer {
                 },
                 _ => {
                     //unexpected char!
+                    //Return what we found so far
                     return Ok(Some(found));
                 }
             }
@@ -1130,21 +1130,6 @@ impl Tokenizer {
                     }
                 }
             }
-            //Look for comments
-            // else if let Some((_, _)) = code.return_match(COMMENT.to_owned()) {
-            //     //Don't add comments into product
-            //     //Try to consume the newline
-            //     match code.peek_char() {
-            //         Some('\n') => {
-            //             code.get_char();
-            //             if product.len() > 0 && is_statement == true && state.paren_depth.len() == 0 {
-            //                 product.push(Token::quick(TType::NL, lineno, col_pos, code.position()-1, "".to_string()));
-            //             }
-            //         },
-            //         _ => {}
-            //     }
-            //     //product.push(Token::quick(TType::Comment, lineno, col_pos, new_pos, found));
-            // }
             else {
                 if let Some(sym) = code.get_char() {
                     if sym == ' ' {
