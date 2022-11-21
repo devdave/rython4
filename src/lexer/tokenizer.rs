@@ -4,33 +4,13 @@ use std::cmp::Ordering;
 use std::io::Read;
 
 
-
-
-
-
 use crate::cleaner;
 use crate::tokens::{Position, Token, TokError, TType, OPERATOR_RE};
 use super::code_line::CodeLine;
 
 use crate::tokens::patterns::{
-                            // NAME_RE,
-                            // COMMENT,
                             BL_COMMENT,
-                            // FLOATING_POINT,
-                            // POSSIBLE_NAME,
-                            // POSSIBLE_ONE_CHAR_NAME,
                             SPACE_TAB_FORMFEED_RE,
-                          // NUMBER,
-                          // CAPTURE_QUOTE_STRING,
-                          // CAPTURE_APOS_STRING,
-                          // TRIPLE_QUOTE_START,
-                          // TRIPLE_QUOTE_CLOSE,
-                          // TRIPLE_SINGLE_START,
-                          // TRIPLE_SINGLE_CLOSE,
-                          // CAPTURE_TRIPLE_STRING,
-                          // ANY_NAME,
-                        // SINGLE_APOS_CLOSE,
-                        // SINGLE_QUOTE_CLOSE,
 };
 
 use super::operators::{is_onechar_opcode, is_twochar_op, is_threechar_op};
