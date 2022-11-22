@@ -82,7 +82,9 @@ fn parse_statement_enum(stm: Statement, depth: usize) {
     }
 }
 
-fn visit_if_expr(if_expr{ test, body, orelse, is_elif}: If) {
+fn visit_if_expr(If{ test, body, orelse, is_elif}: If, depth: usize) {
+    let prefix = INDENT.repeat(depth);
+
     if is_elif == true {
         println!("{} else if -> ", prefix);
     } else {
