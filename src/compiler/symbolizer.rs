@@ -2,7 +2,7 @@
 // assembler for a symbol table.
 
 
-use crate::ast::AssignTarget;
+use crate::ast::{AssignTarget, OrElse};
 use crate::ast::Assert;
 use crate::ast::Arg;
 use crate::ast::AssignTargetExpression;
@@ -81,6 +81,34 @@ fn parse_statement_enum(stm: Statement, depth: usize) {
     }
 }
 
+fn visit_if_expr(if_expr{ test, body, orelse, is_elif}: If) {
+    if is_elif == true {
+        println!("{} else if -> ", prefix);
+    } else {
+        println!("{} if -> ", prefix);
+    }
+
+    println!("{}\t Test is -> ", prefix);
+    parse_expression(test, depth + 2);
+
+    println!("{}\tBody ->", prefix);
+    parse_suite(body, depth + 2);
+
+    if orelse.is_some() {
+        let or_else_block =  *orelse.unwrap();
+        match or_else_block {
+            OrElse::Elif(if_expr) => {
+                visit_if_expr(if_expr);
+            }
+            OrElse::Else(_) => {}
+        }
+
+
+
+
+    }
+}
+
 fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
     let prefix = INDENT.repeat(depth);
 
@@ -89,19 +117,10 @@ fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
             parse_def(fdef, depth + 1);
         }
         CompoundStatement::If(if_expr) => {
+            visit visit_if_expr(if_expr);
             match if_expr {
                 If { test, body, orelse, is_elif } => {
-                    if is_elif == true {
-                        println!("{} else if -> ", prefix);
-                    } else {
-                        println!("{} if -> ", prefix);
-                    }
 
-                    println!("{}\t Test is -> ", prefix);
-                    parse_expression(test, depth + 2);
-
-                    println!("{}\tBody ->", prefix);
-                    parse_suite(body, depth + 2);
                 }
             }
         }
