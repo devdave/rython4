@@ -3,6 +3,7 @@
 
 
 use crate::ast::{Arg, Assert, AssignTarget, AssignTargetExpression, AstString, Attribute, AugAssign, AugOp, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompFor, CompOp, CompoundStatement, DelTargetExpression, DictElement, Element, Else, Expression, For, FunctionDef, If, Import, ImportFrom, Match, MatchCase, MatchPattern, MatchSequence, NameOrAttribute, Parameters, Return, SimpleStatementSuite, Slice, SmallStatement, Statement, Subscript, Suite, UnaryOp, With, YieldValue};
+use crate::ast::ImportAlias;
 use crate::ast::Expression::BooleanOperation;
 use super::ast::Module;
 
@@ -1027,5 +1028,8 @@ fn parse_assert(stm: Assert, depth: usize) {
 fn parse_import(import: Import, depth: usize) {
     let prefix = INDENT.repeat(depth);
 
-    for name in import.names {}
+    for ImportAlias{ name, asname } in import.names {
+        
+
+    }
 }
