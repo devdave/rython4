@@ -1,7 +1,7 @@
 //Originally copied from crate::walker::mod this will be turned into a
 // assembler for a symbol table.
 
-
+use crate::ast;
 use crate::ast::{AssignTarget, OrElse};
 use crate::ast::Assert;
 use crate::ast::Arg;
@@ -44,7 +44,8 @@ use crate::ast::UnaryOp;
 use crate::ast::With;
 use crate::ast::YieldValue;
 use crate::ast::Expression::BooleanOperation;
-use super::ast::Module;
+use crate::ast::Module;
+
 
 const INDENT: &str = "  ";
 
