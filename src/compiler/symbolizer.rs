@@ -101,7 +101,7 @@ fn visit_if_expr(If{ test, body, orelse, is_elif}: If, depth: usize) {
         let or_else_block =  *orelse.unwrap();
         match or_else_block {
             OrElse::Elif(if_expr) => {
-                visit_if_expr(if_expr);
+                visit_if_expr(if_expr, depth+1);
             }
             OrElse::Else(_) => {}
         }
@@ -120,12 +120,7 @@ fn parse_compound_statement(stm_compound: CompoundStatement, depth: usize) {
             parse_def(fdef, depth + 1);
         }
         CompoundStatement::If(if_expr) => {
-            visit visit_if_expr(if_expr);
-            match if_expr {
-                If { test, body, orelse, is_elif } => {
-
-                }
-            }
+            visit_if_expr(if_expr, depth+1);
         }
         CompoundStatement::For(for_expr) => {
             println!("{} For ->", prefix);
