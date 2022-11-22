@@ -2,7 +2,47 @@
 // assembler for a symbol table.
 
 
-use crate::ast::{Arg, Assert, AssignTarget, AssignTargetExpression, AstString, Attribute, AugAssign, AugOp, BaseSlice, BinaryOp, BooleanOp, ComparisonTarget, CompFor, CompOp, CompoundStatement, DelTargetExpression, DictElement, Element, Else, Expression, For, FunctionDef, If, Import, ImportFrom, Match, MatchCase, MatchPattern, MatchSequence, NameOrAttribute, Parameters, Return, SimpleStatementSuite, Slice, SmallStatement, Statement, Subscript, Suite, UnaryOp, With, YieldValue};
+use crate::ast::AssignTarget;
+use crate::ast::Assert;
+use crate::ast::Arg;
+use crate::ast::AssignTargetExpression;
+use crate::ast::AstString;
+use crate::ast::Attribute;
+use crate::ast::AugAssign;
+use crate::ast::AugOp;
+use crate::ast::BaseSlice;
+use crate::ast::BinaryOp;
+use crate::ast::BooleanOp;
+use crate::ast::ComparisonTarget;
+use crate::ast::CompFor;
+use crate::ast::CompOp;
+use crate::ast::CompoundStatement;
+use crate::ast::DelTargetExpression;
+use crate::ast::DictElement;
+use crate::ast::Element;
+use crate::ast::Else;
+use crate::ast::Expression;
+use crate::ast::For;
+use crate::ast::FunctionDef;
+use crate::ast::If;
+use crate::ast::Import;
+use crate::ast::ImportFrom;
+use crate::ast::Match;
+use crate::ast::MatchCase;
+use crate::ast::MatchPattern;
+use crate::ast::MatchSequence;
+use crate::ast::NameOrAttribute;
+use crate::ast::Parameters;
+use crate::ast::Return;
+use crate::ast::SimpleStatementSuite;
+use crate::ast::Slice;
+use crate::ast::SmallStatement;
+use crate::ast::Statement;
+use crate::ast::Subscript;
+use crate::ast::Suite;
+use crate::ast::UnaryOp;
+use crate::ast::With;
+use crate::ast::YieldValue;
 use crate::ast::Expression::BooleanOperation;
 use super::ast::Module;
 
@@ -231,7 +271,9 @@ fn parse_match_case_pattern(mpattern: &MatchPattern, depth: usize) {
         }
         MatchPattern::Sequence(seq) => {
             match seq {
-                MatchSequence::MatchList(list) => {}
+                MatchSequence::MatchList(list) => {
+
+                }
                 MatchSequence::MatchTuple(tpl) => {}
             }
         }
