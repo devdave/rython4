@@ -29,21 +29,8 @@ pub enum NameOrAttribute {
     A(Box<Attribute>),
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Integer {
-    //Because it can be 1234 and 1_234 it must be stored as a string
-    pub value: std::string::String,
-}
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Float {
-    pub value: std::string::String,
-}
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Binary {
-    pub value: std::string::String,
-}
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BinaryOperation {
     pub left: Box<Expression>,
@@ -59,15 +46,7 @@ pub struct BooleanOperation {
     pub right: Box<Expression>,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Hexidecimal {
-    pub value: std::string::String,
-}
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Imaginary {
-    pub value: std::string::String,
-}
 
 // Semi-atomic/more complex nodes
 #[derive(Debug, PartialEq, Eq, Clone)]
