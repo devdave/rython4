@@ -10,6 +10,8 @@ use super::statement::Annotation;
 
 use super::traits::WithComma;
 
+use super::numbers::{Hexidecimal, Imaginary, Integer, Binary, Float};
+
 type TokenRef = Rc<Token>;
 
 // Atomic nodes
