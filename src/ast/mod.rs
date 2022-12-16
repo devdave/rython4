@@ -11,8 +11,10 @@ mod whitespace;
 
 pub use module::Module;
 
+pub use numbers::{Integer, Float, Imaginary, Hexidecimal};
+
 pub use expression::{
-    Comma, Name, Integer, Float, Binary, Hexidecimal, Imaginary, Comparison, ComparisonTarget, Element, StarredElement,
+    Comma, Name, Comparison, ComparisonTarget, Element, StarredElement,
     Arg, Attribute, Tuple, Call, GeneratorExp, CompFor, CompIf,
     AssignTargetExpression,
     Subscript, BaseSlice, Index, Slice, SubscriptElement, ListComp, SetComp, DictComp, List, Set, Dict, DictElement,
